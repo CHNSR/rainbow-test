@@ -148,6 +148,7 @@ class _OrderPagesState extends State<OrderPages> {
                   unselectedLabelColor: Colors.black,
                   dividerColor: Colors.transparent,
                   dividerHeight: 0,
+                  labelPadding: const EdgeInsets.all(10),
                   tabs: categories
                       .map((e) => Tab(text: e.foodSetName))
                       .toList(),
@@ -302,23 +303,6 @@ class _OrderPagesState extends State<OrderPages> {
           ),
         );
       },
-    );
-  }
-
-  Widget _subCategoryChip(String title, bool selected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: selected ? Colors.blue.shade100 : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-          color: selected ? Colors.blue : Colors.black54,
-        ),
-      ),
     );
   }
 }
