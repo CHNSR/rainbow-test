@@ -1,0 +1,22 @@
+# Flutter build & tool
+.dart_tool/
+build/
+
+# iOS pods
+ios/Pods/
+ios/.symlinks/
+
+# Android local config
+android/local.properties
+android/.gradle/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

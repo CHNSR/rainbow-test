@@ -1,0 +1,10 @@
+To day task
+- BLoC First page | pass
+- sidebar 0.3 | pass
+- Flexible text | pass
+- use data with json | inprogress
+- slider func | pass
+- search func
+- cart func (use BLoC)
+- Setting func
+- bottom 0.2 | pass
