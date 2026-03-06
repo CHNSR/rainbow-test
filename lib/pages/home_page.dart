@@ -111,15 +111,37 @@ class _HomePageState extends State<HomePage> {
 
                     Container(
                       color: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.credit_card, color: Colors.red),
-                          SizedBox(width: 8),
                           Flexible(
-                            child: Text(
-                              "Accept only Credit Card",
-                              style: TextStyle(color: Colors.red),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Icon(
+                                Icons.credit_card,
+                                color: Colors.red,
+                                size: 50,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 8),
+
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: const Text(
+                                "Accept only Credit Card",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ),
                         ],

@@ -21,3 +21,4 @@ To day task
 - search func | pass
 - Setting func
 - cart func (use BLoC)
+- responsive ui
