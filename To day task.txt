@@ -2,9 +2,22 @@ To day task
 - BLoC First page | pass
 - sidebar 0.3 | pass
 - Flexible text | pass
-- use data with json | inprogress
 - slider func | pass
-- search func
-- cart func (use BLoC)
-- Setting func
 - bottom 0.2 | pass
+- use data with json | inprogress
+- search func
+- Setting func
+- cart func (use BLoC)
+
+day 3
+To day task
+- BLoC First page | pass
+- sidebar 0.3 | pass
+- Flexible text | pass
+- slider func | pass
+- bottom 0.2 | pass
+- use data with json | pass
+- grid menu | pass
+- search func | pass
+- Setting func
+- cart func (use BLoC)

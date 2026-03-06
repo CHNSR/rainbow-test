@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/model/food_category.dart';
+
+class SubCategoryBar extends StatelessWidget {
+  final List<SubFoodCategory> categories;
+  final String? selectedCategoryId;
+  final Function(String) onSelect;
+
+  const SubCategoryBar({
+    super.key,
+    required this.categories,
+    required this.selectedCategoryId,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final isSelected = category.foodCatId == selectedCategoryId;
+
+          return GestureDetector(
+            onTap: () => onSelect(category.foodCatId!),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.blue : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                category.foodCatName ?? "",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isSelected ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

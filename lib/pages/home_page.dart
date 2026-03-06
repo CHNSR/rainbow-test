@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/select_order_type.dart';
-import 'package:flutter_application_1/widgets/bottom_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -81,12 +80,23 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
 
                   children: [
-                    Text(
-                      "Self-Service\nExperience.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+                    MediaQuery(
+                      data: MediaQuery.of(context),
+                      child: Builder(
+                        builder: (context) {
+                          print(
+                            "${MediaQuery.of(context).size.width} x ${MediaQuery.of(context).size.height}",
+                          );
+                          return Text(
+                            "Self-Service\nExperience.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width / 20,
+                              //fontSize: 60,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
                       ),
                     ),
 
@@ -99,16 +109,21 @@ class _HomePageState extends State<HomePage> {
 
                     SizedBox(height: 8),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.credit_card, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text(
-                          "Accept only Credit Card",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ],
+                    Container(
+                      color: Colors.green,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.credit_card, color: Colors.red),
+                          SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              "Accept only Credit Card",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     SizedBox(height: 24),

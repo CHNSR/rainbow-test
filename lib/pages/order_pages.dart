@@ -1,7 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/menu_filter.dart';
 import 'package:flutter_application_1/model/food_category.dart';
+import 'package:flutter_application_1/model/food_menu.dart';
 import 'package:flutter_application_1/service/food_service.dart';
+import 'package:flutter_application_1/widgets/order_page/category_tabs.dart';
+import 'package:flutter_application_1/widgets/order_page/menu_grid.dart';
+import 'package:flutter_application_1/widgets/order_page/search_widget.dart';
+import 'package:flutter_application_1/widgets/order_page/sub_category_tabs.dart';
+import 'package:flutter_application_1/widgets/order_page/topbar.dart';
 
 class OrderPages extends StatefulWidget {
   const OrderPages({super.key});
@@ -11,15 +18,69 @@ class OrderPages extends StatefulWidget {
 }
 
 class _OrderPagesState extends State<OrderPages> {
+  List<FoodSet> sets = [];
   List<SubFoodCategory> categories = [];
+  List<FoodMenu> menus = [];
 
-  void loadCategory() async {
+  String? selectedSetId;
+  String? selectedCategoryId;
+  String searchText = "";
+
+  bool isLoading = true;
+  final AutoSizeGroup nameGroup = AutoSizeGroup();
+  final AutoSizeGroup descGroup = AutoSizeGroup();
+  final AutoSizeGroup priceGroup = AutoSizeGroup();
+  bool showSearchBar = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  //filter menu ตาม set, category, search
+  List<FoodMenu> get filteredMenus {
+    return MenuFilter.filterMenus(
+      menus: menus,
+      foodSetId: selectedSetId,
+      foodCatId: selectedCategoryId,
+      searchText: searchText,
+    );
+  }
+
+  List<SubFoodCategory> get filteredCategories {
+    return categories.where((c) => c.foodCatId == selectedSetId).toList();
+  }
+
+  void loadData() async {
+    sets = await FoodService.parseFoodSet();
     categories = await FoodService.parseFoodCategory();
-    setState(() {});
+    menus = await FoodService.parseFoodMenu();
+
+    if (sets.isNotEmpty) {
+      // set ตัวแรก
+      selectedSetId = sets.first.foodSetId;
+
+      // menu ของ set นี้
+      final menusInSet = menus
+          .where((m) => m.foodSetId == selectedSetId)
+          .toList();
+
+      if (menusInSet.isNotEmpty) {
+        selectedCategoryId = menusInSet.first.foodCatId;
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       body: Stack(
         children: [
@@ -31,10 +92,47 @@ class _OrderPagesState extends State<OrderPages> {
                   flex: 3,
                   child: Column(
                     children: [
-                      _buildTopBar(),
-                      _buildCategoryTabs(),
-                      _buildSubCategoryTabs(),
-                      Expanded(child: _buildMenuGrid()),
+                      TopBar(
+                        showSearchBar: showSearchBar,
+                        onToggleSearch: () {
+                          setState(() {
+                            showSearchBar = !showSearchBar;
+                          });
+                        },
+                        onSearchChanged: (value) {
+                          setState(() {
+                            searchText = value;
+                          });
+                        },
+                      ),
+
+                      CategoryBar(
+                        sets: sets,
+                        selectedSetId: selectedSetId,
+                        onSelect: (setId) {
+                          setState(() {
+                            selectedSetId = setId;
+
+                            final menusInSet = menus
+                                .where((m) => m.foodSetId == selectedSetId)
+                                .toList();
+
+                            if (menusInSet.isNotEmpty) {
+                              selectedCategoryId = menusInSet.first.foodCatId;
+                            }
+                          });
+                        },
+                      ),
+                      SubCategoryBar(
+                        categories: filteredCategories,
+                        selectedCategoryId: selectedCategoryId,
+                        onSelect: (catId) {
+                          setState(() {
+                            selectedCategoryId = catId;
+                          });
+                        },
+                      ),
+                      Expanded(child: MenuGrid(foods: filteredMenus)),
                     ],
                   ),
                 ),
@@ -54,110 +152,6 @@ class _OrderPagesState extends State<OrderPages> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTopBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.arrow_back),
-            label: const Text("Back"),
-          ),
-          const Spacer(),
-          const Icon(Icons.search),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuGrid() {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.8,
-      ),
-      itemCount: 8,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(blurRadius: 6, color: Colors.black.withOpacity(0.1)),
-            ],
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  child: Container(color: Colors.grey.shade300),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(8),
-                child: Text("Food Name"),
-              ),
-              const Text("\$12.95"),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCategoryTabs() {
-    return FutureBuilder<List<FoodSet>>(
-      future: FoodService.parseFoodSet(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return const Text("Error loading categories");
-        }
-
-        final categories = snapshot.data!;
-
-        return DefaultTabController(
-          length: categories.length,
-          child: Column(
-            children: [
-              /// TAB BAR
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TabBar(
-                  isScrollable: true,
-                  indicatorColor: Colors.transparent,
-                  indicator: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.black,
-                  dividerColor: Colors.transparent,
-                  dividerHeight: 0,
-                  labelPadding: const EdgeInsets.all(10),
-                  tabs: categories
-                      .map((e) => Tab(text: e.foodSetName))
-                      .toList(),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -245,64 +239,6 @@ class _OrderPagesState extends State<OrderPages> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSubCategoryTabs() {
-    return FutureBuilder<List<SubFoodCategory>>(
-      future: FoodService.parseFoodCategory(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return const Text("Error loading categories");
-        }
-
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text("No categories");
-        }
-
-        final subcategories = snapshot.data!;
-
-        return DefaultTabController(
-          length: subcategories.length,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: TabBar(
-              isScrollable: true,
-
-              indicatorColor: Colors.transparent,
-
-              indicator: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(10),
-              ),
-
-              indicatorSize: TabBarIndicatorSize.tab,
-
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.black,
-
-              labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-
-              dividerColor: Colors.transparent,
-
-              tabs: subcategories
-                  .map(
-                    (category) => Tab(
-                      child: Text(
-                        category.foodCatName,
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-        );
-      },
     );
   }
 }
