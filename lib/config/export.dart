@@ -11,6 +11,8 @@ export 'package:flutter_application_1/pages/order_pages.dart';
 export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
 export 'package:flutter_application_1/pages/store_management_page.dart';
+export 'package:flutter_application_1/pages/setting_page.dart';
+export 'package:flutter_application_1/pages/store_management_page.dart';
 
 // ==============================================================================
 // 🔷 MODEL EXPORTS

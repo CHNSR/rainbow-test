@@ -27,19 +27,38 @@ class _HomePageState extends State<HomePage> {
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.language),
-            onSelected: (value) {},
+            onSelected: (value) {
+              switch (value) {
+                case "english":
+                  // TODO: implement language selection
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Language set to English")),
+                  );
+                  break;
+                case "setting":
+                  AppNavigator.goToSetting(context);
+                  break;
+                case "store management":
+                  AppNavigator.goToStoreManagement(context);
+                  break;
+                case "exit":
+                  // Close the application
+                  Navigator.of(context).pop();
+                  break;
+              }
+            },
             itemBuilder: (context) => const [
               PopupMenuItem(
                 value: "english",
                 child: Text("English", style: TextStyle(fontSize: 12)),
               ),
               PopupMenuItem(
-                value: "seting",
+                value: "setting",
                 child: Text("Setting", style: TextStyle(fontSize: 12)),
               ),
               PopupMenuItem(
                 value: "store management",
-                child: Text("Store Managament", style: TextStyle(fontSize: 12)),
+                child: Text("Store Management", style: TextStyle(fontSize: 12)),
               ),
               PopupMenuItem(
                 value: 'exit',

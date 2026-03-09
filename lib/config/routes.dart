@@ -27,11 +27,11 @@ class AppRouter {
       case AppRoutes.order:
         return MaterialPageRoute(builder: (_) => const OrderPages());
 
-      // case AppRoutes.setting:
-      //   return MaterialPageRoute(builder: (_) => const SettingPage());
+      case AppRoutes.setting:
+        return MaterialPageRoute(builder: (_) => const SettingPage());
 
-      // case AppRoutes.storeManagement:
-      //   return MaterialPageRoute(builder: (_) => const StoreManagementPage());
+      case AppRoutes.storeManagement:
+        return MaterialPageRoute(builder: (_) => const StoreManagementPage());
 
       default:
         return MaterialPageRoute(
