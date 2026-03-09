@@ -4,8 +4,15 @@ import 'package:flutter_application_1/widgets/order_page/menu_card.dart';
 
 class MenuGrid extends StatelessWidget {
   final List<FoodMenu> foods;
+  final ScrollController? scrollController;
+  final Function(FoodMenu)? onAddToCart;
 
-  const MenuGrid({super.key, required this.foods});
+  const MenuGrid({
+    super.key,
+    required this.foods,
+    this.scrollController,
+    this.onAddToCart,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +25,7 @@ class MenuGrid extends StatelessWidget {
     }
 
     return GridView.builder(
+      controller: scrollController,
       padding: const EdgeInsets.all(10),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
@@ -29,7 +37,7 @@ class MenuGrid extends StatelessWidget {
       itemBuilder: (context, i) {
         final food = foods[i];
 
-        return MenuCard(food: food);
+        return MenuCard(food: food, onAddToCart: () => onAddToCart?.call(food));
       },
     );
   }

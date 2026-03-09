@@ -8,3 +8,11 @@ class SetOrderType extends OrderEvent {
 
   SetOrderType(this.orderType);
 }
+
+// Event สำหรับยืนยันการสั่งซื้อ
+class ConfirmOrderEvent extends OrderEvent {
+  final String foodSetId;
+  final List<CartItem> cartItems;
+
+  ConfirmOrderEvent({required this.foodSetId, required this.cartItems});
+}

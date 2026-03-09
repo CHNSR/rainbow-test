@@ -7,30 +7,30 @@ class MenuFilter {
     String? foodCatId,
     String searchText = "",
   }) {
-    var result = menus;
+    final query = searchText.trim().toLowerCase();
 
-    /// filter foodSet
-    if (foodSetId != null) {
-      result = result.where((m) => m.foodSetId == foodSetId).toList();
-    }
+    return menus.where((m) {
+      /// filter foodSet
+      if (foodSetId != null && m.foodSetId != foodSetId) {
+        return false;
+      }
 
-    /// filter category
-    if (foodCatId != null) {
-      result = result.where((m) => m.foodCatId == foodCatId).toList();
-    }
+      /// filter category
+      if (foodCatId != null && m.foodCatId != foodCatId) {
+        return false;
+      }
 
-    /// filter search
-    if (searchText.isNotEmpty) {
-      final query = searchText.toLowerCase();
-
-      result = result.where((m) {
+      /// filter search
+      if (query.isNotEmpty) {
         final name = (m.foodName ?? "").toLowerCase();
         final desc = (m.foodDesc ?? "").toLowerCase();
 
-        return name.contains(query) || desc.contains(query);
-      }).toList();
-    }
+        if (!name.contains(query) && !desc.contains(query)) {
+          return false;
+        }
+      }
 
-    return result;
+      return true;
+    }).toList();
   }
 }

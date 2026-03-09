@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/select_order_type.dart';
+import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/utils/responsive.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -109,44 +110,8 @@ class _HomePageState extends State<HomePage> {
 
                     SizedBox(height: 8),
 
-                    Container(
-                      color: Colors.green,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Icon(
-                                Icons.credit_card,
-                                color: Colors.red,
-                                size: 50,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 8),
-
-                          Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: const Text(
-                                "Accept only Credit Card",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // ✅ ใช้ responsive helper class
+                    const CreditCardInfoCard(),
 
                     SizedBox(height: 24),
 
@@ -162,12 +127,7 @@ class _HomePageState extends State<HomePage> {
                         backgroundColor: Colors.blueAccent,
                       ),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SelectOrderType(),
-                          ),
-                        );
+                        AppNavigator.goToSelectOrderType(context);
                       },
                       child: const Text(
                         "Tap to Order",

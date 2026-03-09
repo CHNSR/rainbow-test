@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/bottom_sheet.dart';
-import 'package:flutter_application_1/widgets/select_catagory.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 class SelectOrderType extends StatefulWidget {
   const SelectOrderType({super.key});

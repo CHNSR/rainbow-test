@@ -1,14 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/menu_filter.dart';
-import 'package:flutter_application_1/model/food_category.dart';
-import 'package:flutter_application_1/model/food_menu.dart';
-import 'package:flutter_application_1/service/food_service.dart';
-import 'package:flutter_application_1/widgets/order_page/category_tabs.dart';
-import 'package:flutter_application_1/widgets/order_page/menu_grid.dart';
-import 'package:flutter_application_1/widgets/order_page/search_widget.dart';
-import 'package:flutter_application_1/widgets/order_page/sub_category_tabs.dart';
-import 'package:flutter_application_1/widgets/order_page/topbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 class OrderPages extends StatefulWidget {
   const OrderPages({super.key});
@@ -21,6 +14,7 @@ class _OrderPagesState extends State<OrderPages> {
   List<FoodSet> sets = [];
   List<SubFoodCategory> categories = [];
   List<FoodMenu> menus = [];
+  List<CartItem> cartItems = [];
 
   String? selectedSetId;
   String? selectedCategoryId;
@@ -32,10 +26,19 @@ class _OrderPagesState extends State<OrderPages> {
   final AutoSizeGroup priceGroup = AutoSizeGroup();
   bool showSearchBar = false;
 
+  late ScrollController _menuScrollController;
+
   @override
   void initState() {
     super.initState();
+    _menuScrollController = ScrollController();
     loadData();
+  }
+
+  @override
+  void dispose() {
+    _menuScrollController.dispose();
+    super.dispose();
   }
 
   //filter menu ตาม set, category, search
@@ -49,7 +52,20 @@ class _OrderPagesState extends State<OrderPages> {
   }
 
   List<SubFoodCategory> get filteredCategories {
-    return categories.where((c) => c.foodCatId == selectedSetId).toList();
+    if (selectedSetId == null) {
+      return [];
+    }
+
+    // ได้ foodCatId ทั้งหมดจาก menu ที่อยู่ใน set นี้
+    final foodCatsInSet = menus
+        .where((m) => m.foodSetId == selectedSetId)
+        .map((m) => m.foodCatId)
+        .toSet();
+
+    // Filter categories ให้เฉพาะที่มี foodCatId ใน set นี้
+    return categories
+        .where((c) => foodCatsInSet.contains(c.foodCatId))
+        .toList();
   }
 
   void loadData() async {
@@ -57,6 +73,7 @@ class _OrderPagesState extends State<OrderPages> {
     categories = await FoodService.parseFoodCategory();
     menus = await FoodService.parseFoodMenu();
 
+    // Set default: category แรก และ sub-category แรก
     if (sets.isNotEmpty) {
       // set ตัวแรก
       selectedSetId = sets.first.foodSetId;
@@ -74,6 +91,49 @@ class _OrderPagesState extends State<OrderPages> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  void addToCart(FoodMenu food) {
+    setState(() {
+      // ตรวจสอบว่า item นี้มีใน cart แล้วหรือไม่
+      final existingIndex = cartItems.indexWhere(
+        (item) => item.food.foodId == food.foodId,
+      );
+
+      if (existingIndex != -1) {
+        // ถ้ามีแล้ว เพิ่มจำนวน
+        cartItems[existingIndex].quantity++;
+      } else {
+        // ถ้าไม่มี เพิ่ม item ใหม่
+        cartItems.add(CartItem(food: food, quantity: 1));
+      }
+    });
+  }
+
+  double get cartTotal {
+    return cartItems.fold(0, (sum, item) => sum + item.totalPrice);
+  }
+
+  void confirmOrder() {
+    // ส่ง event ไป BLoC
+    if (cartItems.isNotEmpty && selectedSetId != null) {
+      context.read<OrderBloc>().add(
+        ConfirmOrderEvent(foodSetId: selectedSetId!, cartItems: cartItems),
+      );
+
+      // ล้าง cart หลังสั่งซื้อ
+      setState(() {
+        cartItems.clear();
+      });
+
+      // Optional: แสดง snackbar ให้ user เห็น
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Order confirmed!"),
+          duration: Duration(milliseconds: 1500),
+        ),
+      );
+    }
   }
 
   @override
@@ -121,6 +181,12 @@ class _OrderPagesState extends State<OrderPages> {
                               selectedCategoryId = menusInSet.first.foodCatId;
                             }
                           });
+                          // Scroll ไปยัง item แรก
+                          _menuScrollController.animateTo(
+                            0.0,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
                         },
                       ),
                       SubCategoryBar(
@@ -130,9 +196,21 @@ class _OrderPagesState extends State<OrderPages> {
                           setState(() {
                             selectedCategoryId = catId;
                           });
+                          // Scroll ไปยัง item แรก
+                          _menuScrollController.animateTo(
+                            0.0,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
                         },
                       ),
-                      Expanded(child: MenuGrid(foods: filteredMenus)),
+                      Expanded(
+                        child: MenuGrid(
+                          foods: filteredMenus,
+                          scrollController: _menuScrollController,
+                          onAddToCart: addToCart,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -172,18 +250,108 @@ class _OrderPagesState extends State<OrderPages> {
 
           const Divider(),
 
-          const Expanded(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: AutoSizeText(
-                  "No order selected",
-                  maxLines: 1,
-                  minFontSize: 8,
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-            ),
+          // Cart Items List
+          Expanded(
+            child: cartItems.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: AutoSizeText(
+                        "No order selected",
+                        maxLines: 1,
+                        minFontSize: 8,
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: cartItems.length,
+                    itemBuilder: (context, index) {
+                      final cartItem = cartItems[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    cartItem.food.foodName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    "\$${cartItem.food.foodPrice.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 60,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (cartItem.quantity > 1) {
+                                          cartItem.quantity--;
+                                        } else {
+                                          cartItems.removeAt(index);
+                                        }
+                                      });
+                                    },
+                                    child: const Text(
+                                      "-",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "${cartItem.quantity}",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        cartItem.quantity++;
+                                      });
+                                    },
+                                    child: const Text(
+                                      "+",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
           ),
 
           const Divider(),
@@ -194,39 +362,45 @@ class _OrderPagesState extends State<OrderPages> {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    AutoSizeText(
+                  children: [
+                    const AutoSizeText(
                       "Subtotal",
                       maxLines: 1,
                       minFontSize: 8,
                       style: TextStyle(color: Colors.black, fontSize: 14),
                     ),
                     AutoSizeText(
-                      "\$0.00",
+                      "\$${cartTotal.toStringAsFixed(2)}",
                       maxLines: 1,
                       minFontSize: 8,
-                      style: TextStyle(color: Colors.black, fontSize: 14),
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: confirmOrder,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.grey.shade500,
+                    backgroundColor: cartItems.isEmpty
+                        ? Colors.grey.shade500
+                        : Colors.lightGreen,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: const Text(
-                      "Confirm Order (0)",
+                    child: Text(
+                      "Confirm Order (${cartItems.length})",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

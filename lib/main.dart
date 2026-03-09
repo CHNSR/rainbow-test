@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/bloc/order_state_bloc/tap_to_order_bloc.dart';
-import 'package:flutter_application_1/pages/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [BlocProvider(create: (context) => OrderBloc())],
-
-      child: MainApp(),
+      child: const MainApp(),
     ),
   );
 }
@@ -18,9 +16,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: const HomePage(),
+      onGenerateRoute: AppRouter.generateRoute,
+      initialRoute: AppRoutes.home,
     );
   }
 }
