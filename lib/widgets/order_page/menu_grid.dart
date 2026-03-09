@@ -36,7 +36,6 @@ class MenuGrid extends StatelessWidget {
       itemCount: foods.length,
       itemBuilder: (context, i) {
         final food = foods[i];
-
         return MenuCard(food: food, onAddToCart: () => onAddToCart?.call(food));
       },
     );

@@ -189,6 +189,7 @@ class _OrderPagesState extends State<OrderPages> {
                           );
                         },
                       ),
+                      SizedBox(height: 8),
                       SubCategoryBar(
                         categories: filteredCategories,
                         selectedCategoryId: selectedCategoryId,

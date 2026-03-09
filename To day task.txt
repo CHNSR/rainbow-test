@@ -22,3 +22,25 @@ To day task
 - Setting func
 - cart func (use BLoC)
 - responsive ui
+
+Day 4 
+- BLoC First page | pass
+- sidebar 0.3 | pass
+- Flexible text | pass
+- slider func | pass
+- bottom 0.2 | pass
+- use data with json | pass
+- grid menu | pass
+- search func | pass
+- restructure lib | pass
+- query menu | pass
+- cart ui | pass
+- cart func (use BLoC) | inprogress |issue :Stuck how to set data in bloc | 80%
+- responsive ui |inprogress 80%
+- Setting UI | pass
+- Setting func Bloc | inprogress 30%
+- text in homepage 
+- pinin store management
+- use slide library ในการเลื่อน subcategorybar
+- scroll ข้างเนื้อหาล่างก็ต้อง Scroll ข้างบนด้วย
+- 
