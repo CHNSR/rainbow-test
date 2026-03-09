@@ -145,12 +145,12 @@ class BottomSheetInfo extends StatelessWidget {
     double titleFontSize,
     double contentFontSize,
   ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        /// 🔹 Left: Address
-        Expanded(
-          child: Column(
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔹 Left: Address
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -177,12 +177,10 @@ class BottomSheetInfo extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        SizedBox(width: spacing * 2),
+          SizedBox(width: spacing * 2),
 
-        /// 🔹 Right: Social Media
-        Expanded(
-          child: Column(
+          /// 🔹 Right: Social Media
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -211,8 +209,8 @@ class BottomSheetInfo extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

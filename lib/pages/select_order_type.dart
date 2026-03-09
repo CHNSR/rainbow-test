@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/widgets/bottom_sheet2.dart';
 
 class SelectOrderType extends StatefulWidget {
   const SelectOrderType({super.key});
@@ -14,7 +15,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
       context: context,
       builder: (ctx) => SizedBox(
         height: MediaQuery.of(context).size.height * 0.2,
-        child: BottomSheetInfo(),
+        child: BottomSheet2(),
       ),
     );
   }
@@ -34,22 +35,46 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
             ),
           ],
         ),
+
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.language),
-            onSelected: (value) {},
+            icon: Image.asset(
+              "assets/picture/usa_flag.png",
+              width: 24,
+              height: 24,
+            ),
+            onSelected: (value) {
+              switch (value) {
+                case "english":
+                  // TODO: implement language selection
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Language set to English")),
+                  );
+                  break;
+                case "setting":
+                  AppNavigator.goToSetting(context);
+                  break;
+                case "store management":
+                  AppNavigator.goToStoreManagement(context);
+                  break;
+                case "exit":
+                  // Close the application
+                  Navigator.of(context).pop();
+                  break;
+              }
+            },
             itemBuilder: (context) => const [
               PopupMenuItem(
                 value: "english",
                 child: Text("English", style: TextStyle(fontSize: 12)),
               ),
               PopupMenuItem(
-                value: "seting",
+                value: "setting",
                 child: Text("Setting", style: TextStyle(fontSize: 12)),
               ),
               PopupMenuItem(
                 value: "store management",
-                child: Text("Store Managament", style: TextStyle(fontSize: 12)),
+                child: Text("Store Management", style: TextStyle(fontSize: 12)),
               ),
               PopupMenuItem(
                 value: 'exit',
@@ -113,10 +138,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
           ),
         ],
       ),
-      bottomSheet: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.15,
-        child: BottomSheetInfo(),
-      ),
+      bottomSheet: BottomSheet2(),
     );
   }
 }

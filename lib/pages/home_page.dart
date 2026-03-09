@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_application_1/utils/responsive.dart';
+import 'package:flutter_application_1/widgets/bottom_sheet2.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +11,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  void _openIconButtonPress() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.2,
+        child: BottomSheet2(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,16 +28,23 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          children: [
-            const Icon(Icons.restaurant),
-            const SizedBox(width: 8),
-            const Text("Soi Siam", style: TextStyle(fontSize: 14)),
-          ],
+        title: GestureDetector(
+          onTap: _openIconButtonPress,
+          child: Row(
+            children: [
+              const Icon(Icons.restaurant),
+              const SizedBox(width: 8),
+              const Text("Soi Siam", style: TextStyle(fontSize: 14)),
+            ],
+          ),
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.language),
+            icon: Image.asset(
+              "assets/picture/usa_flag.png",
+              width: 24,
+              height: 24,
+            ),
             onSelected: (value) {
               switch (value) {
                 case "english":
@@ -75,6 +93,7 @@ class _HomePageState extends State<HomePage> {
             top: 0,
             left: 0,
             right: 0,
+            bottom: 0,
             child: Image.asset(
               "assets/picture/home_background1.png",
               fit: BoxFit.cover,
@@ -84,10 +103,10 @@ class _HomePageState extends State<HomePage> {
             top: MediaQuery.of(context).size.height * 0.35,
             left: 0,
             right: 0,
-            bottom: -35,
+            bottom: -40,
             child: Image.asset(
               "assets/picture/togo_walk_in.gif",
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
               alignment: Alignment.bottomCenter,
             ),
           ),
