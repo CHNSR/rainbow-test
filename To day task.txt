@@ -43,4 +43,27 @@ Day 4
 - pinin store management
 - use slide library ในการเลื่อน subcategorybar
 - scroll ข้างเนื้อหาล่างก็ต้อง Scroll ข้างบนด้วย
-- 
+
+Day 5
+- BLoC First page | pass
+- sidebar 0.3 | pass
+- Flexible text | pass
+- slider func | pass
+- bottom 0.2 | pass
+- use data with json | pass
+- grid menu | pass
+- search func | pass
+- restructure lib | pass
+- query menu | pass
+- cart ui | pass
+----------------------------------------
+- fillter | pass today 10
+- use slide library ในการเลื่อน subcategorybar | pass ทั้งวัน + improve performance today
+- move cart section to widgit | pass 
+- animation scroll subcategory |if you click last index animation is pass every index to last | inprogress 80%
+
+-----------------------------------------
+- cart func (use BLoC) | inprogress |issue :Stuck how to set data in bloc | 80%
+- responsive ui |inprogress 80%
+- text in homepage 
+- subcategory กับ category จะหายไปเมื่อเสริช use state

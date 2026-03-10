@@ -5,12 +5,14 @@ class SubCategoryBar extends StatelessWidget {
   final List<SubFoodCategory> categories;
   final String? selectedCategoryId;
   final Function(String) onSelect;
+  final ScrollController scrollController;
 
   const SubCategoryBar({
     super.key,
     required this.categories,
     required this.selectedCategoryId,
     required this.onSelect,
+    required this.scrollController,
   });
 
   @override
@@ -22,6 +24,7 @@ class SubCategoryBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: ListView.builder(
+        controller: scrollController,
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         itemBuilder: (context, index) {
@@ -30,7 +33,14 @@ class SubCategoryBar extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: GestureDetector(
-              onTap: () => onSelect(category.foodCatId!),
+              onTap: () {
+                onSelect(category.foodCatId!);
+                scrollController.animateTo(
+                  index * 100,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                );
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 alignment: Alignment.center,

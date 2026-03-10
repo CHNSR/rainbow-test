@@ -123,9 +123,6 @@ class _HomePageState extends State<HomePage> {
                       data: MediaQuery.of(context),
                       child: Builder(
                         builder: (context) {
-                          print(
-                            "${MediaQuery.of(context).size.width} x ${MediaQuery.of(context).size.height}",
-                          );
                           return Text(
                             "Self-Service\nExperience.",
                             textAlign: TextAlign.center,

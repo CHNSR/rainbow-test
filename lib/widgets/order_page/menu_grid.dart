@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/model/food_menu.dart';
-import 'package:flutter_application_1/widgets/order_page/menu_card.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 class MenuGrid extends StatelessWidget {
   final List<FoodMenu> foods;
-  final ScrollController? scrollController;
   final Function(FoodMenu)? onAddToCart;
+  final List<SubFoodCategory> subcategories;
+  final ScrollController? subcategoryScrollController;
+  final Map<String, GlobalKey> categoryKeys;
+  final ScrollController menuScrollController;
 
   const MenuGrid({
     super.key,
     required this.foods,
-    this.scrollController,
+    required this.subcategories,
+    required this.subcategoryScrollController,
+    required this.categoryKeys,
+    required this.menuScrollController,
     this.onAddToCart,
   });
+
+  Map<String, List<FoodMenu>> groupFoodByCategory(List<FoodMenu> foods) {
+    final Map<String, List<FoodMenu>> map = {};
+
+    for (var food in foods) {
+      map.putIfAbsent(food.foodCatId, () => []);
+      map[food.foodCatId]!.add(food);
+    }
+
+    return map;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,24 +36,61 @@ class MenuGrid extends StatelessWidget {
 
     final crossAxisCount = orientation == Orientation.landscape ? 4 : 2;
 
-    if (foods.isEmpty) {
-      return const Center(child: Text("No food items"));
-    }
+    final foodMap = groupFoodByCategory(foods);
 
-    return GridView.builder(
-      controller: scrollController,
-      padding: const EdgeInsets.all(10),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 6,
-        mainAxisSpacing: 6,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: foods.length,
-      itemBuilder: (context, i) {
-        final food = foods[i];
-        return MenuCard(food: food, onAddToCart: () => onAddToCart?.call(food));
-      },
+    return CustomScrollView(
+      controller: menuScrollController,
+      slivers: subcategories.map((section) {
+        final menu = foodMap[section.foodCatId] ?? [];
+
+        if (menu.isEmpty) {
+          return const SliverToBoxAdapter(child: SizedBox());
+        }
+
+        return SliverMainAxisGroup(
+          slivers: [
+            /// Category Header
+            SliverToBoxAdapter(
+              child: Padding(
+                key: categoryKeys[section.foodCatId],
+                padding: const EdgeInsets.all(8),
+                child: Text(
+                  section.foodCatName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            /// Menu Grid
+            SliverPadding(
+              padding: const EdgeInsets.all(8),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate((context, i) {
+                  final food = menu[i];
+
+                  return MenuCard(
+                    food: food,
+                    onAddToCart: () {
+                      if (onAddToCart != null) {
+                        onAddToCart!(food);
+                      }
+                    },
+                  );
+                }, childCount: menu.length),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: 0.75,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 5,
+                ),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 }

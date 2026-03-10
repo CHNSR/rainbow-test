@@ -3,7 +3,6 @@ import 'package:flutter_application_1/pages/home_page.dart';
 import 'package:flutter_application_1/pages/order_pages.dart';
 import 'package:flutter_application_1/pages/select_order_type.dart';
 import 'package:flutter_application_1/pages/setting_page.dart';
-import 'package:flutter_application_1/pages/store_management_page.dart';
 
 /// ✅ Route names - ใช้ reference ชื่อ route
 class AppRoutes {
@@ -29,9 +28,6 @@ class AppRouter {
 
       case AppRoutes.setting:
         return MaterialPageRoute(builder: (_) => const SettingPage());
-
-      case AppRoutes.storeManagement:
-        return MaterialPageRoute(builder: (_) => const StoreManagementPage());
 
       default:
         return MaterialPageRoute(
