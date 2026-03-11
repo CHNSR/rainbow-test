@@ -11,8 +11,7 @@ class SetOrderType extends OrderEvent {
 
 // Event สำหรับยืนยันการสั่งซื้อ
 class ConfirmOrderEvent extends OrderEvent {
-  final String foodSetId;
-  final List<CartItem> cartItems;
+  final List<Map<String, dynamic>> items;
 
-  ConfirmOrderEvent({required this.foodSetId, required this.cartItems});
+  ConfirmOrderEvent(this.items);
 }

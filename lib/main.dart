@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
@@ -17,6 +19,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // set mouse can scroll in Listview Gridview SingleChildScrollView
+      scrollBehavior: MaterialScrollBehavior().copyWith(
+        dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
+      ),
       debugShowCheckedModeBanner: false,
       home: const HomePage(),
       onGenerateRoute: AppRouter.generateRoute,

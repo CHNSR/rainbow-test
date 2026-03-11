@@ -2,9 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/widgets/order_page/cart_section.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class OrderPages extends StatefulWidget {
   const OrderPages({super.key});
@@ -21,14 +19,12 @@ class _OrderPagesState extends State<OrderPages> {
   String? selectedSetId;
   String? selectedCategoryId;
   String searchText = "";
-
   bool isLoading = true;
   bool showSearchBar = false;
-
   late ScrollController _menuScrollController;
   ScrollController subcategoryScrollController = ScrollController();
-
   Map<String, GlobalKey> categoryIndexMap = {};
+  bool categoryVisble = true;
 
   final AutoSizeGroup nameGroup = AutoSizeGroup();
   final AutoSizeGroup descGroup = AutoSizeGroup();
@@ -94,21 +90,6 @@ class _OrderPagesState extends State<OrderPages> {
         .toList();
   }
 
-  // void scrollToCategory(String catId) {
-  //   final key = categoryIndexMap[catId];
-
-  //   if (key == null) return;
-
-  //   final context = key.currentContext;
-
-  //   if (context == null) return;
-
-  //   Scrollable.ensureVisible(
-  //     context,
-  //     duration: const Duration(milliseconds: 300),
-  //     curve: Curves.easeInOut,
-  //   );
-  // }
   void scrollToCategory(String catId) {
     final key = categoryIndexMap[catId];
     if (key == null) return;
@@ -145,29 +126,6 @@ class _OrderPagesState extends State<OrderPages> {
     });
   }
 
-  double get cartTotal {
-    return cartItems.fold(0, (sum, item) => sum + item.totalPrice);
-  }
-
-  void confirmOrder() {
-    if (cartItems.isNotEmpty && selectedSetId != null) {
-      context.read<OrderBloc>().add(
-        ConfirmOrderEvent(foodSetId: selectedSetId!, cartItems: cartItems),
-      );
-
-      setState(() {
-        cartItems.clear();
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Order confirmed!"),
-          duration: Duration(milliseconds: 1500),
-        ),
-      );
-    }
-  }
-
   void _onMenuScroll() {
     for (var cat in filteredCategories) {
       final key = categoryIndexMap[cat.foodCatId];
@@ -178,19 +136,6 @@ class _OrderPagesState extends State<OrderPages> {
       if (context == null) continue;
 
       final box = context.findRenderObject() as RenderBox;
-      // final position = box.localToGlobal(Offset.zero);
-
-      // if (position.dy >= 0 && position.dy < 150) {
-      //   if (selectedCategoryId != cat.foodCatId) {
-      //     setState(() {
-      //       selectedCategoryId = cat.foodCatId;
-      //     });
-
-      //     _scrollSubCategory(cat.foodCatId);
-      //   }
-
-      //   break;
-      // }
       final position = box.localToGlobal(Offset.zero);
 
       const triggerOffset = 120; // ปรับตามความสูง TopBar + CategoryBar
@@ -256,58 +201,64 @@ class _OrderPagesState extends State<OrderPages> {
                     flex: 3,
                     child: Column(
                       children: [
-                        TopBar(
-                          showSearchBar: showSearchBar,
-                          onToggleSearch: () {
-                            setState(() {
-                              showSearchBar = !showSearchBar;
-                            });
-                          },
-                          onSearchChanged: (value) {
-                            setState(() {
-                              searchText = value;
-                            });
-                          },
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.10,
+                          child: TopBar(
+                            showSearchBar: showSearchBar,
+                            onToggleSearch: () {
+                              setState(() {
+                                showSearchBar = !showSearchBar;
+                              });
+                            },
+                            onSearchChanged: (value) {
+                              setState(() {
+                                searchText = value;
+                              });
+                            },
+                          ),
                         ),
+                        if (!showSearchBar) ...[
+                          CategoryBar(
+                            sets: sets,
+                            selectedSetId: selectedSetId,
+                            onSelect: (setId) {
+                              setState(() {
+                                selectedSetId = setId;
 
-                        CategoryBar(
-                          sets: sets,
-                          selectedSetId: selectedSetId,
-                          onSelect: (setId) {
-                            setState(() {
-                              selectedSetId = setId;
+                                final menusInSet = menus
+                                    .where((m) => m.foodSetId == selectedSetId)
+                                    .toList();
 
-                              final menusInSet = menus
-                                  .where((m) => m.foodSetId == selectedSetId)
-                                  .toList();
+                                if (menusInSet.isNotEmpty) {
+                                  selectedCategoryId =
+                                      menusInSet.first.foodCatId;
+                                }
+                              });
+                              // Scroll ไปยัง item แรก
+                              _menuScrollController.animateTo(
+                                0.0,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                          ),
+                          SizedBox(height: 8),
+                          SubCategoryBar(
+                            scrollController: subcategoryScrollController,
+                            categories: filteredCategories,
+                            selectedCategoryId: selectedCategoryId,
+                            onSelect: (catId) {
+                              setState(() {
+                                selectedCategoryId = catId;
+                              });
+                              // Scroll ไปยัง category ที่เลือก
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                scrollToCategory(catId);
+                              });
+                            },
+                          ),
+                        ],
 
-                              if (menusInSet.isNotEmpty) {
-                                selectedCategoryId = menusInSet.first.foodCatId;
-                              }
-                            });
-                            // Scroll ไปยัง item แรก
-                            _menuScrollController.animateTo(
-                              0.0,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        ),
-                        SizedBox(height: 8),
-                        SubCategoryBar(
-                          scrollController: subcategoryScrollController,
-                          categories: filteredCategories,
-                          selectedCategoryId: selectedCategoryId,
-                          onSelect: (catId) {
-                            setState(() {
-                              selectedCategoryId = catId;
-                            });
-                            // Scroll ไปยัง category ที่เลือก
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              scrollToCategory(catId);
-                            });
-                          },
-                        ),
                         Expanded(
                           child: MenuGrid(
                             foods: filteredMenus,
@@ -331,10 +282,7 @@ class _OrderPagesState extends State<OrderPages> {
                         left: BorderSide(color: Colors.grey.shade300),
                       ),
                     ),
-                    child: CartSection(
-                      cartItems: cartItems,
-                      cartTotal: cartTotal,
-                    ),
+                    child: CartSection(cartItems: cartItems),
                   ),
                 ],
               ),

@@ -9,12 +9,8 @@ class FoodService {
     final String response = await rootBundle.loadString(
       'assets/data/menu.json',
     );
-
     final data = json.decode(response);
-
     final List categoryJson = data['result']['foodCategory'];
-    print("Category JSON: $categoryJson");
-
     return categoryJson.map((e) => SubFoodCategory.fromJson(e)).toList();
   }
 
@@ -22,12 +18,8 @@ class FoodService {
     final String response = await rootBundle.loadString(
       'assets/data/menu.json',
     );
-
     final data = json.decode(response);
-
     final List foodSetJson = data['result']['foodSet'];
-    print("Food Set JSON: $foodSetJson");
-
     return foodSetJson.map((e) => FoodSet.fromJson(e)).toList();
   }
 
@@ -35,13 +27,8 @@ class FoodService {
     final String response = await rootBundle.loadString(
       'assets/data/menu.json',
     );
-
     final Map<String, dynamic> data = json.decode(response);
-
     final List<dynamic> foodMenuJson = data['result']['food'];
-
-    print("Food Menu JSON: $foodMenuJson");
-
     return foodMenuJson
         .map((e) => FoodMenu.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -58,7 +45,6 @@ class FoodService {
       }
       groupedFoodMenus[food.foodCatId]!.add(food);
     }
-
     return groupedFoodMenus;
   }
 }

@@ -16,6 +16,7 @@ class BottomSheet2 extends StatelessWidget {
         final spacing = isMobile ? 3.0 : 6.0;
         // Your layout logic here
         return Container(
+          width: double.infinity,
           color: const Color(0xFF1F1F1F),
           padding: EdgeInsets.symmetric(
             horizontal: horizontalPadding,
@@ -28,7 +29,6 @@ class BottomSheet2 extends StatelessWidget {
               // Contract Info Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(

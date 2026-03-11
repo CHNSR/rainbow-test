@@ -10,77 +10,85 @@ class SelectOrderType extends StatefulWidget {
 }
 
 class _SelectOrderTypeState extends State<SelectOrderType> {
-  void _openIconButtonPress() {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.2,
-        child: BottomSheet2(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Row(
-          children: [
-            const Icon(Icons.restaurant),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: _openIconButtonPress,
-              child: const Text("Soi Siam", style: TextStyle(fontSize: 14)),
-            ),
-          ],
+        automaticallyImplyLeading: false,
+        title: Builder(
+          builder: (context) {
+            double screenWidth = MediaQuery.of(context).size.width;
+
+            double iconSize = screenWidth < 500 ? 20 : 26;
+            double fontSize = screenWidth < 500 ? 14 : 18;
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+
+              children: [
+                Icon(Icons.restaurant, size: iconSize),
+                const SizedBox(width: 8),
+                Text("Soi Siam", style: TextStyle(fontSize: fontSize)),
+              ],
+            );
+          },
         ),
 
         actions: [
-          PopupMenuButton<String>(
-            icon: Image.asset(
-              "assets/picture/usa_flag.png",
-              width: 24,
-              height: 24,
-            ),
-            onSelected: (value) {
-              switch (value) {
-                case "english":
-                  // TODO: implement language selection
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Language set to English")),
-                  );
-                  break;
-                case "setting":
-                  AppNavigator.goToSetting(context);
-                  break;
-                case "store management":
-                  AppNavigator.goToStoreManagement(context);
-                  break;
-                case "exit":
-                  // Close the application
-                  Navigator.of(context).pop();
-                  break;
-              }
+          Builder(
+            builder: (context) {
+              double screenWidth = MediaQuery.of(context).size.width;
+              double flagSize = screenWidth < 500 ? 20 : 26;
+              return PopupMenuButton<String>(
+                icon: Image.asset(
+                  "assets/picture/usa_flag.png",
+                  height: flagSize,
+                  width: flagSize,
+                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case "english":
+                      // TODO: implement language selection
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Language set to English"),
+                        ),
+                      );
+                      break;
+                    case "setting":
+                      AppNavigator.goToSetting(context);
+                      break;
+                    case "store management":
+                      AppNavigator.goToStoreManagement(context);
+                      break;
+                    case "exit":
+                      // Close the application
+                      Navigator.of(context).pop();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: "english",
+                    child: Text("English", style: TextStyle(fontSize: 12)),
+                  ),
+                  PopupMenuItem(
+                    value: "setting",
+                    child: Text("Setting", style: TextStyle(fontSize: 12)),
+                  ),
+                  PopupMenuItem(
+                    value: "store management",
+                    child: Text(
+                      "Store Management",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'exit',
+                    child: Text("Exit", style: TextStyle(fontSize: 12)),
+                  ),
+                ],
+              );
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: "english",
-                child: Text("English", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: "setting",
-                child: Text("Setting", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: "store management",
-                child: Text("Store Management", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: 'exit',
-                child: Text("Exit", style: TextStyle(fontSize: 12)),
-              ),
-            ],
           ),
         ],
       ),
@@ -105,7 +113,10 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                   Text(
                     "Self-Service\nExperience.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width / 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
 
                   SizedBox(height: 16),
@@ -117,17 +128,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
 
                   SizedBox(height: 8),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.credit_card, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text(
-                        "Accept only Credit Card",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ],
-                  ),
+                  const CreditCardInfoCard(),
 
                   SizedBox(height: 24),
 
@@ -136,9 +137,9 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
               ),
             ),
           ),
+          Align(alignment: Alignment.bottomCenter, child: BottomSheet2()),
         ],
       ),
-      bottomSheet: BottomSheet2(),
     );
   }
 }

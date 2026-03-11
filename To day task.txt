@@ -67,3 +67,43 @@ Day 5
 - responsive ui |inprogress 80%
 - text in homepage 
 - subcategory กับ category จะหายไปเมื่อเสริช use state
+
+Day 6
+To day task
+- BLoC First page | pass
+- sidebar 0.3 | pass
+- Flexible text | pass
+- slider func | pass
+- bottom 0.2 | pass
+- use data with json | pass
+- grid menu | pass
+- search func | pass
+- restructure lib | pass
+- query menu | pass
+- cart ui | pass
+----------------------------------------
+- filter | pass 
+- use slide library ในการเลื่อน subcategory bar | pass ทั้
+วัน + improve performance today
+- move cart section to widget | pass 
+- animation scroll subcategory |if you click last index animation is pass every index to last | pass
+
+-----------------------------------------
+taoday 11/3/2026
+- cart func (use BLoC) | pass
+- grid height have 8 item in page
+- hide subcategory and category |pass
+- responsive ui search bar | pass
+- responsive bottom bar  | pass
+- slider in website | pass
+- bottom width infinity | pass
+- landscape UI homepage| pass
+- text responsive UI| pass
+- fix ui in mobile
+-----------------------------------------
+
+- shopping bag text in homepage | in progress
+- grid height have 8 item in page |
+- print receipt in BLoC
+- restructure in app |
+- read logic and read bloc |

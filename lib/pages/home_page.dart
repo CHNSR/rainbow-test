@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/utils/responsive.dart';
 import 'package:flutter_application_1/widgets/bottom_sheet2.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,25 +10,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  void _openIconButtonPress() {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.2,
-        child: BottomSheet2(),
-      ),
-    );
+  bool showBottom = false;
+
+  void _toggleBottomSheet() {
+    setState(() {
+      showBottom = !showBottom;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: GestureDetector(
-          onTap: _openIconButtonPress,
+          onTap: _toggleBottomSheet,
           child: Row(
             children: [
               const Icon(Icons.restaurant),
@@ -99,81 +98,20 @@ class _HomePageState extends State<HomePage> {
               fit: BoxFit.cover,
             ),
           ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.35,
-            left: 0,
-            right: 0,
-            bottom: -40,
-            child: Image.asset(
-              "assets/picture/togo_walk_in.gif",
-              fit: BoxFit.cover,
-              alignment: Alignment.bottomCenter,
-            ),
-          ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-
-                  children: [
-                    MediaQuery(
-                      data: MediaQuery.of(context),
-                      child: Builder(
-                        builder: (context) {
-                          return Text(
-                            "Self-Service\nExperience.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width / 20,
-                              //fontSize: 60,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    SizedBox(height: 16),
-
-                    Text(
-                      "From self-order and self-checkout",
-                      textAlign: TextAlign.center,
-                    ),
-
-                    SizedBox(height: 8),
-
-                    // ✅ ใช้ responsive helper class
-                    const CreditCardInfoCard(),
-
-                    SizedBox(height: 24),
-
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        backgroundColor: Colors.blueAccent,
-                      ),
-                      onPressed: () {
-                        AppNavigator.goToSelectOrderType(context);
-                      },
-                      child: const Text(
-                        "Tap to Order",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
+                child: isLandscape
+                    ? LandscapeMainContant()
+                    : PortraitMainContant(),
               ),
             ),
           ),
+
+          //for bottom sheet
+          if (showBottom)
+            Align(alignment: Alignment.bottomCenter, child: BottomSheet2()),
         ],
       ),
     );

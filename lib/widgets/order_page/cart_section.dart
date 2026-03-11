@@ -1,15 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/bloc/order_state_bloc/tap_to_order_bloc.dart';
 import 'package:flutter_application_1/model/cart_item.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartSection extends StatefulWidget {
   final List<CartItem> cartItems;
-  final double cartTotal;
-  const CartSection({
-    super.key,
-    required this.cartItems,
-    required this.cartTotal,
-  });
+  const CartSection({super.key, required this.cartItems});
 
   @override
   State<CartSection> createState() => _CartSectionState();
@@ -17,14 +14,28 @@ class CartSection extends StatefulWidget {
 
 class _CartSectionState extends State<CartSection> {
   void confirmOrder() {
+    final orderItems = widget.cartItems.map((item) {
+      return {"foodId": item.food.foodId, "quantity": item.quantity};
+    }).toList();
     if (widget.cartItems.isNotEmpty) {
+      context.read<OrderBloc>().add(ConfirmOrderEvent(orderItems));
+
+      setState(() {
+        widget.cartItems.clear();
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Order confirmed!"),
           duration: Duration(milliseconds: 1500),
+          backgroundColor: Colors.green,
         ),
       );
     }
+  }
+
+  double get cartTotal {
+    return widget.cartItems.fold(0, (sum, item) => sum + item.totalPrice);
   }
 
   @override
@@ -186,7 +197,7 @@ class _CartSectionState extends State<CartSection> {
                     Spacer(),
                     Expanded(
                       child: AutoSizeText(
-                        "\$${widget.cartTotal.toStringAsFixed(2)}",
+                        "\$${cartTotal.toStringAsFixed(2)}",
                         maxLines: 1,
                         minFontSize: 8,
                         textAlign: TextAlign.right,

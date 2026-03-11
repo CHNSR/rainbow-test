@@ -45,19 +45,18 @@ class MenuCard extends StatelessWidget {
                     AutoSizeText(
                       food.foodName ?? "",
                       maxLines: 1,
-                      minFontSize: 12,
+                      minFontSize: 5,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
 
                     //Text of drescription
-                    const SizedBox(height: 4),
-
-                    Expanded(
+                    //const SizedBox(height: 4),
+                    Flexible(
                       child: AutoSizeText(
                         food.foodDesc ?? "",
                         maxLines: 2,
-                        minFontSize: 10,
+                        minFontSize: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 12,
@@ -66,8 +65,7 @@ class MenuCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 4),
-
+                    //const SizedBox(height: 4),
                     AutoSizeText(
                       "\$${food.foodPrice}",
                       maxLines: 1,
