@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/bloc/order_state_bloc/tap_to_order_bloc.dart';
-import 'package:flutter_application_1/model/cart_item.dart';
+import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CartSection extends StatefulWidget {
@@ -186,65 +185,65 @@ class _CartSectionState extends State<CartSection> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: AutoSizeText(
-                        "Subtotal",
-                        maxLines: 1,
-                        minFontSize: 8,
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
+                    AutoSizeText(
+                      "Subtotal",
+                      maxLines: 1,
+                      minFontSize: 16,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(color: Colors.black),
                     ),
-                    Spacer(),
-                    Expanded(
-                      child: AutoSizeText(
-                        "\$${cartTotal.toStringAsFixed(2)}",
-                        maxLines: 1,
-                        minFontSize: 8,
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          color: Colors.purple,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+
+                    AutoSizeText(
+                      "\$${cartTotal.toStringAsFixed(2)}",
+                      maxLines: 1,
+                      minFontSize: 16,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        color: Colors.purple,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: confirmOrder,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, screenWidth * 0.10),
-                    backgroundColor: widget.cartItems.isEmpty
-                        ? Colors.grey.shade500
-                        : Colors.lightGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: confirmOrder,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, screenWidth * 0.09),
+                      backgroundColor: widget.cartItems.isEmpty
+                          ? Colors.grey.shade500
+                          : Colors.lightGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
-                  ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.shopping_cart,
-                          size: screenWidth * 0.1,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 8),
-                        AutoSizeText(
-                          "Confirm Order (${widget.cartItems.fold(0, (sum, item) => sum + item.quantity)})",
-                          maxLines: 1,
-                          minFontSize: 16,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.1,
-                            fontWeight: FontWeight.bold,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_cart,
+                            size: screenWidth * 0.09,
                             color: Colors.white,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          AutoSizeText(
+                            "Confirm Order (${widget.cartItems.fold(0, (sum, item) => sum + item.quantity)})",
+                            maxLines: 1,
+                            minFontSize: 16,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.09,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/utils/responsive.dart';
+import 'package:flutter_application_1/config/export.dart';
 
-class BottomSheet2 extends StatelessWidget {
-  const BottomSheet2({super.key});
+class BottomSheetCustom extends StatelessWidget {
+  const BottomSheetCustom({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,39 +31,42 @@ class BottomSheet2 extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Flexible(
+                  Expanded(
                     child: Padding(
                       padding: EdgeInsets.all(spacing * 2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Contact Us",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: titleFontSize,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Contact Us",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: titleFontSize,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: spacing),
-                          Text(
-                            "Rattanathibech 28 Alley, Tambon Bang Kraso, Mueang Nonthaburi District, Nonthaburi 11000",
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: contentFontSize,
+                            SizedBox(height: spacing),
+                            Text(
+                              "Rattanathibech 28 Alley, Tambon Bang Kraso, Mueang Nonthaburi District, Nonthaburi 11000",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: contentFontSize,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(width: spacing),
-                  Flexible(
+                  Expanded(
                     child: Padding(
                       padding: EdgeInsets.all(spacing * 2),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [

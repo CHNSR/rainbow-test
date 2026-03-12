@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/order_page/search_widget.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 class TopBar extends StatelessWidget {
   final bool showSearchBar;

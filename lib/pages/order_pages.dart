@@ -1,7 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_application_1/widgets/order_page/cart_section.dart';
 import 'package:flutter_application_1/config/export.dart';
 
 class OrderPages extends StatefulWidget {
@@ -12,98 +10,20 @@ class OrderPages extends StatefulWidget {
 }
 
 class _OrderPagesState extends State<OrderPages> {
-  List<FoodSet> sets = [];
-  List<SubFoodCategory> categories = [];
-  List<FoodMenu> menus = [];
-  List<CartItem> cartItems = [];
-  String? selectedSetId;
-  String? selectedCategoryId;
-  String searchText = "";
-  bool isLoading = true;
+  final controller = OrderController();
   bool showSearchBar = false;
   late ScrollController _menuScrollController;
   ScrollController subcategoryScrollController = ScrollController();
   Map<String, GlobalKey> categoryIndexMap = {};
-  bool categoryVisble = true;
-
-  final AutoSizeGroup nameGroup = AutoSizeGroup();
-  final AutoSizeGroup descGroup = AutoSizeGroup();
-  final AutoSizeGroup priceGroup = AutoSizeGroup();
-
-  //load data from assets
-  Future<void> loadData() async {
-    sets = await FoodService.parseFoodSet();
-    categories = await FoodService.parseFoodCategory();
-    menus = await FoodService.parseFoodMenu();
-
-    for (var cat in categories) {
-      categoryIndexMap[cat.foodCatId] = GlobalKey();
-    }
-
-    if (sets.isNotEmpty) {
-      selectedSetId = sets.first.foodSetId;
-
-      final menusInSet = menus
-          .where((m) => m.foodSetId == selectedSetId)
-          .toList();
-
-      if (menusInSet.isNotEmpty) {
-        selectedCategoryId = null;
-      }
-    }
-
-    buildCategoryKeys();
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  void buildCategoryKeys() {
-    categoryIndexMap.clear();
-
-    for (var cat in categories) {
-      categoryIndexMap[cat.foodCatId] = GlobalKey();
-    }
-  }
-
-  List<FoodMenu> get filteredMenus {
-    return MenuFilter.filterMenus(
-      menus: MenuFilter.filterMenus(
-        menus: menus,
-        foodSetId: selectedSetId,
-        searchText: searchText,
-      ),
-    );
-  }
-
-  List<SubFoodCategory> get filteredCategories {
-    if (selectedSetId == null) return [];
-
-    final foodCatsInSet = menus
-        .where((m) => m.foodSetId == selectedSetId)
-        .map((m) => m.foodCatId)
-        .toSet();
-
-    return categories
-        .where((c) => foodCatsInSet.contains(c.foodCatId))
-        .toList();
-  }
 
   void scrollToCategory(String catId) {
-    final key = categoryIndexMap[catId];
-    if (key == null) return;
-
-    final ctx = key.currentContext;
+    final ctx = categoryIndexMap[catId]?.currentContext;
     if (ctx == null) return;
 
     final renderObject = ctx.findRenderObject();
-    if (renderObject == null) return;
+    final viewport = RenderAbstractViewport.of(renderObject!);
 
-    final viewport = RenderAbstractViewport.of(renderObject);
-    if (viewport == null) return;
-
-    final offset = viewport.getOffsetToReveal(renderObject, 0.0).offset;
+    final offset = viewport!.getOffsetToReveal(renderObject, 0.0).offset;
 
     _menuScrollController.animateTo(
       offset,
@@ -112,22 +32,8 @@ class _OrderPagesState extends State<OrderPages> {
     );
   }
 
-  void addToCart(FoodMenu food) {
-    setState(() {
-      final index = cartItems.indexWhere(
-        (item) => item.food.foodId == food.foodId,
-      );
-
-      if (index != -1) {
-        cartItems[index].quantity++;
-      } else {
-        cartItems.add(CartItem(food: food, quantity: 1));
-      }
-    });
-  }
-
   void _onMenuScroll() {
-    for (var cat in filteredCategories) {
+    for (var cat in controller.filteredCategories) {
       final key = categoryIndexMap[cat.foodCatId];
 
       if (key == null) continue;
@@ -141,9 +47,9 @@ class _OrderPagesState extends State<OrderPages> {
       const triggerOffset = 120; // ปรับตามความสูง TopBar + CategoryBar
 
       if (position.dy <= triggerOffset && position.dy > 0) {
-        if (selectedCategoryId != cat.foodCatId) {
+        if (controller.selectedCategoryId != cat.foodCatId) {
           setState(() {
-            selectedCategoryId = cat.foodCatId;
+            controller.selectedCategoryId = cat.foodCatId;
           });
 
           _scrollSubCategory(cat.foodCatId);
@@ -153,12 +59,11 @@ class _OrderPagesState extends State<OrderPages> {
   }
 
   void _scrollSubCategory(String catId) {
-    final index = filteredCategories.indexWhere((c) => c.foodCatId == catId);
-
-    if (index == -1) return;
-
+    final index = controller.filteredCategories.indexWhere(
+      (c) => c.foodCatId == catId,
+    );
+    if (index < 0) return;
     const itemWidth = 120.0;
-
     subcategoryScrollController.animateTo(
       index * itemWidth,
       duration: const Duration(milliseconds: 250),
@@ -171,7 +76,14 @@ class _OrderPagesState extends State<OrderPages> {
     super.initState();
     _menuScrollController = ScrollController();
     _menuScrollController.addListener(_onMenuScroll);
+
     loadData();
+  }
+
+  Future<void> loadData() async {
+    await controller.loadData();
+    controller.buildCategoryKeys(categoryIndexMap);
+    setState(() {});
   }
 
   @override
@@ -183,7 +95,7 @@ class _OrderPagesState extends State<OrderPages> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (controller.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -212,25 +124,29 @@ class _OrderPagesState extends State<OrderPages> {
                             },
                             onSearchChanged: (value) {
                               setState(() {
-                                searchText = value;
+                                controller.searchText = value;
                               });
                             },
                           ),
                         ),
                         if (!showSearchBar) ...[
                           CategoryBar(
-                            sets: sets,
-                            selectedSetId: selectedSetId,
+                            sets: controller.sets,
+                            selectedSetId: controller.selectedSetId,
                             onSelect: (setId) {
                               setState(() {
-                                selectedSetId = setId;
+                                controller.selectedSetId = setId;
 
-                                final menusInSet = menus
-                                    .where((m) => m.foodSetId == selectedSetId)
+                                final menusInSet = controller.menus
+                                    .where(
+                                      (m) =>
+                                          m.foodSetId ==
+                                          controller.selectedSetId,
+                                    )
                                     .toList();
 
                                 if (menusInSet.isNotEmpty) {
-                                  selectedCategoryId =
+                                  controller.selectedCategoryId =
                                       menusInSet.first.foodCatId;
                                 }
                               });
@@ -245,11 +161,11 @@ class _OrderPagesState extends State<OrderPages> {
                           SizedBox(height: 8),
                           SubCategoryBar(
                             scrollController: subcategoryScrollController,
-                            categories: filteredCategories,
-                            selectedCategoryId: selectedCategoryId,
+                            categories: controller.filteredCategories,
+                            selectedCategoryId: controller.selectedCategoryId,
                             onSelect: (catId) {
                               setState(() {
-                                selectedCategoryId = catId;
+                                controller.selectedCategoryId = catId;
                               });
                               // Scroll ไปยัง category ที่เลือก
                               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -261,11 +177,15 @@ class _OrderPagesState extends State<OrderPages> {
 
                         Expanded(
                           child: MenuGrid(
-                            foods: filteredMenus,
-                            subcategories: filteredCategories,
+                            foods: controller.filteredMenus,
+                            subcategories: controller.filteredCategories,
                             subcategoryScrollController:
                                 subcategoryScrollController,
-                            onAddToCart: addToCart,
+                            onAddToCart: (food) {
+                              setState(() {
+                                controller.addToCart(food);
+                              });
+                            },
                             categoryKeys: categoryIndexMap,
                             menuScrollController: _menuScrollController,
                           ),
@@ -282,7 +202,7 @@ class _OrderPagesState extends State<OrderPages> {
                         left: BorderSide(color: Colors.grey.shade300),
                       ),
                     ),
-                    child: CartSection(cartItems: cartItems),
+                    child: CartSection(cartItems: controller.cartItems),
                   ),
                 ],
               ),

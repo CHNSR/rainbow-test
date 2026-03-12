@@ -10,7 +10,6 @@ export 'package:flutter_application_1/pages/home_page.dart';
 export 'package:flutter_application_1/pages/order_pages.dart';
 export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
-export 'package:flutter_application_1/pages/setting_page.dart';
 // ==============================================================================
 // 🔷 MODEL EXPORTS
 // ==============================================================================
@@ -40,14 +39,22 @@ export 'package:flutter_application_1/widgets/order_page/menu_grid.dart';
 export 'package:flutter_application_1/widgets/order_page/menu_card.dart';
 export 'package:flutter_application_1/widgets/order_page/topbar.dart';
 export 'package:flutter_application_1/widgets/order_page/search_widget.dart';
-export 'package:flutter_application_1/widgets/bottom_sheet.dart';
-export 'package:flutter_application_1/widgets/select_catagory.dart';
-export 'package:flutter_application_1/widgets/home_widgets_buttons.dart';
+export 'package:flutter_application_1/widgets/select_category_type.dart/bottom_sheet.dart';
+export 'package:flutter_application_1/widgets/select_category_type.dart/select_catagory.dart';
+export 'package:flutter_application_1/widgets/homepage_widget/home_widgets_buttons.dart';
+export 'package:flutter_application_1/widgets/select_category_type.dart/bottom_sheet.dart';
+export 'package:flutter_application_1/widgets/homepage_widget/appbar_widget.dart';
+export 'package:flutter_application_1/widgets/order_page/cart_section.dart';
+export 'package:flutter_application_1/widgets/change_lang_widget.dart';
+export 'package:flutter_application_1/widgets/homepage_widget/appbar_widget.dart';
+export 'package:flutter_application_1/widgets/order_page/cart_section.dart';
+export 'package:flutter_application_1/widgets/change_lang_widget.dart';
 
 // ==============================================================================
 // 🔷 CORE EXPORTS
 // ==============================================================================
-export 'package:flutter_application_1/core/menu_filter.dart';
+export 'package:flutter_application_1/utils/menu_filter.dart';
+export 'package:flutter_application_1/core/order_controller.dart';
 
 // ==============================================================================
 // 🔷 UTILS EXPORTS

@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/model/food_menu.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 class MenuCard extends StatelessWidget {
   final FoodMenu food;

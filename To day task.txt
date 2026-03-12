@@ -107,3 +107,30 @@ taoday 11/3/2026
 - print receipt in BLoC
 - restructure in app |
 - read logic and read bloc |
+
+Day 7
+
+- cart func (use BLoC) | pass
+- grid height have 8 item in page
+- hide subcategory and category |pass
+- responsive ui search bar | pass
+- responsive bottom bar  | passy
+- slider in website | pass
+- bottom width infinity | pass
+- landscape UI homepage| pass
+- text responsive UI| pass
+- fix ui in mobile
+
+
+- picin first page | pass
+- confirm button | pass
+- extend app bar | pass
+- animation | pass
+- shopping bag text in homepage | pass
+- restructure in home page | pass
+-----------------------------------------
+- mobile button | inprogress
+- print receipt in BLoC
+- restruck in order page |  pass
+- read logic and read bloc |
+- restructure project | pass

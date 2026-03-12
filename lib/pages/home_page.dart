@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/widgets/bottom_sheet2.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,11 +10,33 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool showBottom = false;
+  Offset offset = const Offset(0, 1);
 
-  void _toggleBottomSheet() {
-    setState(() {
-      showBottom = !showBottom;
-    });
+  void _toggleBottomSheet() async {
+    if (!showBottom) {
+      // เปิด
+      setState(() {
+        showBottom = true;
+        offset = const Offset(0, 1);
+      });
+
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      setState(() {
+        offset = const Offset(0, 0);
+      });
+    } else {
+      // ปิด (animate ลงก่อน)
+      setState(() {
+        offset = const Offset(0, 1);
+      });
+
+      await Future.delayed(const Duration(milliseconds: 400));
+
+      setState(() {
+        showBottom = false;
+      });
+    }
   }
 
   @override
@@ -37,81 +58,26 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        actions: [
-          PopupMenuButton<String>(
-            icon: Image.asset(
-              "assets/picture/usa_flag.png",
-              width: 24,
-              height: 24,
-            ),
-            onSelected: (value) {
-              switch (value) {
-                case "english":
-                  // TODO: implement language selection
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Language set to English")),
-                  );
-                  break;
-                case "setting":
-                  AppNavigator.goToSetting(context);
-                  break;
-                case "store management":
-                  AppNavigator.goToStoreManagement(context);
-                  break;
-                case "exit":
-                  // Close the application
-                  Navigator.of(context).pop();
-                  break;
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: "english",
-                child: Text("English", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: "setting",
-                child: Text("Setting", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: "store management",
-                child: Text("Store Management", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: 'exit',
-                child: Text("Exit", style: TextStyle(fontSize: 12)),
-              ),
-            ],
-          ),
-        ],
+        actions: [PopupWidget()],
       ),
+      //
       body: Stack(
         children: [
-          //back ground
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Image.asset(
-              "assets/picture/home_background1.png",
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Center(
-                child: isLandscape
-                    ? LandscapeMainContant()
-                    : PortraitMainContant(),
-              ),
-            ),
+          Center(
+            child: isLandscape ? LandscapeMainContant() : PortraitMainContant(),
           ),
 
-          //for bottom sheet
           if (showBottom)
-            Align(alignment: Alignment.bottomCenter, child: BottomSheet2()),
+            AnimatedSlide(
+              offset: offset,
+              duration: const Duration(seconds: 1),
+
+              curve: Curves.easeInOut,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: BottomSheetCustom(),
+              ),
+            ),
         ],
       ),
     );
