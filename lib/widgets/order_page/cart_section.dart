@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CartSection extends StatefulWidget {
   final List<CartItem> cartItems;
@@ -46,24 +47,29 @@ class _CartSectionState extends State<CartSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-            child: AutoSizeText(
-              "My Order",
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: screenWidth * 0.02,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              AutoSizeText(
+                "My Order",
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.02,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF4F4F4F),
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Image.asset('assets/logo/Vector.png', width: 10, height: 10),
+            ],
           ),
 
-          const Divider(),
+          Divider(),
 
           // Cart Items List
           Expanded(
             child: widget.cartItems.isEmpty
-                ? const Center(
+                ? const Align(
+                    alignment: Alignment.topCenter,
                     child: Padding(
                       padding: EdgeInsets.all(8.0),
                       child: AutoSizeText(
@@ -179,7 +185,7 @@ class _CartSectionState extends State<CartSection> {
           const Divider(),
 
           Padding(
-            padding: EdgeInsets.all(screenWidth * 0.01),
+            padding: EdgeInsets.all(screenWidth * 0.001),
             child: Column(
               children: [
                 Row(
@@ -188,34 +194,45 @@ class _CartSectionState extends State<CartSection> {
                     AutoSizeText(
                       "Subtotal",
                       maxLines: 1,
-                      minFontSize: 16,
+                      minFontSize: 10,
+                      maxFontSize: 18,
                       textAlign: TextAlign.left,
-                      style: TextStyle(color: Colors.black),
+                      style: GoogleFonts.workSans(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
 
                     AutoSizeText(
                       "\$${cartTotal.toStringAsFixed(2)}",
                       maxLines: 1,
-                      minFontSize: 16,
+                      minFontSize: 10,
+                      maxFontSize: 18,
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Colors.purple,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.workSans(
+                        color: cartTotal == 0
+                            ? Color(0xFF4F4F4F)
+                            : Color(0xFF7B61FF),
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(
+                    top: 8.0,
+                    bottom: 8.0,
+                    right: 4.0,
+                    left: 4.0,
+                  ),
                   child: ElevatedButton(
                     onPressed: confirmOrder,
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, screenWidth * 0.09),
+                      minimumSize: Size(double.infinity, 56),
                       backgroundColor: widget.cartItems.isEmpty
                           ? Colors.grey.shade500
-                          : Colors.lightGreen,
+                          : Color(0xFF32CD32),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
