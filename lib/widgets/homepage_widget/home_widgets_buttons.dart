@@ -71,33 +71,71 @@ class LandscapeMainContant extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: MediaQuery.of(context).size.width / 15,
-                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Rasa',
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  const Text(
+                  Text(
                     "From self-order and self-checkout",
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade600,
+                    ),
                   ),
 
                   const SizedBox(height: 8),
 
-                  const CreditCardInfoCard(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // 🔷 Icon
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Icon(
+                            Icons.credit_card_sharp,
+                            color: Colors.red,
+                            size: MediaQuery.of(context).size.width / 68,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      // 🔷 Text
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Accept only Credit Card",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: MediaQuery.of(context).size.width / 70,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.red,
+                              decorationThickness: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: MediaQuery.of(context).size.width / 25),
 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
+                        horizontal: 42,
+                        vertical: 25,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: const Color.fromARGB(255, 54, 118, 255),
                     ),
                     onPressed: () {
                       AppNavigator.goToSelectOrderType(context);
@@ -116,13 +154,37 @@ class LandscapeMainContant extends StatelessWidget {
         /// RIGHT IMAGE
         Expanded(
           flex: 5,
-          child: Align(
-            alignment: .bottomCenter,
-            child: Image.asset(
-              "assets/picture/togo_walk_in.gif",
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  "assets/picture/togo_walk_in.gif",
+                  fit: BoxFit.cover,
+                ),
+              ),
+
+              Align(
+                alignment: const Alignment(-0.05, 0.30),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.restaurant,
+                      color: Colors.white,
+                      size: MediaQuery.of(context).size.width * 0.02,
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                    Text(
+                      "Soi Siam",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.width * 0.02,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -132,7 +194,6 @@ class LandscapeMainContant extends StatelessWidget {
 
 class PortraitMainContant extends StatelessWidget {
   const PortraitMainContant({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -157,8 +218,20 @@ class PortraitMainContant extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.restaurant, color: Colors.white),
-                    Text("Soi Siam", style: TextStyle(color: Colors.white)),
-                    Text("Restaurant", style: TextStyle(color: Colors.white)),
+                    Text(
+                      "Soi Siam",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.width * 0.04,
+                      ),
+                    ),
+                    Text(
+                      "Restaurant",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.width * 0.04,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -184,9 +257,9 @@ class PortraitMainContant extends StatelessWidget {
                 "Self-Service\nExperience.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width / 20,
-                  //fontSize: 60,
-                  fontWeight: FontWeight.bold,
+                  fontSize: MediaQuery.of(context).size.width / 10,
+                  fontFamily: 'Rasa',
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
@@ -195,26 +268,60 @@ class PortraitMainContant extends StatelessWidget {
               Text(
                 "From self-order and self-checkout",
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade600,
+                ),
               ),
 
-              SizedBox(height: 8),
+              SizedBox(height: 1),
 
               // ✅ ใช้ responsive helper class
-              const CreditCardInfoCard(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 🔷 Icon
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Icon(
+                        Icons.credit_card_sharp,
+                        color: Colors.red,
+                        size: MediaQuery.of(context).size.width / 25,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  // 🔷 Text
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "Accept only Credit Card",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: MediaQuery.of(context).size.width / 40,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
 
-              SizedBox(height: 8),
+              SizedBox(height: MediaQuery.of(context).size.width / 25),
 
               // ElevatedButton(
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
-                    vertical: 12,
+                    vertical: 20,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: const Color.fromARGB(255, 54, 118, 255),
                 ),
                 onPressed: () {
                   AppNavigator.goToSelectOrderType(context);

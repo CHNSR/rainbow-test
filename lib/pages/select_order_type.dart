@@ -56,8 +56,9 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                     "Self-Service\nExperience.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width / 15,
-                      fontWeight: FontWeight.bold,
+                      fontSize: MediaQuery.of(context).size.width / 10,
+                      fontFamily: 'Rasa',
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
 
@@ -66,15 +67,54 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                   Text(
                     "From self-order and self-checkout",
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width / 45,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade600,
+                    ),
                   ),
 
                   SizedBox(height: 8),
 
-                  const CreditCardInfoCard(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // 🔷 Icon
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Icon(
+                            Icons.credit_card_sharp,
+                            color: Colors.red,
+                            size: MediaQuery.of(context).size.width / 40,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      // 🔷 Text
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Accept only Credit Card",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: MediaQuery.of(context).size.width / 50,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.red,
+                              decorationThickness: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
                   SizedBox(height: 24),
 
                   SelectCatagory(),
+                  Spacer(),
                 ],
               ),
             ),

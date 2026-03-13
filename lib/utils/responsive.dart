@@ -112,6 +112,7 @@ class CreditCardInfoCard extends StatelessWidget {
                       color: Colors.red,
                       fontSize: Responsive.fontSize(constraints),
                       fontWeight: FontWeight.w600,
+                      height: 1,
                     ),
                   ),
                 ),
