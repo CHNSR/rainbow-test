@@ -20,6 +20,16 @@ class OrderController extends ChangeNotifier {
 
     if (sets.isNotEmpty) {
       selectedSetId = sets.first.foodSetId;
+
+      // หาเมนูใน set นั้น
+      final menusInSet = menus
+          .where((m) => m.foodSetId == selectedSetId)
+          .toList();
+      print("[OrderController] Menu Set: ${menusInSet.first.foodSetId}");
+      // ตั้ง default category จาก menu ตัวแรก
+      if (menusInSet.isNotEmpty) {
+        selectedCategoryId = menusInSet.first.foodCatId;
+      }
     }
 
     isLoading = false;

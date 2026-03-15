@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/utils/deviceType.dart';
 
 class OrderPages extends StatefulWidget {
   const OrderPages({super.key});
@@ -101,6 +102,7 @@ class _OrderPagesState extends State<OrderPages> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           SafeArea(
@@ -114,7 +116,7 @@ class _OrderPagesState extends State<OrderPages> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.10,
+                          height: MediaQuery.of(context).size.height * 0.08,
                           child: TopBar(
                             showSearchBar: showSearchBar,
                             onToggleSearch: () {
@@ -159,19 +161,25 @@ class _OrderPagesState extends State<OrderPages> {
                             },
                           ),
                           SizedBox(height: 8),
-                          SubCategoryBar(
-                            scrollController: subcategoryScrollController,
-                            categories: controller.filteredCategories,
-                            selectedCategoryId: controller.selectedCategoryId,
-                            onSelect: (catId) {
-                              setState(() {
-                                controller.selectedCategoryId = catId;
-                              });
-                              // Scroll ไปยัง category ที่เลือก
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                scrollToCategory(catId);
-                              });
-                            },
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: 1,
+                            child: SubCategoryBar(
+                              scrollController: subcategoryScrollController,
+                              categories: controller.filteredCategories,
+                              selectedCategoryId: controller.selectedCategoryId,
+                              onSelect: (catId) {
+                                setState(() {
+                                  controller.selectedCategoryId = catId;
+                                });
+                                // Scroll ไปยัง category ที่เลือก
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  scrollToCategory(catId);
+                                });
+                              },
+                            ),
                           ),
                         ],
 
@@ -196,13 +204,15 @@ class _OrderPagesState extends State<OrderPages> {
 
                   /// 🔹 RIGHT SIDE (CART)
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(color: Colors.grey.shade300),
-                      ),
+                    width: DeviceType.isDesktop(context)
+                        ? screenWidth * 0.20
+                        : DeviceType.isTablet(context)
+                        ? screenWidth * 0.25
+                        : screenWidth * 0.30,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8, right: 8),
+                      child: CartSection(cartItems: controller.cartItems),
                     ),
-                    child: CartSection(cartItems: controller.cartItems),
                   ),
                 ],
               ),

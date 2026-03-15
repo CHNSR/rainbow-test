@@ -23,10 +23,9 @@ class MainApp extends StatelessWidget {
       scrollBehavior: MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
       ),
+      home: HomePage(),
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
       onGenerateRoute: AppRouter.generateRoute,
-      initialRoute: AppRoutes.home,
     );
   }
 }

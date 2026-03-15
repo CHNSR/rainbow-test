@@ -16,37 +16,64 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double buttonHeight;
+    double iconSize;
+    double fontSize;
+
+    if (width < 600) {
+      buttonHeight = 24;
+      iconSize = 12;
+      fontSize = 9;
+    } else if (width < 1024) {
+      buttonHeight = 32;
+      iconSize = 18;
+      fontSize = 14;
+    } else {
+      buttonHeight = 36;
+      iconSize = 20;
+      fontSize = 18;
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: [
-          /// Back button (เล็กลง)
-          SizedBox(
-            height: 32,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade200,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: const Size(60, 32),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Row(
-                children: [
-                  const Icon(Icons.arrow_back, color: Colors.black54, size: 18),
-                  const AutoSizeText(
-                    maxLines: 1,
-                    minFontSize: 8,
-                    overflow: TextOverflow.visible,
-                    "Back",
-                    style: TextStyle(color: Colors.black54),
+          /// Back button
+          Align(
+            alignment: .centerLeft,
+            child: SizedBox(
+              height: buttonHeight,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade200,
+                  elevation: 0,
+                  padding: const EdgeInsets.all(3),
+                  minimumSize: Size(50, buttonHeight),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(3),
                   ),
-                ],
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.arrow_back,
+                      color: Colors.black54,
+                      size: iconSize,
+                    ),
+                    Text(
+                      maxLines: 1,
+                      overflow: TextOverflow.visible,
+                      "Back",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: fontSize,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -62,10 +89,19 @@ class TopBar extends StatelessWidget {
                   )
                 : Align(
                     alignment: Alignment.centerRight,
-                    child: IconButton(
-                      iconSize: 26,
-                      onPressed: onToggleSearch,
-                      icon: const Icon(Icons.search),
+                    child: Container(
+                      height: iconSize * 2,
+                      width: iconSize * 2,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: iconSize,
+                        onPressed: onToggleSearch,
+                        icon: const Icon(Icons.search),
+                      ),
                     ),
                   ),
           ),

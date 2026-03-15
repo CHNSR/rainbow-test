@@ -38,17 +38,14 @@ class MenuGrid extends StatelessWidget {
 
     final foodMap = groupFoodByCategory(foods);
     double width = MediaQuery.of(context).size.width;
-
-    double w = MediaQuery.of(context).size.width;
-
     double aspectRatio;
 
-    if (w < 500) {
-      aspectRatio = 0.6; // mobile
-    } else if (w < 900) {
-      aspectRatio = 0.7; // tablet
+    if (width < 500) {
+      aspectRatio = 0.8;
+    } else if (width < 900) {
+      aspectRatio = 0.85;
     } else {
-      aspectRatio = 0.8; // kiosk / desktop
+      aspectRatio = 0.9;
     }
 
     return CustomScrollView(
@@ -96,8 +93,8 @@ class MenuGrid extends StatelessWidget {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
                   childAspectRatio: aspectRatio,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
                 ),
               ),
             ),
