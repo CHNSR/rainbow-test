@@ -7,7 +7,11 @@ import 'package:flutter_application_1/config/export.dart';
 void main() {
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => OrderBloc())],
+      providers: [
+        BlocProvider(create: (context) => OrderBloc()),
+        BlocProvider(create: (context) => MenuBloc()),
+        BlocProvider(create: (context) => CartBloc()),
+      ],
       child: const MainApp(),
     ),
   );

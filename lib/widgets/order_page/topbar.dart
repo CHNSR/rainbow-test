@@ -40,7 +40,7 @@ class TopBar extends StatelessWidget {
         children: [
           /// Back button
           Align(
-            alignment: .centerLeft,
+            alignment: Alignment.centerLeft,
             child: SizedBox(
               height: buttonHeight,
               child: ElevatedButton(
