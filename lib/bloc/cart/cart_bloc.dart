@@ -13,7 +13,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onAddToCart(AddToCartEvent event, Emitter<CartState> emit) {
     final List<CartItem> updatedCart = List.from(state.cartItems);
-    
+    print('[BLOC]: updatedCart.length :$updatedCart');
     final index = updatedCart.indexWhere(
       (item) => item.food.foodId == event.food.foodId,
     );
@@ -22,9 +22,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       // Modify the item within the new list to maintain immutability
       final existingItem = updatedCart[index];
       updatedCart[index] = CartItem(
-        food: existingItem.food, 
-        quantity: existingItem.quantity + 1
-      );
+          food: existingItem.food, quantity: existingItem.quantity + 1);
     } else {
       updatedCart.add(CartItem(food: event.food, quantity: 1));
     }
@@ -34,7 +32,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onRemoveFromCart(RemoveFromCartEvent event, Emitter<CartState> emit) {
     final List<CartItem> updatedCart = List.from(state.cartItems);
-    
+
     final index = updatedCart.indexWhere(
       (item) => item.food.foodId == event.food.foodId,
     );
@@ -43,9 +41,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       final existingItem = updatedCart[index];
       if (existingItem.quantity > 1) {
         updatedCart[index] = CartItem(
-          food: existingItem.food, 
-          quantity: existingItem.quantity - 1
-        );
+            food: existingItem.food, quantity: existingItem.quantity - 1);
       } else {
         updatedCart.removeAt(index);
       }

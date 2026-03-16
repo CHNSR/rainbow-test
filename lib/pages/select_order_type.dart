@@ -11,6 +11,8 @@ class SelectOrderType extends StatefulWidget {
 class _SelectOrderTypeState extends State<SelectOrderType> {
   @override
   Widget build(BuildContext context) {
+    final screen = MediaQuery.of(context).size;
+    final base = screen.shortestSide;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -22,7 +24,6 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
             double fontSize = screenWidth < 500 ? 14 : 18;
             return Row(
               mainAxisSize: MainAxisSize.min,
-
               children: [
                 Icon(Icons.restaurant, size: iconSize),
                 const SizedBox(width: 8),
@@ -31,9 +32,9 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
             );
           },
         ),
-
         actions: [ChangeLangWidget()],
       ),
+      bottomNavigationBar: BottomSheetCustom(),
       body: Stack(
         children: [
           Positioned(
@@ -51,31 +52,26 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 20),
-
                   Text(
                     "Self-Service\nExperience.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width / 10,
+                      fontSize: ResponsiveFont.title(base),
                       fontFamily: 'Rasa',
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
                   SizedBox(height: 16),
-
                   Text(
                     "From self-order and self-checkout",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width / 45,
+                      fontSize: ResponsiveFont.subtitle(base),
                       fontWeight: FontWeight.w600,
                       color: Colors.grey.shade600,
                     ),
                   ),
-
                   SizedBox(height: 8),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -86,7 +82,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                           child: Icon(
                             Icons.credit_card_sharp,
                             color: Colors.red,
-                            size: MediaQuery.of(context).size.width / 40,
+                            size: ResponsiveFont.logosize(base),
                           ),
                         ),
                       ),
@@ -99,7 +95,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                             "Accept only Credit Card",
                             style: TextStyle(
                               color: Colors.red,
-                              fontSize: MediaQuery.of(context).size.width / 50,
+                              fontSize: ResponsiveFont.subtitle(base),
                               fontWeight: FontWeight.w600,
                               decoration: TextDecoration.underline,
                               decorationColor: Colors.red,
@@ -110,16 +106,13 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                       ),
                     ],
                   ),
-
                   SizedBox(height: 24),
-
                   SelectCatagory(),
                   Spacer(),
                 ],
               ),
             ),
           ),
-          Align(alignment: Alignment.bottomCenter, child: BottomSheetCustom()),
         ],
       ),
     );

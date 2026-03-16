@@ -11,8 +11,8 @@ class BottomSheetCustom extends StatelessWidget {
         final isMobile = Responsive.isMobileConstraints(constraints);
         final horizontalPadding = isMobile ? 8.0 : 16.0;
         final verticalPadding = isMobile ? 8.0 : 12.0;
-        final titleFontSize = isMobile ? 11.0 : 14.0;
-        final contentFontSize = isMobile ? 9.0 : 11.0;
+        final titleFontSize = isMobile ? 8.0 : 14.0;
+        final contentFontSize = isMobile ? 6.0 : 11.0;
         final spacing = isMobile ? 3.0 : 6.0;
         // Your layout logic here
         return Container(

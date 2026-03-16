@@ -64,11 +64,15 @@ class CategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth * 0.15).clamp(140, 240).toDouble();
+    final cardHeight = cardWidth * (180 / 150);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 150,
-        height: 180,
+        width: cardWidth,
+        height: cardHeight,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           color: Colors.white,
@@ -82,7 +86,6 @@ class CategoryButton extends StatelessWidget {
         ),
         child: Column(
           children: [
-            /// 🔹 รูปด้านบน
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
@@ -95,11 +98,9 @@ class CategoryButton extends StatelessWidget {
                 ),
               ),
             ),
-
-            /// 🔹 แถบด้านล่าง
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: EdgeInsets.symmetric(vertical: cardHeight * 0.08),
               decoration: BoxDecoration(
                 color: buttonColor,
                 borderRadius: const BorderRadius.vertical(
@@ -109,9 +110,9 @@ class CategoryButton extends StatelessWidget {
               child: Center(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: cardWidth * 0.1,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

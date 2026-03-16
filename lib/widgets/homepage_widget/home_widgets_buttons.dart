@@ -43,6 +43,7 @@ class _TabtoOrderButtonState extends State<TabtoOrderButton> {
 
 class LandscapeMainContant extends StatelessWidget {
   const LandscapeMainContant({super.key});
+//  final width = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +76,7 @@ class LandscapeMainContant extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Text(
                     "From self-order and self-checkout",
                     textAlign: TextAlign.center,
@@ -86,9 +85,7 @@ class LandscapeMainContant extends StatelessWidget {
                       color: Colors.grey.shade600,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -123,9 +120,7 @@ class LandscapeMainContant extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   SizedBox(height: MediaQuery.of(context).size.width / 25),
-
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
@@ -162,7 +157,6 @@ class LandscapeMainContant extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-
               Align(
                 alignment: const Alignment(-0.05, 0.30),
                 child: Row(
@@ -174,11 +168,14 @@ class LandscapeMainContant extends StatelessWidget {
                       size: MediaQuery.of(context).size.width * 0.02,
                     ),
                     SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Text(
-                      "Soi Siam",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: MediaQuery.of(context).size.width * 0.02,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "Soi Siam",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: MediaQuery.of(context).size.width * 0.02,
+                        ),
                       ),
                     ),
                   ],
@@ -211,7 +208,6 @@ class PortraitMainContant extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-
               Align(
                 alignment: const Alignment(-0.05, 0.35),
                 child: Column(
@@ -238,7 +234,6 @@ class PortraitMainContant extends StatelessWidget {
             ],
           ),
         ),
-
         Positioned.fill(
           top: 0,
           bottom: MediaQuery.of(context).size.height * 0.5,
@@ -269,6 +264,7 @@ class PortraitMainContant extends StatelessWidget {
                 "From self-order and self-checkout",
                 textAlign: TextAlign.center,
                 style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.03,
                   fontWeight: FontWeight.w600,
                   color: Colors.grey.shade600,
                 ),
@@ -312,23 +308,29 @@ class PortraitMainContant extends StatelessWidget {
               SizedBox(height: MediaQuery.of(context).size.width / 25),
 
               // ElevatedButton(
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 20,
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
+                height: MediaQuery.of(context).size.width * 0.10,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        //horizontal: 32,
+                        //vertical: 10,
+                        ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    backgroundColor: const Color(0xFF496EE2),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+                  onPressed: () {
+                    AppNavigator.goToSelectOrderType(context);
+                  },
+                  child: Text(
+                    "Tap to Order",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: MediaQuery.of(context).size.width * 0.03),
                   ),
-                  backgroundColor: const Color.fromARGB(255, 54, 118, 255),
-                ),
-                onPressed: () {
-                  AppNavigator.goToSelectOrderType(context);
-                },
-                child: const Text(
-                  "Tap to Order",
-                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ],

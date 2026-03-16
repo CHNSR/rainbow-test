@@ -41,35 +41,37 @@ class Responsive {
 
   /// ✅ Helper: icon size
   static double iconSize(BoxConstraints constraints) => getValue(
-    constraints: constraints,
-    mobile: 35.0,
-    tablet: 40.0,
-    desktop: 50.0,
-  );
+        constraints: constraints,
+        mobile: 35.0,
+        tablet: 40.0,
+        desktop: 50.0,
+      );
 
   /// ✅ Helper: font size
   static double fontSize(BoxConstraints constraints) => getValue(
-    constraints: constraints,
-    mobile: 14.0,
-    tablet: 17.0,
-    desktop: 20.0,
-  );
+        constraints: constraints,
+        mobile: 14.0,
+        tablet: 17.0,
+        desktop: 20.0,
+      );
 
   /// ✅ Helper: padding horizontal
   static double paddingH(BoxConstraints constraints) => getValue(
-    constraints: constraints,
-    mobile: 8.0,
-    tablet: 10.0,
-    desktop: 12.0,
-  );
+        constraints: constraints,
+        mobile: 8.0,
+        tablet: 10.0,
+        desktop: 12.0,
+      );
 
   /// ✅ Helper: spacing
   static double spacing(BoxConstraints constraints) => getValue(
-    constraints: constraints,
-    mobile: 4.0,
-    tablet: 6.0,
-    desktop: 8.0,
-  );
+        constraints: constraints,
+        mobile: 4.0,
+        tablet: 6.0,
+        desktop: 8.0,
+      );
+
+  static double? title(double base) {}
 }
 
 /// 🎯 Credit Card Info Card Builder
@@ -122,5 +124,32 @@ class CreditCardInfoCard extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class ResponsiveFont {
+  static double title(double width) {
+    if (width < 700) return 40;
+    if (width < 1200) return 60;
+    if (width < 2000) return 80;
+    return 100;
+  }
+
+  static double subtitle(double width) {
+    if (width < 700) return 8;
+    if (width < 1200) return 14;
+    return 18;
+  }
+
+  static double textsmall(double width) {
+    if (width < 700) return 5;
+    if (width < 1200) return 8;
+    return 12;
+  }
+
+  static double logosize(double width) {
+    if (width < 700) return 20;
+    if (width < 1200) return 24;
+    return 28;
   }
 }

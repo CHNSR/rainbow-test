@@ -136,7 +136,7 @@ Day 7
 - restructure project | pass
 
 Day 8 
--  bug back button | pass
+- bug back button | pass
 - font family | pass
 - Text sized homepage | pass
 - grid format | pass
@@ -150,3 +150,30 @@ Day 8
 - restruck in order page | 
 - read logic and read bloc |
 - restructure project |
+
+---------------------------------------------------------
+Day 9 
+- restructure project Bloc | pass
+- Size text in shopping bag landscape | freez
+- select order page buttons| pass
+- home page re UI | pass
+- button orderpage | pass
+- x1 card at menu | pass
+- shadow cart session | pass
+- bloc cart order | pass
+------------------------------------
+- UI bottom bar | inprogress
+- restructure of cart session
+- mobile button |
+- select first filter of category|
+- scale menu card |
+- category menu bar | pass
+- app bar scale of back buttons | 
+- restruck in order page | 
+- read logic and read bloc |
+- restructure project |
+- check fonts all page|
+- follow up ui in order page| 
+	- Topbar | pass
+	- cart section | 80%
+	- default category |inprogress

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MenuGrid extends StatelessWidget {
   final List<FoodMenu> foods;
@@ -8,6 +9,7 @@ class MenuGrid extends StatelessWidget {
   final ScrollController? subcategoryScrollController;
   final Map<String, GlobalKey> categoryKeys;
   final ScrollController menuScrollController;
+  final List<CartItem> cartItems;
 
   const MenuGrid({
     super.key,
@@ -16,6 +18,7 @@ class MenuGrid extends StatelessWidget {
     required this.subcategoryScrollController,
     required this.categoryKeys,
     required this.menuScrollController,
+    required this.cartItems,
     this.onAddToCart,
   });
 
@@ -84,9 +87,9 @@ class MenuGrid extends StatelessWidget {
                   return MenuCard(
                     food: food,
                     onAddToCart: () {
-                      if (onAddToCart != null) {
-                        onAddToCart!(food);
-                      }
+                      context.read<CartBloc>().add(
+                            AddToCartEvent(food),
+                          );
                     },
                   );
                 }, childCount: menu.length > 8 ? 8 : menu.length),
