@@ -197,3 +197,4 @@ Day 10
 - restructure project |
 - check fonts all page|
 - font size card page |
+- select category card page |
