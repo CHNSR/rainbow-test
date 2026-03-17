@@ -47,8 +47,10 @@ export 'package:flutter_application_1/widgets/select_category_type.dart/bottom_s
 export 'package:flutter_application_1/widgets/select_category_type.dart/select_catagory.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/home_widgets_buttons.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/appbar_widget.dart';
-export 'package:flutter_application_1/widgets/order_page/cart_section.dart';
+export 'package:flutter_application_1/widgets/cart_section_widget/cart_section.dart';
 export 'package:flutter_application_1/widgets/change_lang_widget.dart';
+export 'package:flutter_application_1/widgets/cart_section_widget/card_Item.dart';
+export 'package:flutter_application_1/widgets/cart_section_widget/sub_total_session.dart';
 
 // ==============================================================================
 // 🔷 CORE EXPORTS

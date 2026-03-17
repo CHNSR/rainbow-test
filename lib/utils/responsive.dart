@@ -136,6 +136,7 @@ class ResponsiveFont {
   }
 
   static double subtitle(double width) {
+    if (width < 400) return 5;
     if (width < 700) return 8;
     if (width < 1200) return 14;
     return 18;
@@ -151,5 +152,49 @@ class ResponsiveFont {
     if (width < 700) return 20;
     if (width < 1200) return 24;
     return 28;
+  }
+
+  static double subcategory_size(double width) {
+    if (width < 400) return 8;
+    if (width < 700) return 10;
+    if (width < 1200) return 12;
+    return 14;
+  }
+
+  static double titleCategory(double width) {
+    if (width < 400) return 10;
+    if (width < 700) return 12;
+    if (width < 1200) return 14;
+    return 16;
+  }
+
+  static double backButton(double width) {
+    if (width < 400) return 8;
+    if (width < 700) return 10;
+    if (width < 1200) return 14;
+    return 16;
+  }
+}
+
+class ResponsiveSize {
+  static double subcategoryheight(double width) {
+    if (width < 400) return 20;
+    if (width < 700) return 30;
+    if (width < 1200) return 40;
+    return 50;
+  }
+
+  static double backButtonheight(double width) {
+    if (width < 400) return 18;
+    if (width < 700) return 20;
+    if (width < 1200) return 30;
+    return 36;
+  }
+
+  static double backButtonSize(double width) {
+    if (width < 400) return 8;
+    if (width < 700) return 16;
+    if (width < 1200) return 20;
+    return 26;
   }
 }

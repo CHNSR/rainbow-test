@@ -61,12 +61,12 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 5),
                   Text(
                     "From self-order and self-checkout",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: ResponsiveFont.subtitle(base),
+                      fontSize: MediaQuery.of(context).size.width * 0.03,
                       fontWeight: FontWeight.w600,
                       color: Colors.grey.shade600,
                     ),
@@ -82,7 +82,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                           child: Icon(
                             Icons.credit_card_sharp,
                             color: Colors.red,
-                            size: ResponsiveFont.logosize(base),
+                            size: MediaQuery.of(context).size.width * 0.04,
                           ),
                         ),
                       ),
@@ -95,7 +95,8 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                             "Accept only Credit Card",
                             style: TextStyle(
                               color: Colors.red,
-                              fontSize: ResponsiveFont.subtitle(base),
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.03,
                               fontWeight: FontWeight.w600,
                               decoration: TextDecoration.underline,
                               decorationColor: Colors.red,

@@ -15,8 +15,9 @@ class CategoryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return SizedBox(
-      height: 40,
+      height: ResponsiveSize.subcategoryheight(screenWidth),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: sets.length,
@@ -32,13 +33,14 @@ class CategoryBar extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: isSelected ? Color(0xFF02CCFE) : Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(3),
               ),
               child: Text(
                 set.foodSetName ?? "",
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black,
-                ),
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontSize: ResponsiveFont.titleCategory(screenWidth),
+                    fontWeight: FontWeight.w400),
               ),
             ),
           );

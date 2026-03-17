@@ -65,7 +65,7 @@ class CategoryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth * 0.15).clamp(140, 240).toDouble();
+    final cardWidth = (screenWidth * 0.15).clamp(130, 240).toDouble();
     final cardHeight = cardWidth * (180 / 150);
 
     return GestureDetector(

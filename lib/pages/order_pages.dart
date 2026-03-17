@@ -100,7 +100,6 @@ class _OrderPagesState extends State<OrderPages> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -116,20 +115,33 @@ class _OrderPagesState extends State<OrderPages> {
                         listener: (context, state) {
                       if (state is MenuLoaded) {
                         buildCategoryKeys(state.categories);
+
+                        /// 🔥 auto select subcategory แรก (ครั้งแรกเท่านั้น)
+                        if (state.selectedCategoryId == null &&
+                            state.filteredCategories.isNotEmpty) {
+                          context.read<MenuBloc>().add(
+                                SelectCategoryEvent(
+                                  state.filteredCategories.first.foodCatId!,
+                                ),
+                              );
+                        }
                       }
-                    }, builder: (context, menuState) {
+                    },
+
+                        /// ✅ builder ต้องอยู่นอก listener
+                        builder: (context, menuState) {
                       if (menuState is MenuLoading) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (menuState is MenuError) {
                         return Center(
-                            child: Text("Error: \${menuState.message}"));
+                            child: Text("Error: ${menuState.message}"));
                       } else if (menuState is! MenuLoaded) {
                         return const SizedBox();
                       }
+
                       return Column(
                         children: [
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.08,
                             child: TopBar(
                               showSearchBar: showSearchBar,
                               onToggleSearch: () {
@@ -166,7 +178,7 @@ class _OrderPagesState extends State<OrderPages> {
                                 );
                               },
                             ),
-                            SizedBox(height: 8),
+                            SizedBox(height: screenWidth * 0.015),
                             Align(
                               alignment: Alignment.centerLeft,
                               widthFactor: 1,

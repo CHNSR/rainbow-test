@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 
@@ -16,39 +15,26 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double buttonHeight;
-    double iconSize;
-    double fontSize;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double iconSize = ResponsiveSize.backButtonSize(screenWidth);
 
-    if (width < 600) {
-      buttonHeight = 24;
-      iconSize = 12;
-      fontSize = 9;
-    } else if (width < 1024) {
-      buttonHeight = 32;
-      iconSize = 18;
-      fontSize = 14;
-    } else {
-      buttonHeight = 36;
-      iconSize = 20;
-      fontSize = 18;
-    }
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.only(left: 0, right: 6, top: 6, bottom: 6),
       child: Row(
         children: [
           /// Back button
           Align(
             alignment: Alignment.centerLeft,
             child: SizedBox(
-              height: buttonHeight,
+              height: ResponsiveSize.backButtonheight(screenWidth),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey.shade200,
                   elevation: 0,
-                  padding: const EdgeInsets.all(3),
-                  minimumSize: Size(50, buttonHeight),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+                  minimumSize:
+                      Size(20, ResponsiveSize.subcategoryheight(screenWidth)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(3),
                   ),
@@ -63,13 +49,16 @@ class TopBar extends StatelessWidget {
                       color: Colors.black54,
                       size: iconSize,
                     ),
+                    SizedBox(
+                      width: screenWidth * 0.004,
+                    ),
                     Text(
                       maxLines: 1,
                       overflow: TextOverflow.visible,
                       "Back",
                       style: TextStyle(
                         color: Colors.black54,
-                        fontSize: fontSize,
+                        fontSize: ResponsiveFont.backButton(screenWidth),
                       ),
                     ),
                   ],
@@ -90,17 +79,17 @@ class TopBar extends StatelessWidget {
                 : Align(
                     alignment: Alignment.centerRight,
                     child: Container(
-                      height: iconSize * 2,
+                      height: ResponsiveSize.backButtonheight(screenWidth),
                       width: iconSize * 2,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(3),
                       ),
                       child: IconButton(
-                        padding: EdgeInsets.zero,
+                        padding: EdgeInsets.all(iconSize * 0.2),
                         iconSize: iconSize,
                         onPressed: onToggleSearch,
-                        icon: const Icon(Icons.search),
+                        icon: Image.asset('assets/logo/search_logo.png'),
                       ),
                     ),
                   ),

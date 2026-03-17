@@ -177,3 +177,23 @@ Day 9
 	- Topbar | pass
 	- cart section | 80%
 	- default category |inprogress
+
+Day 10
+- bottoms bar size | pass
+- category menu bar | pass
+- under line and color of text| pass
+- app bar scale of back buttons | pass
+- restructure of cart session | pass
+- select first filter of category| pass
+- landscape side categorybar button | pass
+- restruck in order page | pass
+- shadow of card | pass
+- button confirm | pass
+- subtotal size | pass
+---------------------------------------------------------------
+- mobile button | 
+- scale menu card |
+- read logic and read bloc |
+- restructure project |
+- check fonts all page|
+- font size card page |

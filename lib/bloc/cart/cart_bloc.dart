@@ -13,7 +13,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
   void _onAddToCart(AddToCartEvent event, Emitter<CartState> emit) {
     final List<CartItem> updatedCart = List.from(state.cartItems);
-    print('[BLOC]: updatedCart.length :$updatedCart');
     final index = updatedCart.indexWhere(
       (item) => item.food.foodId == event.food.foodId,
     );

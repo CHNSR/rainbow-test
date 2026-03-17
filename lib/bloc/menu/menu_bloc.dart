@@ -12,8 +12,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     on<SearchMenuEvent>(_onSearchMenu);
   }
 
-  Future<void> _onLoadMenu(
-      LoadMenuEvent event, Emitter<MenuState> emit) async {
+  Future<void> _onLoadMenu(LoadMenuEvent event, Emitter<MenuState> emit) async {
     emit(MenuLoading());
     try {
       final sets = await FoodService.parseFoodSet();
@@ -26,13 +25,20 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       if (sets.isNotEmpty) {
         initialSetId = sets.first.foodSetId;
 
-        final menusInSet = menus
-            .where((m) => m.foodSetId == initialSetId)
+        /// 🔥 หา menu ที่อยู่ใน set นี้
+        final menusInSet =
+            menus.where((m) => m.foodSetId == initialSetId).toList();
+
+        /// 🔥 เอา categoryId ที่มีอยู่จริงใน set นี้
+        final categoryIdsInSet = menusInSet.map((m) => m.foodCatId).toSet();
+
+        /// 🔥 filter category ให้ตรงกับ set
+        final categoriesInSet = categories
+            .where((c) => categoryIdsInSet.contains(c.foodCatId))
             .toList();
-        print("[MenuBloc] Menu Set: ${menusInSet.first.foodSetId}");
-        
-        if (menusInSet.isNotEmpty) {
-          initialCategoryId = menusInSet.first.foodCatId;
+
+        if (categoriesInSet.isNotEmpty) {
+          initialCategoryId = categoriesInSet.first.foodCatId;
         }
       }
 
@@ -51,25 +57,31 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   void _onSelectSet(SelectSetEvent event, Emitter<MenuState> emit) {
     if (state is MenuLoaded) {
       final currentState = state as MenuLoaded;
-      
-      String? newCategoryId;
-      final menusInSet = currentState.menus
-          .where((m) => m.foodSetId == event.setId)
+
+      /// 🔥 หา menu ใน set นี้
+      final menusInSet =
+          currentState.menus.where((m) => m.foodSetId == event.setId).toList();
+
+      /// 🔥 เอา categoryId ที่มีอยู่จริง
+      final categoryIds = menusInSet.map((m) => m.foodCatId).toSet();
+
+      /// 🔥 filter category ให้ตรงกับ set
+      final categoriesInSet = currentState.categories
+          .where((c) => categoryIds.contains(c.foodCatId))
           .toList();
 
-      if (menusInSet.isNotEmpty) {
-        newCategoryId = menusInSet.first.foodCatId;
-      }
+      /// 🔥 เลือก category แรก
+      final firstCategoryId =
+          categoriesInSet.isNotEmpty ? categoriesInSet.first.foodCatId : null;
 
       emit(currentState.copyWith(
         selectedSetId: event.setId,
-        selectedCategoryId: newCategoryId,
+        selectedCategoryId: firstCategoryId, // 🔥 ตรงนี้สำคัญ
       ));
     }
   }
 
-  void _onSelectCategory(
-      SelectCategoryEvent event, Emitter<MenuState> emit) {
+  void _onSelectCategory(SelectCategoryEvent event, Emitter<MenuState> emit) {
     if (state is MenuLoaded) {
       final currentState = state as MenuLoaded;
       emit(currentState.copyWith(selectedCategoryId: event.categoryId));

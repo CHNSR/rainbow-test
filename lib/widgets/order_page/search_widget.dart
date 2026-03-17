@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/utils/responsive.dart';
 
 class SearchWidget extends StatefulWidget {
   final ValueChanged<String> onChanged;
@@ -29,29 +30,33 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenwidget = MediaQuery.of(context).size.width;
+    final double buttonHeight = ResponsiveSize.backButtonheight(screenwidget);
+    final double textSize = ResponsiveFont.backButton(screenwidget);
     return SizedBox(
-      height: 32,
+      height: buttonHeight,
       child: TextField(
         controller: controller,
         onChanged: widget.onChanged,
-        style: const TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: textSize),
         decoration: InputDecoration(
           isDense: true,
-          hint: AutoSizeText("Search foods...", maxLines: 1, minFontSize: 14),
+          hint: Text("Search foods...",
+              maxLines: 1, style: TextStyle(fontSize: textSize)),
 
           /// 🔹 ปรับ icon ให้ชิด text
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 6, right: 4),
-            child: Icon(Icons.search, size: 18),
+          prefixIcon: Padding(
+            padding: EdgeInsets.all(1),
+            child: Icon(Icons.search, size: 12),
           ),
 
           prefixIconConstraints: const BoxConstraints(
-            minWidth: 28,
-            minHeight: 28,
+            minWidth: 18,
+            minHeight: 18,
           ),
 
           suffixIcon: IconButton(
-            icon: const Icon(Icons.clear, size: 18),
+            icon: Icon(Icons.clear, size: textSize),
             padding: EdgeInsets.zero,
             onPressed: _clear,
           ),
@@ -60,8 +65,8 @@ class _SearchWidgetState extends State<SearchWidget> {
 
           /// 🔹 ลด padding เพื่อให้ text ไม่โดนตัด
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 6,
-            vertical: 6,
+            horizontal: 1,
+            vertical: 1,
           ),
         ),
       ),
