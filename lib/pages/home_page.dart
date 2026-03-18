@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
           onTap: _toggleBottomSheet,
           child: Row(
             children: [
-              const Icon(Icons.restaurant),
+              Image.asset("assets/logo/chonsom.png", width: 15, height: 15),
               const SizedBox(width: 8),
               const Text("Soi Siam", style: TextStyle(fontSize: 14)),
             ],
@@ -66,12 +66,10 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: isLandscape ? LandscapeMainContant() : PortraitMainContant(),
           ),
-
           if (showBottom)
             AnimatedSlide(
               offset: offset,
               duration: const Duration(seconds: 1),
-
               curve: Curves.easeInOut,
               child: Align(
                 alignment: Alignment.bottomCenter,

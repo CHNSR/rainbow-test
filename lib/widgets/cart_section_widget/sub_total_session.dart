@@ -22,20 +22,19 @@ class _SubTotalSessionState extends State<SubTotalSession> {
     }).toList();
 
     if (cartItems.isNotEmpty) {
-      /// send order
-      context.read<OrderBloc>().add(
-            ConfirmOrderEvent(orderItems),
-          );
-
       /// clear cart
       context.read<CartBloc>().add(
             ClearCartEvent(),
           );
 
+      /// send order ใหม่
+      context.read<OrderBloc>().add(
+            ConfirmOrderEvent(orderItems),
+          );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Order confirmed!"),
-          duration: Duration(milliseconds: 1500),
           backgroundColor: Colors.green,
         ),
       );
@@ -68,8 +67,8 @@ class _SubTotalSessionState extends State<SubTotalSession> {
                       textAlign: TextAlign.left,
                       style: GoogleFonts.workSans(
                         fontSize: ResponsiveFont.titleCategory(screenWidth),
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF4F4F4F),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -83,13 +82,13 @@ class _SubTotalSessionState extends State<SubTotalSession> {
                         color: cartTotal(cartItems) == 0
                             ? Color(0xFF4F4F4F)
                             : Color(0xFF7B61FF),
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: screenWidth * 0.001),
+              SizedBox(height: screenWidth * 0.01),
               LayoutBuilder(builder: (context, constraints) {
                 return Padding(
                   padding: EdgeInsets.only(

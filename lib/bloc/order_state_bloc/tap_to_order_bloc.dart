@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:meta/meta.dart';
@@ -47,7 +49,8 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       }
 
       /// รวมกับ order เก่า
-      final updatedOrders = [...state.orders, ...newOrders];
+      //final updatedOrders = [...state.orders, ...newOrders];
+      final updatedOrders = [...newOrders];
 
       /// 🔹 print updatedOrders
       print("----------- ALL ORDERS IN STATE -----------");

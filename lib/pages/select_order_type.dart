@@ -12,20 +12,31 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-    final base = screen.shortestSide;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screen.width > screen.height;
+
+    final appBarHeight = screenHeight < 300.0
+        ? screenHeight * 0.05
+        : screenHeight < 900.0
+            ? screen.height * 0.1
+            : screen.height * 0.02;
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: appBarHeight,
         automaticallyImplyLeading: false,
         title: Builder(
           builder: (context) {
             double screenWidth = MediaQuery.of(context).size.width;
-
-            double iconSize = screenWidth < 500 ? 20 : 26;
-            double fontSize = screenWidth < 500 ? 14 : 18;
+            double iconSize = screenWidth < 300 ? 15 : 20;
+            double fontSize = screenWidth < 300 ? 14 : 18;
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.restaurant, size: iconSize),
+                Image.asset(
+                  "assets/logo/chonsom.png",
+                  height: iconSize,
+                  width: iconSize,
+                ),
                 const SizedBox(width: 8),
                 Text("Soi Siam", style: TextStyle(fontSize: fontSize)),
               ],
@@ -34,10 +45,10 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
         ),
         actions: [ChangeLangWidget()],
       ),
-      bottomNavigationBar: BottomSheetCustom(),
+      bottomNavigationBar: isLandscape ? null : BottomSheetCustom(),
       body: Stack(
         children: [
-          Positioned(
+          Positioned.fill(
             top: 0,
             left: 0,
             right: 0,
@@ -52,62 +63,10 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 20),
-                  Text(
-                    "Self-Service\nExperience.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: ResponsiveFont.title(base),
-                      fontFamily: 'Rasa',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    "From self-order and self-checkout",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.03,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // 🔷 Icon
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Icon(
-                            Icons.credit_card_sharp,
-                            color: Colors.red,
-                            size: MediaQuery.of(context).size.width * 0.04,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      // 🔷 Text
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            "Accept only Credit Card",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.03,
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.red,
-                              decorationThickness: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // HomePage Text
+                  TextHomepage(),
                   SizedBox(height: 24),
+                  // HomePage Button
                   SelectCatagory(),
                   Spacer(),
                 ],

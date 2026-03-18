@@ -198,3 +198,18 @@ Day 10
 - check fonts all page|
 - font size card page |
 - select category card page |
+
+Day 11
+- change logo home page | pass
+- change logo select order page| pass
+- class accept only credit card |  pass
+- bottom logo | pass
+- font size card page | pass
+- mobile button |  pass
+- scroll bug fix | pass 
+- scale menu card |
+- fix bug overflow in select category page |pass by hide bottom bar. If it's land space.
+------------------------------------------------
+- read logic and read bloc |
+- restructure project |
+- check fonts all page| pass

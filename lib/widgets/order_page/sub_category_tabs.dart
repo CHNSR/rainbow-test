@@ -18,14 +18,14 @@ class SubCategoryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
+    // 🔥 กำหนดความกว้างต่อ item
+    final itemWidth = screenWidth * 0.18; // ปรับได้ตามต้องการ
+
     return Align(
       alignment: Alignment.centerLeft,
-      child: Container(
+      child: SizedBox(
         height: ResponsiveSize.subcategoryheight(screenWidth),
-        decoration: BoxDecoration(
-          color: Color(0xFFF6F6F6),
-          borderRadius: BorderRadius.circular(10),
-        ),
         child: ListView.builder(
           controller: scrollController,
           scrollDirection: Axis.horizontal,
@@ -33,32 +33,35 @@ class SubCategoryBar extends StatelessWidget {
           itemBuilder: (context, index) {
             final category = categories[index];
             final isSelected = category.foodCatId == selectedCategoryId;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: GestureDetector(
-                onTap: () {
-                  onSelect(category.foodCatId!);
-                  scrollController.animateTo(
-                    index * 100,
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOut,
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isSelected ? Color(0xFF02CCFE) : Color(0xFFF6F6F6),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Text(
-                    category.foodCatName ?? "",
-                    style: TextStyle(
-                      fontSize: ResponsiveFont.subcategory_size(screenWidth),
-                      color: isSelected ? Colors.white : Colors.black,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
+
+            return GestureDetector(
+              onTap: () {
+                onSelect(category.foodCatId!);
+                scrollController.animateTo(
+                  index * itemWidth, // 🔥 ใช้ width จริง
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                );
+              },
+              child: Container(
+                width: itemWidth, // ✅ ทำให้เท่ากัน
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? const Color(0xFF02CCFE)
+                      : const Color(0xFFF6F6F6),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Text(
+                  category.foodCatName ?? "",
+                  textAlign: TextAlign.center, // 🔥 กันล้น
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis, // 🔥 กันล้น
+                  style: TextStyle(
+                    fontSize: ResponsiveFont.subcategory_size(screenWidth),
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ),

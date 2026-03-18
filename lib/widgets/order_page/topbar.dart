@@ -80,13 +80,13 @@ class TopBar extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: Container(
                       height: ResponsiveSize.backButtonheight(screenWidth),
-                      width: iconSize * 2,
+                      width: ResponsiveSize.backButtonheight(screenWidth),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: IconButton(
-                        padding: EdgeInsets.all(iconSize * 0.2),
+                        padding: EdgeInsets.all(iconSize * 0.25),
                         iconSize: iconSize,
                         onPressed: onToggleSearch,
                         icon: Image.asset('assets/logo/search_logo.png'),

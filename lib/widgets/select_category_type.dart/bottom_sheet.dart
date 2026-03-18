@@ -8,23 +8,30 @@ class BottomSheetCustom extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final size = MediaQuery.of(context).size;
+        final isLandscape = size.width > size.height;
         final isMobile = Responsive.isMobileConstraints(constraints);
-        final horizontalPadding = isMobile ? 8.0 : 16.0;
-        final verticalPadding = isMobile ? 36.0 : 12.0;
-        final titleFontSize = isMobile ? 8.0 : 14.0;
-        final contentFontSize = isMobile ? 6.0 : 11.0;
-        final spacing = isMobile ? 3.0 : 6.0;
+        final horizontalPadding = isLandscape ? 8.0 : 16.0;
+        final verticalPadding = isLandscape ? 36.0 : 12.0;
+        final titleFontSize =
+            isLandscape ? size.height * 0.02 : size.height * 0.01;
+        final contentFontSize =
+            isLandscape ? size.height * 0.001 : size.height * 0.01;
+        final spacing =
+            isLandscape ? size.height * 0.00005 : size.height * 0.005;
+
         // Your layout logic here
         return Container(
           width: double.infinity,
+          height: isLandscape ? size.height * 0.10 : size.height * 0.20,
           color: const Color(0xFF1F1F1F),
           padding: EdgeInsets.symmetric(
             horizontal: horizontalPadding,
             vertical: verticalPadding,
           ),
           child: Column(
+            mainAxisSize: isLandscape ? MainAxisSize.max : MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
             children: [
               // Contract Info Section
               Row(
@@ -70,11 +77,12 @@ class BottomSheetCustom extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(
-                                Icons.phone,
-                                color: Colors.white,
-                                size: contentFontSize + 2,
-                              ),
+                              SizedBox(
+                                  height: contentFontSize + 4,
+                                  width: contentFontSize + 4,
+                                  child: Image.asset(
+                                    'assets/picture/call_pic.png',
+                                  )),
                               SizedBox(width: spacing),
                               Text(
                                 "090-890-xxxx",
@@ -90,11 +98,12 @@ class BottomSheetCustom extends StatelessWidget {
                           SizedBox(height: spacing),
                           Row(
                             children: [
-                              Icon(
-                                Icons.email,
-                                color: Colors.white,
-                                size: contentFontSize + 2,
-                              ),
+                              SizedBox(
+                                  height: contentFontSize + 4,
+                                  width: contentFontSize + 4,
+                                  child: Image.asset(
+                                    'assets/picture/instagram_pic.png',
+                                  )),
                               SizedBox(width: spacing),
                               Text(
                                 "SoiSiam",
@@ -110,11 +119,12 @@ class BottomSheetCustom extends StatelessWidget {
                           SizedBox(height: spacing),
                           Row(
                             children: [
-                              Icon(
-                                Icons.chat,
-                                color: Colors.white,
-                                size: contentFontSize + 2,
-                              ),
+                              SizedBox(
+                                  height: contentFontSize + 4,
+                                  width: contentFontSize + 4,
+                                  child: Image.asset(
+                                    'assets/picture/youtube_pic.png',
+                                  )),
                               SizedBox(width: spacing),
                               Text(
                                 "SoiSiam Channel",
@@ -130,11 +140,12 @@ class BottomSheetCustom extends StatelessWidget {
                           SizedBox(height: spacing),
                           Row(
                             children: [
-                              Icon(
-                                Icons.email,
-                                color: Colors.white,
-                                size: contentFontSize + 2,
-                              ),
+                              SizedBox(
+                                  height: contentFontSize + 4,
+                                  width: contentFontSize + 4,
+                                  child: Image.asset(
+                                    'assets/picture/email_pic.png',
+                                  )),
                               SizedBox(width: spacing),
                               Text(
                                 "soisiam@gmail.co.th",

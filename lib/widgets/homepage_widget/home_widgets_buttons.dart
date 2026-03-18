@@ -43,10 +43,11 @@ class _TabtoOrderButtonState extends State<TabtoOrderButton> {
 
 class LandscapeMainContant extends StatelessWidget {
   const LandscapeMainContant({super.key});
-//  final width = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Row(
       children: [
         /// LEFT UI
@@ -67,59 +68,9 @@ class LandscapeMainContant extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Self-Service\nExperience.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width / 15,
-                      fontFamily: 'Rasa',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "From self-order and self-checkout",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // 🔷 Icon
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Icon(
-                            Icons.credit_card_sharp,
-                            color: Colors.red,
-                            size: MediaQuery.of(context).size.width / 68,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      // 🔷 Text
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            "Accept only Credit Card",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: MediaQuery.of(context).size.width / 70,
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.red,
-                              decorationThickness: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  //Text title
+                  TextHomepage(),
+
                   SizedBox(height: MediaQuery.of(context).size.width / 25),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -162,12 +113,12 @@ class LandscapeMainContant extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.restaurant,
-                      color: Colors.white,
-                      size: MediaQuery.of(context).size.width * 0.02,
+                    Image.asset(
+                      "assets/logo/chonsom_white.png",
+                      height: height * 0.03,
+                      width: width * 0.03,
                     ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.001),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
@@ -193,6 +144,9 @@ class PortraitMainContant extends StatelessWidget {
   const PortraitMainContant({super.key});
   @override
   Widget build(BuildContext context) {
+    final screenWith = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Stack(
       children: [
         Positioned.fill(
@@ -213,7 +167,8 @@ class PortraitMainContant extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.restaurant, color: Colors.white),
+                    Image.asset("assets/logo/chonsom_white.png",
+                        width: screenWith * 0.02, height: screenHeight * 0.04),
                     Text(
                       "Soi Siam",
                       style: TextStyle(
@@ -248,65 +203,8 @@ class PortraitMainContant extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                "Self-Service\nExperience.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width / 10,
-                  fontFamily: 'Rasa',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-
-              SizedBox(height: 8),
-
-              Text(
-                "From self-order and self-checkout",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.03,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-
-              SizedBox(height: 1),
-
-              // ✅ ใช้ responsive helper class
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // 🔷 Icon
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Icon(
-                        Icons.credit_card_sharp,
-                        color: Colors.red,
-                        size: MediaQuery.of(context).size.width / 25,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  // 🔷 Text
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "Accept only Credit Card",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: MediaQuery.of(context).size.width / 40,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
+              TextHomepage(),
               SizedBox(height: MediaQuery.of(context).size.width / 25),
-
               // ElevatedButton(
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.35,

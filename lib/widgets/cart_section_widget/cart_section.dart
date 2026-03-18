@@ -29,14 +29,7 @@ class _CartSectionState extends State<CartSection> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // lang side
-            Align(
-              alignment: Alignment.topRight,
-              child: Image.asset(
-                'assets/picture/usa_flag.png',
-                width: screenWidth * 0.02,
-                height: screenWidth * 0.02,
-              ),
-            ),
+            Align(alignment: Alignment.topRight, child: ChangeLangWidget()),
             Padding(
               padding: EdgeInsets.only(top: screenWidth * 0.03),
               child: Row(

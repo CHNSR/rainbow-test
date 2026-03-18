@@ -53,21 +53,36 @@ class _OrderPagesState extends State<OrderPages> {
       if (position.dy <= triggerOffset && position.dy > 0) {
         if (menuState.selectedCategoryId != cat.foodCatId) {
           context.read<MenuBloc>().add(SelectCategoryEvent(cat.foodCatId));
-          _scrollSubCategory(cat.foodCatId, menuState.filteredCategories);
+          _scrollSubCategory(cat.foodCatId, menuState.filteredCategories,
+              MediaQuery.of(context).size.width * (0.18));
         }
       }
     }
   }
 
   void _scrollSubCategory(
-      String catId, List<SubFoodCategory> filteredCategories) {
+    String catId,
+    List<SubFoodCategory> filteredCategories,
+    double itemWidth,
+  ) {
     final index = filteredCategories.indexWhere(
       (c) => c.foodCatId == catId,
     );
     if (index < 0) return;
-    const itemWidth = 120.0;
+
+    if (!subcategoryScrollController.hasClients) return;
+
+    final maxScroll = subcategoryScrollController.position.maxScrollExtent;
+
+    final targetOffset = index * itemWidth;
+
+    final safeOffset = targetOffset.clamp(0.0, maxScroll);
+
+    // 🔥 กัน animate ซ้ำค่าเดิม (ลดกระพริบ)
+    if ((subcategoryScrollController.offset - safeOffset).abs() < 1) return;
+
     subcategoryScrollController.animateTo(
-      index * itemWidth,
+      safeOffset,
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
     );

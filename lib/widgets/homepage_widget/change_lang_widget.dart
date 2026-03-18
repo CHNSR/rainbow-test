@@ -14,7 +14,7 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
     return Builder(
       builder: (context) {
         double screenWidth = MediaQuery.of(context).size.width;
-        double flagSize = screenWidth < 500 ? 20 : 26;
+        double flagSize = screenWidth < 400 ? 30 : 15;
         return PopupMenuButton<String>(
           shape: BeveledRectangleBorder(
             borderRadius: BorderRadius.circular(10),
