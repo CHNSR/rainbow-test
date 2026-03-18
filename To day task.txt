@@ -213,3 +213,12 @@ Day 11
 - read logic and read bloc |
 - restructure project |
 - check fonts all page| pass
+
+check rebuild 
+size fl
+แบ่ง โฮม 
+เปลี่ยนปุ่ม
+เปลี่ยนแอปบาเป็น ROw ไม่ใช้ appbar
+space ระหว่างปุ่มกัย text
+หน้าเดียวกันไม่ต้องแยก เอามาทำ widgetเลย
+ปุ่ม orderconfirm
