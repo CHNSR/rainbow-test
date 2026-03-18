@@ -14,10 +14,10 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
     return Builder(
       builder: (context) {
         double screenWidth = MediaQuery.of(context).size.width;
-        double flagSize = screenWidth < 400 ? 30 : 15;
+        double flagSize = screenWidth < 400 ? 10 : 15;
         return PopupMenuButton<String>(
           shape: BeveledRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(6),
           ),
           offset: const Offset(0, 40),
           icon: Image.asset(

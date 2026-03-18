@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> {
     final size = MediaQuery.of(context).size;
     final isLandscape = size.width > size.height;
     return Scaffold(
+      backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,

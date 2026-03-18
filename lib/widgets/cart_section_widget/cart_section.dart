@@ -31,7 +31,7 @@ class _CartSectionState extends State<CartSection> {
             // lang side
             Align(alignment: Alignment.topRight, child: ChangeLangWidget()),
             Padding(
-              padding: EdgeInsets.only(top: screenWidth * 0.03),
+              padding: EdgeInsets.only(top: screenWidth * 0.001),
               child: Row(
                 children: [
                   AutoSizeText(

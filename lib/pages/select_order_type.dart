@@ -21,9 +21,11 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
             ? screen.height * 0.1
             : screen.height * 0.02;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: appBarHeight,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         title: Builder(
           builder: (context) {
             double screenWidth = MediaQuery.of(context).size.width;

@@ -16,15 +16,15 @@ class CardItem extends StatelessWidget {
         return cartItems.isEmpty
             ?
             // No order selected
-            const Align(
+            Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: AutoSizeText(
+                  child: Text(
                     "No order selected",
                     maxLines: 1,
-                    minFontSize: 8,
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(
+                        color: Colors.grey, fontSize: screenWidth * 0.02),
                   ),
                 ),
               )
