@@ -48,9 +48,9 @@ class MenuCard extends StatelessWidget {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                double titleSize = constraints.maxWidth * 0.07;
+                double titleSize = constraints.maxWidth * 0.05;
                 double descSize = constraints.maxWidth * 0.04;
-                double priceSize = constraints.maxWidth * 0.07;
+                double priceSize = constraints.maxWidth * 0.05;
 
                 return Column(
                   children: [

@@ -14,12 +14,12 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
     return Builder(
       builder: (context) {
         double screenWidth = MediaQuery.of(context).size.width;
-        double flagSize = screenWidth < 400 ? 10 : 15;
+        double flagSize = screenWidth < 400 ? 25 : 15;
         return SizedBox(
           height: flagSize,
           width: flagSize,
           child: PopupMenuButton<String>(
-            padding: EdgeInsets.zero,
+            padding: EdgeInsets.only(right: 8, bottom: 8),
             constraints: const BoxConstraints(),
             shape: BeveledRectangleBorder(
               borderRadius: BorderRadius.circular(1),

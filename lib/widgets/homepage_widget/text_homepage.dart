@@ -11,7 +11,7 @@ class TextHomepage extends StatelessWidget {
 
     // 🔥 แยก scale ตาม orientation
     final titleSize = isLandscape ? size.width / 15 : size.width / 10;
-    final subTitleSize = isLandscape ? size.width / 60 : size.width * 0.03;
+    final subTitleSize = isLandscape ? size.width / 60 : size.width * 0.025;
     final iconSize = isLandscape ? size.width / 80 : size.width / 25;
     final noteSize = isLandscape ? size.width / 80 : size.width / 40;
 
