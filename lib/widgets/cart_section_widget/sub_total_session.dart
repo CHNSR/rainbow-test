@@ -88,7 +88,7 @@ class _SubTotalSessionState extends State<SubTotalSession> {
                   ),
                 ],
               ),
-              SizedBox(height: screenWidth * 0.01),
+              SizedBox(height: screenWidth * 0.001),
               LayoutBuilder(builder: (context, constraints) {
                 return Padding(
                   padding: EdgeInsets.only(

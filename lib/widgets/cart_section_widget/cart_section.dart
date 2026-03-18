@@ -51,10 +51,8 @@ class _CartSectionState extends State<CartSection> {
             ),
 
             Divider(),
-
             // Cart Items List
             Expanded(child: CardItem()),
-
             const Divider(),
             //sub total
             SubTotalSession()
