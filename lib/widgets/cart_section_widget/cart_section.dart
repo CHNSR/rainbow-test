@@ -1,6 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CartSection extends StatefulWidget {
   const CartSection({super.key});
@@ -45,20 +47,298 @@ class _CartSectionState extends State<CartSection> {
                   ),
                   SizedBox(width: screenWidth * 0.01),
                   Image.asset('assets/logo/vector.png',
-                      width: screenWidth * 0.02, height: screenWidth * 0.02),
+                      width: (screenWidth * 0.001).clamp(3, 24),
+                      height: (screenWidth * 0.002).clamp(3, 24)),
                 ],
               ),
             ),
 
             Divider(),
             // Cart Items List
-            Expanded(child: CardItem()),
+            Expanded(child: _cardItem(screenWidth)),
             const Divider(),
             //sub total
-            SubTotalSession()
+            _subTotalSession(screenWidth),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _cardItem(double screenWidth) {
+    return BlocBuilder<CartBloc, CartState>(
+      builder: (context, state) {
+        final cartItems = state.cartItems;
+        return cartItems.isEmpty
+            ?
+            // No order selected
+            Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "No order selected",
+                    maxLines: 1,
+                    style: TextStyle(
+                        color: Colors.grey, fontSize: screenWidth * 0.02),
+                  ),
+                ),
+              )
+            //Order add to cart
+            : ListView.separated(
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: cartItems.length,
+                itemBuilder: (context, index) {
+                  final cartItem = cartItems[index];
+
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.0001,
+                      vertical: screenWidth * 0.002,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      /// name
+                                      Text(
+                                        'X${cartItem.quantity} ${cartItem.food.foodName}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: ResponsiveFont.subtitle(
+                                              screenWidth),
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: Color(0xFF4F4F4F),
+                                          decorationThickness: 2,
+                                        ),
+                                      ),
+
+                                      /// desc
+                                      Text(
+                                        cartItem.food.foodDesc ?? '',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: ResponsiveFont.textsmall(
+                                              screenWidth),
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: screenWidth * 0.02,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          /// price
+                                          Text(
+                                            "\$${cartItem.food.foodPrice.toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              color: Color(0xFF7B61FF),
+                                              fontSize: ResponsiveFont.subtitle(
+                                                  screenWidth),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                          /// quantity buttons
+                                          Row(
+                                            children: [
+                                              /// minus
+                                              GestureDetector(
+                                                onTap: () {
+                                                  context.read<CartBloc>().add(
+                                                        RemoveFromCartEvent(
+                                                            cartItem.food),
+                                                      );
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.all(
+                                                      screenWidth * 0.0004),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade300,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.remove,
+                                                    size:
+                                                        ResponsiveFont.subtitle(
+                                                            screenWidth),
+                                                  ),
+                                                ),
+                                              ),
+
+                                              SizedBox(
+                                                  width: screenWidth * 0.01),
+
+                                              Text(
+                                                cartItem.quantity
+                                                    .toString()
+                                                    .padLeft(2, "0"),
+                                                style: TextStyle(
+                                                  fontSize:
+                                                      ResponsiveFont.subtitle(
+                                                          screenWidth),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+
+                                              SizedBox(
+                                                  width: screenWidth * 0.01),
+
+                                              /// plus
+                                              GestureDetector(
+                                                onTap: () {
+                                                  context.read<CartBloc>().add(
+                                                        AddToCartEvent(
+                                                            cartItem.food),
+                                                      );
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.all(
+                                                      screenWidth * 0.0004),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade300,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.add,
+                                                    size:
+                                                        ResponsiveFont.subtitle(
+                                                            screenWidth),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) => Divider(
+                  height: screenWidth * 0.01,
+                  color: Colors.grey.shade300,
+                  thickness: 1,
+                ),
+              );
+      },
+    );
+  }
+
+  Widget _subTotalSession(double screenWidth) {
+    return BlocBuilder<CartBloc, CartState>(
+      builder: (context, state) {
+        final cartItems = state.cartItems;
+        return Padding(
+          padding: EdgeInsets.all(screenWidth * 0.001),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Subtotal",
+                      maxLines: 1,
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.workSans(
+                        fontSize: ResponsiveFont.titleCategory(screenWidth),
+                        color: Color(0xFF4F4F4F),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "\$${OrderPageCore().cartTotal(cartItems)}",
+                      maxLines: 1,
+                      textAlign: TextAlign.right,
+                      style: GoogleFonts.workSans(
+                        fontSize: ResponsiveFont.titleCategory(screenWidth),
+                        color: OrderPageCore().cartTotal(cartItems) == 0
+                            ? Color(0xFF4F4F4F)
+                            : Color(0xFF7B61FF),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: screenWidth * 0.001),
+              LayoutBuilder(builder: (context, constraints) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: Responsive.spacing(constraints) * 2,
+                    top: Responsive.spacing(constraints),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () => OrderPageCore().confirmOrder(context),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 35),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 8),
+                      backgroundColor: cartItems.isEmpty
+                          ? Colors.grey.shade500
+                          : Color(0xFF32CD32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_cart,
+                            size: screenWidth * 0.09,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Confirm Order (${cartItems.fold(0, (sum, item) => sum + item.quantity)})",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: ResponsiveFont.title(screenWidth),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
     );
   }
 }

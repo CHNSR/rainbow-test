@@ -232,8 +232,7 @@ class _OrderPagesState extends State<OrderPages> {
                                   },
                                   categoryKeys: categoryIndexMap,
                                   menuScrollController: _menuScrollController,
-                                  cartItems:
-                                      cartState.cartItems, // ✅ ใช้ได้แล้ว
+                                  cartItems: cartState.cartItems, //
                                 );
                               },
                             ),

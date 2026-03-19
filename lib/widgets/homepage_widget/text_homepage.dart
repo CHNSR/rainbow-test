@@ -5,15 +5,14 @@ class TextHomepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screenWidth > screenHeight;
 
-    // 🔥 แยก scale ตาม orientation
-    final titleSize = isLandscape ? size.width / 15 : size.width / 10;
-    final subTitleSize = isLandscape ? size.width / 60 : size.width * 0.025;
-    final iconSize = isLandscape ? size.width / 80 : size.width / 25;
-    final noteSize = isLandscape ? size.width / 80 : size.width / 40;
+    final titleSize = isLandscape ? screenWidth / 30 : screenWidth / 9;
+    final subTitleSize = isLandscape ? screenWidth / 120 : screenWidth * 0.025;
+    final iconSize = isLandscape ? screenWidth / 110 : screenWidth / 25;
+    final noteSize = isLandscape ? screenWidth / 110 : screenWidth / 40;
 
     return Column(
       children: [
@@ -26,7 +25,7 @@ class TextHomepage extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        SizedBox(height: isLandscape ? 5 : 16),
+        SizedBox(height: isLandscape ? 5 : 10),
         Text(
           "From self-order and self-checkout",
           textAlign: TextAlign.center,
@@ -36,7 +35,7 @@ class TextHomepage extends StatelessWidget {
             color: Colors.grey.shade600,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: isLandscape ? screenWidth * 0.01 : screenWidth * 0.02),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -50,7 +49,8 @@ class TextHomepage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: isLandscape ? 5 : 10),
+            SizedBox(
+                width: isLandscape ? screenWidth * 0.01 : screenWidth * 0.02),
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -59,7 +59,7 @@ class TextHomepage extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.red,
                     fontSize: noteSize,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     decoration: TextDecoration.underline,
                     decorationColor: Colors.red,
                     decorationThickness: 1,

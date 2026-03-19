@@ -222,3 +222,24 @@ size fl
 space ระหว่างปุ่มกัย text
 หน้าเดียวกันไม่ต้องแยก เอามาทำ widgetเลย
 ปุ่ม orderconfirm
+
+Day 12
+- marge cart to widget | pass
+- marge homepage to widget| pass
+- marge select orderpage to widget| pass
+- fix over flow home page widget | pass
+- make responsive select order page widget | pass
+- bug homepage bottom | pass
+- land scape app bar widget size bug | pass
+----------------------------------------------------
+- restructure app bar call  in 1 file | trun to tomorow
+- change lang popup |
+- logo us flag in order page | in progress
+- no select order text lose | 
+- size head text in order page |
+
+- restructure 
+- make widget in class
+- responsive ui use window
+column at home
+- change button to container

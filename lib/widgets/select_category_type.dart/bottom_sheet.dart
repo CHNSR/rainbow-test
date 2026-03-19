@@ -8,22 +8,22 @@ class BottomSheetCustom extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size = MediaQuery.of(context).size;
-        final isLandscape = size.width > size.height;
-        final isMobile = Responsive.isMobileConstraints(constraints);
-        final horizontalPadding = isLandscape ? 8.0 : 16.0;
-        final verticalPadding = isLandscape ? 36.0 : 12.0;
+        final screenSize = MediaQuery.of(context).size;
+        final isLandscape = screenSize.width > screenSize.height;
+        final horizontalPadding =
+            isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.07;
+        final verticalPadding =
+            isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.05;
         final titleFontSize =
-            isLandscape ? size.height * 0.02 : size.height * 0.01;
+            isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.015;
         final contentFontSize =
-            isLandscape ? size.height * 0.001 : size.height * 0.01;
+            isLandscape ? screenSize.width * 0.005 : screenSize.width * 0.015;
         final spacing =
-            isLandscape ? size.height * 0.00005 : size.height * 0.005;
+            isLandscape ? screenSize.width * 0.005 : screenSize.width * 0.005;
 
         // Your layout logic here
         return Container(
           width: double.infinity,
-          height: isLandscape ? size.height * 0.10 : size.height * 0.20,
           color: const Color(0xFF1F1F1F),
           padding: EdgeInsets.symmetric(
             horizontal: horizontalPadding,
@@ -78,8 +78,8 @@ class BottomSheetCustom extends StatelessWidget {
                           Row(
                             children: [
                               SizedBox(
-                                  height: contentFontSize + 4,
-                                  width: contentFontSize + 4,
+                                  height: contentFontSize,
+                                  width: contentFontSize,
                                   child: Image.asset(
                                     'assets/picture/call_pic.png',
                                   )),
@@ -99,8 +99,8 @@ class BottomSheetCustom extends StatelessWidget {
                           Row(
                             children: [
                               SizedBox(
-                                  height: contentFontSize + 4,
-                                  width: contentFontSize + 4,
+                                  height: contentFontSize,
+                                  width: contentFontSize,
                                   child: Image.asset(
                                     'assets/picture/instagram_pic.png',
                                   )),
@@ -120,8 +120,8 @@ class BottomSheetCustom extends StatelessWidget {
                           Row(
                             children: [
                               SizedBox(
-                                  height: contentFontSize + 4,
-                                  width: contentFontSize + 4,
+                                  height: contentFontSize,
+                                  width: contentFontSize,
                                   child: Image.asset(
                                     'assets/picture/youtube_pic.png',
                                   )),
@@ -141,8 +141,8 @@ class BottomSheetCustom extends StatelessWidget {
                           Row(
                             children: [
                               SizedBox(
-                                  height: contentFontSize + 4,
-                                  width: contentFontSize + 4,
+                                  height: contentFontSize,
+                                  width: contentFontSize,
                                   child: Image.asset(
                                     'assets/picture/email_pic.png',
                                   )),
@@ -164,31 +164,38 @@ class BottomSheetCustom extends StatelessWidget {
                   ),
                 ],
               ),
-              // Contract Links Section
-              SizedBox(height: spacing * 2),
+              //SizedBox(height: spacing ),
+              Spacer(),
               // Fonder Info Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      "© Copyright 2022 | Powered by ",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: contentFontSize,
+              Align(
+                alignment: AlignmentGeometry.bottomCenter,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        "© Copyright 2022 | Powered by ",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: contentFontSize,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: spacing),
-                  Image.asset(
-                    "assets/logo/smile_logo.png",
-                    width: isMobile ? 10 : 14,
-                    height: isMobile ? 10 : 14,
-                  ),
-                ],
+                    SizedBox(width: spacing),
+                    Image.asset(
+                      "assets/logo/smile_logo.png",
+                      width: isLandscape
+                          ? screenSize.width * 0.015
+                          : screenSize.width * 0.05,
+                      height: isLandscape
+                          ? screenSize.width * 0.015
+                          : screenSize.width * 0.05,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
