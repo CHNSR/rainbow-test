@@ -7,7 +7,7 @@ class AppbarCustomWidget extends StatelessWidget {
   final Function(bool, Offset) onToggle;
 
   const AppbarCustomWidget({
-    Key? key,
+    super.key,
     required this.showBottom,
     required this.onToggle,
   });

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/export.dart';
 
 class BottomSheetCustom extends StatelessWidget {
   const BottomSheetCustom({super.key});
@@ -24,7 +23,7 @@ class BottomSheetCustom extends StatelessWidget {
         // Your layout logic here
         return Container(
           width: double.infinity,
-          color: const Color(0xFF1F1F1F),
+          color: const Color(0xFF212121),
           padding: EdgeInsets.symmetric(
             horizontal: horizontalPadding,
             vertical: verticalPadding,
