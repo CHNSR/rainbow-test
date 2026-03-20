@@ -29,11 +29,7 @@ class MenuCard extends StatelessWidget {
 
         return GestureDetector(
           onTap: onAddToCart,
-          child:
-              // AspectRatio(
-              //   aspectRatio: 352 / 354,
-              //   child:
-              Container(
+          child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(3),
@@ -90,44 +86,49 @@ class MenuCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               /// TITLE + QUANTITY
-                              RichText(
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: titleSize,
-                                    color: Colors.black,
-                                  ),
-                                  children: [
-                                    if (quantity > 0)
+                              Flexible(
+                                child: RichText(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: false,
+                                  text: TextSpan(
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: titleSize,
+                                      color: Colors.black,
+                                    ),
+                                    children: [
+                                      if (quantity > 0)
+                                        TextSpan(
+                                          text: 'X$quantity ',
+                                          style: const TextStyle(
+                                            color: Color(0xFF32CD32),
+                                          ),
+                                        ),
                                       TextSpan(
-                                        text: 'X$quantity ',
-                                        style: const TextStyle(
-                                          color: Color(0xFF32CD32),
+                                        text: food.foodName ?? '',
+                                        style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: titleSize,
+                                          color: Color(0xFF4F4F4F),
                                         ),
                                       ),
-                                    TextSpan(
-                                      text: food.foodName ?? '',
-                                      style: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: titleSize,
-                                        color: Color(0xFF4F4F4F),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
 
                               /// DESCRIPTION
                               if ((food.foodDesc ?? "").isNotEmpty)
-                                Text(
-                                  food.foodDesc!,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: descSize,
-                                    color: Colors.grey,
+                                Flexible(
+                                  child: Text(
+                                    food.foodDesc!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: descSize,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 ),
 

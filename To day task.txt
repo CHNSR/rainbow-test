@@ -243,3 +243,17 @@ Day 12
 - responsive ui use window
 column at home
 - change button to container
+
+day 13
+- restructure app bar call  in 1 file | pass
+- change lang popup | pass
+- logo us flag in order page | pass
+- no select order text lose | pass
+- confirm order button| pass
+- padding in order page | pass
+- Edge in set category and subcategory | pass
+- scale top bar in landscape | pass
+- text "no order select" | pass
+- icon in cart section (My order) | in progress
+- search icon scale | pass
+- Marge structure in order card section | 

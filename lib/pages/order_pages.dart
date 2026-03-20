@@ -114,7 +114,10 @@ class _OrderPagesState extends State<OrderPages> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final Size screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    bool isLandscape = screenSize.width > screenSize.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -131,7 +134,6 @@ class _OrderPagesState extends State<OrderPages> {
                       if (state is MenuLoaded) {
                         buildCategoryKeys(state.categories);
 
-                        /// 🔥 auto select subcategory แรก (ครั้งแรกเท่านั้น)
                         if (state.selectedCategoryId == null &&
                             state.filteredCategories.isNotEmpty) {
                           context.read<MenuBloc>().add(
@@ -141,10 +143,7 @@ class _OrderPagesState extends State<OrderPages> {
                               );
                         }
                       }
-                    },
-
-                        /// ✅ builder ต้องอยู่นอก listener
-                        builder: (context, menuState) {
+                    }, builder: (context, menuState) {
                       if (menuState is MenuLoading) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (menuState is MenuError) {
@@ -193,7 +192,10 @@ class _OrderPagesState extends State<OrderPages> {
                                 );
                               },
                             ),
-                            SizedBox(height: screenWidth * 0.015),
+                            SizedBox(
+                                height: isLandscape
+                                    ? screenWidth * 0.005
+                                    : screenWidth * 0.015),
                             Align(
                               alignment: Alignment.centerLeft,
                               widthFactor: 1,

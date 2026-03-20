@@ -15,7 +15,9 @@ class CategoryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screen = MediaQuery.of(context).size;
+    final screenWidth = screen.width;
+    final isLandScape = screen.width > screen.height;
     return SizedBox(
       height: ResponsiveSize.subcategoryheight(screenWidth),
       child: ListView.builder(
@@ -25,24 +27,33 @@ class CategoryBar extends StatelessWidget {
           final set = sets[index];
           final isSelected = set.foodSetId == selectedSetId;
 
-          return GestureDetector(
-            onTap: () => onSelect(set.foodSetId!),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isSelected ? Color(0xFF02CCFE) : Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(3),
+          return Row(
+            children: [
+              GestureDetector(
+                onTap: () => onSelect(set.foodSetId!),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal:
+                        isLandScape ? screenWidth * 0.03 : screenWidth * 0.02,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected ? Color(0xFF02CCFE) : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    set.foodSetName ?? "",
+                    style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                        fontSize: ResponsiveFont.titleCategory(screenWidth),
+                        fontWeight: FontWeight.w400),
+                  ),
+                ),
               ),
-              child: Text(
-                set.foodSetName ?? "",
-                style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
-                    fontSize: ResponsiveFont.titleCategory(screenWidth),
-                    fontWeight: FontWeight.w400),
-              ),
-            ),
+              SizedBox(
+                  width: isLandScape ? screenWidth * 0.01 : screenWidth * 0.01),
+            ],
           );
         },
       ),

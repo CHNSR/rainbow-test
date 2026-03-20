@@ -2,19 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class AppbarCustomWidget extends StatefulWidget {
+class AppbarCustomWidget extends StatelessWidget {
   final bool showBottom;
-  final Function(bool, Offset) setStateCallback;
+  final Function(bool, Offset) onToggle;
 
-  const AppbarCustomWidget(
-      {super.key, required this.showBottom, required this.setStateCallback});
-
-  @override
-  State<AppbarCustomWidget> createState() => _AppbarCustomWidgetState();
-}
-
-class _AppbarCustomWidgetState extends State<AppbarCustomWidget> {
-  Offset bottomOffset = const Offset(0, 1);
+  const AppbarCustomWidget({
+    Key? key,
+    required this.showBottom,
+    required this.onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +29,7 @@ class _AppbarCustomWidgetState extends State<AppbarCustomWidget> {
         InkWell(
           onTap: () {
             HomePageCore.toggleBottomSheet(
-              showBottom: widget.showBottom,
-              setStateCallback: (bool show, Offset offset) {
-                widget.setStateCallback(show, offset);
-                setState(() {
-                  bottomOffset = offset;
-                });
-              },
-            );
+                showBottom: showBottom, setStateCallback: onToggle);
           },
           child: Row(
             children: [
@@ -56,6 +45,12 @@ class _AppbarCustomWidgetState extends State<AppbarCustomWidget> {
           ),
         ),
         PopupMenuButton<String>(
+          offset: Offset(0, screen.height * 0.040),
+          borderRadius: BorderRadius.circular(12),
+          constraints: BoxConstraints(
+            maxHeight: isLandscape ? screen.width * 0.15 : screen.height * 0.35,
+            maxWidth: isLandscape ? screen.width * 0.25 : screen.width * 0.35,
+          ),
           icon: Image.asset(
             "assets/picture/usa_flag.png",
             width: logoWidth,

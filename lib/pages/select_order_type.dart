@@ -16,7 +16,6 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-
     final isLandscape = screen.width > screen.height;
 
     return Scaffold(
@@ -204,8 +203,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
     required double screenHeight,
   }) {
     final isLandscape = screenWidth > screenHeight;
-    final cardWidth =
-        isLandscape ? screenWidth * 0.12 : screenWidth * 0.4; // 🔥 ปรับตรงนี้
+    final cardWidth = isLandscape ? screenWidth * 0.12 : screenWidth * 0.4;
     final cardHeight = isLandscape ? screenWidth * 0.14 : screenWidth * 0.5;
     return GestureDetector(
       onTap: onTap,
@@ -243,7 +241,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
               decoration: BoxDecoration(
                 color: buttonColor,
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(5),
+                  bottom: Radius.circular(8),
                 ),
               ),
               child: Center(

@@ -46,83 +46,88 @@ class _HomePageState extends State<HomePage> {
   Widget _landscapeMainContant(Size screen, bool isLand) {
     return Stack(
       children: [
-        Expanded(
-          child: Row(
-            children: [
-              /// LEFT UI
-              Expanded(
-                flex: 5,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      left: screen.width * -0.05,
-                      bottom: screen.width * -0.05,
-                      child: Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.diagonal3Values(-1, -1, 1),
-                        child: Image.asset(
-                          "assets/picture/home_background1.png",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        //Text title
-                        _textHomePage(screen.width, screen.height),
-
-                        SizedBox(height: screen.width / 25),
-                        // button
-                        _tapToOrderButton(screen.width, screen.height),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              /// RIGHT IMAGE
-              Expanded(
-                flex: 5,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
+        Row(
+          children: [
+            /// LEFT UI
+            Expanded(
+              flex: 5,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    left: screen.width * -0.05,
+                    bottom: screen.width * -0.05,
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.diagonal3Values(-1, -1, 1),
                       child: Image.asset(
-                        "assets/picture/togo_walk_in.gif",
+                        "assets/picture/home_background1.png",
                         fit: BoxFit.cover,
                       ),
                     ),
-                    Align(
-                      alignment: const Alignment(-0.05, 0.30),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            "assets/logo/chonsom_white.png",
-                            height: screen.height * 0.03,
-                            width: screen.width * 0.03,
-                          ),
-                          SizedBox(width: screen.width * 0.001),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              "Soi Siam",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screen.width * 0.02,
-                              ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      //Text title
+                      _textHomePage(screen.width, screen.height),
+
+                      SizedBox(height: screen.width / 25),
+                      // button
+                      _tapToOrderButton(screen.width, screen.height),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            /// RIGHT IMAGE
+            Expanded(
+              flex: 5,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Image.asset(
+                      "assets/picture/togo_walk_in.gif",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Align(
+                    alignment: const Alignment(-0.05, 0.30),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          "assets/logo/chonsom_white.png",
+                          height: screen.height * 0.03,
+                          width: screen.width * 0.03,
+                        ),
+                        SizedBox(width: screen.width * 0.001),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Soi Siam",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: screen.width * 0.02,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        _appBarWidget(screen, isLand),
+        AppbarCustomWidget(
+            showBottom: showBottom,
+            onToggle: (bool show, Offset offset) {
+              setState(() {
+                showBottom = show;
+                bottomOffset = offset;
+              });
+            })
       ],
     );
   }
@@ -144,7 +149,16 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              _appBarWidget(screen, isLanding),
+              //_appBarWidget(screen, isLanding),
+              AppbarCustomWidget(
+                showBottom: showBottom,
+                onToggle: (show, offset) {
+                  setState(() {
+                    showBottom = show;
+                    bottomOffset = offset;
+                  });
+                },
+              ),
               SizedBox(height: MediaQuery.of(context).size.width / 20),
               //Text title
               TextHomepage(),
@@ -203,94 +217,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //appbar section
-  Widget _appBarWidget(Size screen, bool isLandscape) {
-    final fontSized = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
-    final logoHeight = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
-    final logoWidth = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
-    final spacing = isLandscape ? screen.width * 0.005 : screen.width * 0.01;
-    return Container(
-      color: Colors.transparent,
-      padding: EdgeInsets.all(
-          isLandscape ? screen.width * 0.01 : screen.width * 0.02),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        InkWell(
-          onTap: () {
-            HomePageCore.toggleBottomSheet(
-              showBottom: showBottom,
-              setStateCallback: (bool show, Offset offset) {
-                setState(() {
-                  showBottom = show;
-                  bottomOffset = offset;
-                });
-              },
-            );
-          },
-          child: Row(
-            children: [
-              Image.asset("assets/logo/chonsom.png",
-                  width: logoWidth, height: logoHeight),
-              SizedBox(width: spacing),
-              Text("Soi Siam",
-                  style: GoogleFonts.roboto(
-                      fontSize: fontSized,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF8D8D8D))),
-            ],
-          ),
-        ),
-        PopupMenuButton<String>(
-          icon: Image.asset(
-            "assets/picture/usa_flag.png",
-            width: logoWidth,
-            height: logoHeight,
-          ),
-          onSelected: (value) {
-            switch (value) {
-              case "english":
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Language set to English")),
-                );
-                break;
-              case "setting":
-                AppNavigator.goToSetting(context);
-                break;
-              case "store management":
-                AppNavigator.goToStoreManagement(context);
-                break;
-              case "exit":
-                // Close the application
-                Navigator.of(context).pop();
-                break;
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: "english",
-              child: Text("English",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: "setting",
-              child: Text("Setting",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: "store management",
-              child: Text("Store Management",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: 'exit',
-              child:
-                  Text("Exit", style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-          ],
-        ),
-      ]),
-    );
-  }
-
   //Tap to order button
   Widget _tapToOrderButton(double screenWidth, double screenHeight) {
     bool isLandscape = screenWidth > screenHeight;
@@ -301,7 +227,7 @@ class _HomePageState extends State<HomePage> {
           vertical: isLandscape ? screenWidth * 0.02 : screenWidth * 0.055,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(8),
         ),
         backgroundColor: const Color(0xFF496EE2),
       ),

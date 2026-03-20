@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +13,9 @@ class CartSection extends StatefulWidget {
 class _CartSectionState extends State<CartSection> {
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final Size screen = MediaQuery.of(context).size;
+    bool isLandscape = screen.width > screen.height;
+    final double screenWidth = screen.width;
 
     return Container(
       decoration: BoxDecoration(color: Colors.white, boxShadow: [
@@ -32,40 +33,50 @@ class _CartSectionState extends State<CartSection> {
           children: [
             // lang side
             Align(alignment: Alignment.topRight, child: ChangeLangWidget()),
-            Padding(
-              padding: EdgeInsets.only(top: screenWidth * 0.001),
-              child: Row(
-                children: [
-                  AutoSizeText(
+
+            Row(
+              children: [
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
                     "My Order",
                     maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: screenWidth * 0.02,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF4F4F4F),
                     ),
                   ),
-                  SizedBox(width: screenWidth * 0.01),
-                  Image.asset('assets/logo/vector.png',
-                      width: (screenWidth * 0.001).clamp(3, 24),
-                      height: (screenWidth * 0.002).clamp(3, 24)),
-                ],
-              ),
+                ),
+                SizedBox(width: screenWidth * 0.005),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Image.asset(
+                    'assets/logo/vector.png',
+                    width:
+                        isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
+                    height:
+                        isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
+                  ),
+                ),
+              ],
             ),
 
             Divider(),
             // Cart Items List
-            Expanded(child: _cardItem(screenWidth)),
+            Expanded(child: _cardItem(screen, isLandscape)),
             const Divider(),
             //sub total
-            _subTotalSession(screenWidth),
+            _subTotalSession(screenWidth, isLandscape),
           ],
         ),
       ),
     );
   }
 
-  Widget _cardItem(double screenWidth) {
+  Widget _cardItem(Size screenSize, bool isLandscape) {
+    final screenWidth = screenSize.width;
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
         final cartItems = state.cartItems;
@@ -80,7 +91,10 @@ class _CartSectionState extends State<CartSection> {
                     "No order selected",
                     maxLines: 1,
                     style: TextStyle(
-                        color: Colors.grey, fontSize: screenWidth * 0.02),
+                        color: Colors.grey,
+                        fontSize: isLandscape
+                            ? screenWidth * 0.015
+                            : screenSize.width * 0.02),
                   ),
                 ),
               )
@@ -94,7 +108,7 @@ class _CartSectionState extends State<CartSection> {
 
                   return Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.0001,
+                      horizontal: screenSize.width * 0.0001,
                       vertical: screenWidth * 0.002,
                     ),
                     child: Column(
@@ -124,7 +138,8 @@ class _CartSectionState extends State<CartSection> {
                                               screenWidth),
                                           decoration: TextDecoration.underline,
                                           decorationColor: Color(0xFF4F4F4F),
-                                          decorationThickness: 2,
+                                          decorationThickness: 1,
+                                          color: Color(0xFF4F4F4F),
                                         ),
                                       ),
 
@@ -196,6 +211,7 @@ class _CartSectionState extends State<CartSection> {
                                                       ResponsiveFont.subtitle(
                                                           screenWidth),
                                                   fontWeight: FontWeight.bold,
+                                                  color: Color(0xFF4F4F4F),
                                                 ),
                                               ),
 
@@ -250,7 +266,7 @@ class _CartSectionState extends State<CartSection> {
     );
   }
 
-  Widget _subTotalSession(double screenWidth) {
+  Widget _subTotalSession(double screenWidth, bool isLandscape) {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
         final cartItems = state.cartItems;
@@ -266,7 +282,9 @@ class _CartSectionState extends State<CartSection> {
                       maxLines: 1,
                       textAlign: TextAlign.left,
                       style: GoogleFonts.workSans(
-                        fontSize: ResponsiveFont.titleCategory(screenWidth),
+                        fontSize: isLandscape
+                            ? screenWidth * 0.011
+                            : screenWidth * 0.025,
                         color: Color(0xFF4F4F4F),
                         fontWeight: FontWeight.w500,
                       ),
@@ -278,7 +296,9 @@ class _CartSectionState extends State<CartSection> {
                       maxLines: 1,
                       textAlign: TextAlign.right,
                       style: GoogleFonts.workSans(
-                        fontSize: ResponsiveFont.titleCategory(screenWidth),
+                        fontSize: isLandscape
+                            ? screenWidth * 0.011
+                            : screenWidth * 0.025,
                         color: OrderPageCore().cartTotal(cartItems) == 0
                             ? Color(0xFF4F4F4F)
                             : Color(0xFF7B61FF),
@@ -288,7 +308,7 @@ class _CartSectionState extends State<CartSection> {
                   ),
                 ],
               ),
-              SizedBox(height: screenWidth * 0.001),
+              SizedBox(height: screenWidth * 0.005),
               LayoutBuilder(builder: (context, constraints) {
                 return Padding(
                   padding: EdgeInsets.only(
@@ -308,28 +328,33 @@ class _CartSectionState extends State<CartSection> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                     ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.shopping_cart,
-                            size: screenWidth * 0.09,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Confirm Order (${cartItems.fold(0, (sum, item) => sum + item.quantity)})",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: ResponsiveFont.title(screenWidth),
-                              fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: EdgeInsets.all(screenWidth * 0.005),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.shopping_cart_outlined,
+                              size: isLandscape
+                                  ? screenWidth * 0.06
+                                  : screenWidth * 0.065,
                               color: Colors.white,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: screenWidth * 0.015),
+                            Text(
+                              "Confirm Order (${cartItems.fold(0, (sum, item) => sum + item.quantity)})",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: ResponsiveFont.title(screenWidth),
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

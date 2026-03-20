@@ -11,24 +11,28 @@ class ChangeLangWidget extends StatefulWidget {
 class _ChangeLangWidgetState extends State<ChangeLangWidget> {
   @override
   Widget build(BuildContext context) {
+    final screen = MediaQuery.of(context).size;
+    final screenWidth = screen.width;
+    final isLandscape = screen.width > screen.height;
+    double flagSize = isLandscape ? screenWidth * 0.03 : screenWidth * 0.06;
     return Builder(
       builder: (context) {
-        double screenWidth = MediaQuery.of(context).size.width;
-        double flagSize = screenWidth < 400 ? 25 : 15;
         return SizedBox(
           height: flagSize,
           width: flagSize,
           child: PopupMenuButton<String>(
-            padding: EdgeInsets.only(right: 8, bottom: 8),
-            constraints: const BoxConstraints(),
-            shape: BeveledRectangleBorder(
-              borderRadius: BorderRadius.circular(1),
+            color: Colors.white,
+            offset: Offset(0, screen.height * 0.040),
+            borderRadius: BorderRadius.circular(12),
+            constraints: BoxConstraints(
+              maxHeight:
+                  isLandscape ? screen.width * 0.15 : screen.height * 0.35,
+              maxWidth: isLandscape ? screen.width * 0.25 : screen.width * 0.35,
             ),
-            offset: const Offset(0, 40),
             icon: Image.asset(
               "assets/picture/usa_flag.png",
-              height: flagSize,
               width: flagSize,
+              height: flagSize,
             ),
             onSelected: (value) {
               switch (value) {
@@ -49,27 +53,26 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
                   break;
               }
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: "english",
-                child: Text("English", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: "setting",
-                child: Text("Setting", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: "store management",
-                child: Text("Store Management", style: TextStyle(fontSize: 12)),
-              ),
-              PopupMenuItem(
-                value: 'exit',
-                child: Text("Exit", style: TextStyle(fontSize: 12)),
-              ),
+            itemBuilder: (context) => [
+              _buildItem("english", "English", screen),
+              _buildItem("setting", "Setting", screen),
+              _buildItem("store management", "Store Management", screen),
+              _buildItem("exit", "Exit", screen),
             ],
           ),
         );
       },
+    );
+  }
+
+  PopupMenuItem<String> _buildItem(String value, String text, Size screen) {
+    return PopupMenuItem(
+      value: value,
+      child: Text(text,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: screen.width * 0.008,
+          )),
     );
   }
 }

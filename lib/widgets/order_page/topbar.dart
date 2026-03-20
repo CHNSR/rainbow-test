@@ -15,11 +15,16 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    final bool isLandscape = size.width > size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double iconSize = ResponsiveSize.backButtonSize(screenWidth);
 
     return Padding(
-      padding: const EdgeInsets.only(left: 0, right: 6, top: 6, bottom: 6),
+      padding: EdgeInsets.only(
+          right: 6,
+          top: isLandscape ? screenWidth * 0.015 : screenWidth * 0.05,
+          bottom: isLandscape ? screenWidth * 0.01 : screenWidth * 0.02),
       child: Row(
         children: [
           /// Back button
@@ -59,6 +64,7 @@ class TopBar extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.black54,
                         fontSize: ResponsiveFont.backButton(screenWidth),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -83,10 +89,11 @@ class TopBar extends StatelessWidget {
                       width: ResponsiveSize.backButtonheight(screenWidth),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: IconButton(
-                        padding: EdgeInsets.all(iconSize * 0.25),
+                        padding: EdgeInsets.all(
+                            isLandscape ? iconSize * 0.3 : iconSize * 0.32),
                         iconSize: iconSize,
                         onPressed: onToggleSearch,
                         icon: Image.asset('assets/logo/search_logo.png'),

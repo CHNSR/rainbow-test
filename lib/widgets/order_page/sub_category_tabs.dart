@@ -17,10 +17,10 @@ class SubCategoryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // 🔥 กำหนดความกว้างต่อ item
-    final itemWidth = screenWidth * 0.18; // ปรับได้ตามต้องการ
+    final itemWidth = isLandscape ? screenWidth * 0.1 : screenWidth * 0.18;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -38,25 +38,25 @@ class SubCategoryBar extends StatelessWidget {
               onTap: () {
                 onSelect(category.foodCatId!);
                 scrollController.animateTo(
-                  index * itemWidth, // 🔥 ใช้ width จริง
+                  index * itemWidth,
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOut,
                 );
               },
               child: Container(
-                width: itemWidth, // ✅ ทำให้เท่ากัน
+                width: itemWidth,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFF02CCFE)
                       : const Color(0xFFF6F6F6),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   category.foodCatName ?? "",
-                  textAlign: TextAlign.center, // 🔥 กันล้น
+                  textAlign: TextAlign.center,
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis, // 🔥 กันล้น
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: ResponsiveFont.subcategory_size(screenWidth),
                     color: isSelected ? Colors.white : Colors.black,
