@@ -257,3 +257,12 @@ day 13
 - icon in cart section (My order) | in progress
 - search icon scale | pass
 - Marge structure in order card section | 
+
+----------------------
+Holiday task
+- กรอบมน MenuCard
+- search icon ขอบข้าง ติดเกิน 
+- menu card desc overflow
+- bottom sheet ui fix
+- bloc state total price
+- restructure 
