@@ -121,6 +121,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         AppbarCustomWidget(
+            showExitButton: false,
             showBottom: showBottom,
             onToggle: (bool show, Offset offset) {
               setState(() {
@@ -152,6 +153,7 @@ class _HomePageState extends State<HomePage> {
               //_appBarWidget(screen, isLanding),
               AppbarCustomWidget(
                 showBottom: showBottom,
+                showExitButton: false,
                 onToggle: (show, offset) {
                   setState(() {
                     showBottom = show;

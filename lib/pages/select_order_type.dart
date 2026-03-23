@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SelectOrderType extends StatefulWidget {
   const SelectOrderType({super.key});
@@ -38,7 +37,16 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        _appBarWidget(screen, isLandscape),
+                        //appbar
+                        AppbarCustomWidget(
+                            showBottom: showBottom,
+                            onToggle: (bool show, Offset offset) {
+                              setState(() {
+                                showBottom = show;
+                                bottomOffset = offset;
+                              });
+                            }),
+                        //_appBarWidget(screen, isLandscape),
                         SizedBox(
                             height: isLandscape
                                 ? screen.width * 0.001
@@ -55,100 +63,13 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                 ),
                 SizedBox(
                     height:
-                        isLandscape ? screen.width * 0.11 : screen.width * 0.33,
+                        isLandscape ? screen.width * 0.11 : screen.width * 0.30,
                     child: BottomSheetCustom()),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _appBarWidget(Size screen, bool isLandscape) {
-    final fontSized = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
-    final logoHeight = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
-    final logoWidth = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
-    final spacing = isLandscape ? screen.width * 0.005 : screen.width * 0.01;
-    return Container(
-      color: Colors.transparent,
-      padding: EdgeInsets.all(
-          isLandscape ? screen.width * 0.01 : screen.width * 0.02),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        InkWell(
-          onTap: () {
-            HomePageCore.toggleBottomSheet(
-              showBottom: showBottom,
-              setStateCallback: (bool show, Offset offset) {
-                setState(() {
-                  showBottom = show;
-                  bottomOffset = offset;
-                });
-              },
-            );
-          },
-          child: Row(
-            children: [
-              Image.asset("assets/logo/chonsom.png",
-                  width: logoWidth, height: logoHeight),
-              SizedBox(width: spacing),
-              Text("Soi Siam",
-                  style: GoogleFonts.roboto(
-                      fontSize: fontSized,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF8D8D8D))),
-            ],
-          ),
-        ),
-        PopupMenuButton<String>(
-          icon: Image.asset(
-            "assets/picture/usa_flag.png",
-            width: logoWidth,
-            height: logoHeight,
-          ),
-          onSelected: (value) {
-            switch (value) {
-              case "english":
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Language set to English")),
-                );
-                break;
-              case "setting":
-                AppNavigator.goToSetting(context);
-                break;
-              case "store management":
-                AppNavigator.goToStoreManagement(context);
-                break;
-              case "exit":
-                // Close the application
-                Navigator.of(context).pop();
-                break;
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: "english",
-              child: Text("English",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: "setting",
-              child: Text("Setting",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: "store management",
-              child: Text("Store Management",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: 'exit',
-              child:
-                  Text("Exit", style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-          ],
-        ),
-      ]),
     );
   }
 

@@ -14,11 +14,11 @@ class BottomSheetCustom extends StatelessWidget {
         final verticalPadding =
             isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.05;
         final titleFontSize =
-            isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.015;
+            isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.022;
         final contentFontSize =
-            isLandscape ? screenSize.width * 0.005 : screenSize.width * 0.015;
+            isLandscape ? screenSize.width * 0.009 : screenSize.width * 0.018;
         final spacing =
-            isLandscape ? screenSize.width * 0.005 : screenSize.width * 0.005;
+            isLandscape ? screenSize.width * 0.002 : screenSize.width * 0.002;
 
         // Your layout logic here
         return Container(
@@ -31,140 +31,158 @@ class BottomSheetCustom extends StatelessWidget {
           child: Column(
             mainAxisSize: isLandscape ? MainAxisSize.max : MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Contract Info Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(spacing * 2),
-                      child: Align(
-                        alignment: Alignment.centerRight,
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(spacing * 2),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Contact Us",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: titleFontSize,
+                                ),
+                              ),
+                              SizedBox(height: spacing),
+                              Text(
+                                "Rattanathibech 28 Alley, Tambon Bang Kraso, Mueang Nonthaburi District, Nonthaburi 11000",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: contentFontSize,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.10),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(spacing * 2),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Contact Us",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: titleFontSize,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                      height: contentFontSize,
+                                      width: contentFontSize,
+                                      child: Image.asset(
+                                        'assets/picture/call_pic.png',
+                                      )),
+                                  SizedBox(width: spacing),
+                                  Text(
+                                    "090-890-xxxx",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: contentFontSize,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             SizedBox(height: spacing),
-                            Text(
-                              "Rattanathibech 28 Alley, Tambon Bang Kraso, Mueang Nonthaburi District, Nonthaburi 11000",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: contentFontSize,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                      height: contentFontSize,
+                                      width: contentFontSize,
+                                      child: Image.asset(
+                                        'assets/logo/instagram.png',
+                                      )),
+                                  SizedBox(width: spacing),
+                                  Text(
+                                    "SoiSiam",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: contentFontSize,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: spacing),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                      height: contentFontSize,
+                                      width: contentFontSize,
+                                      child: Image.asset(
+                                        'assets/picture/youtube_pic.png',
+                                      )),
+                                  SizedBox(width: spacing),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      "SoiSiam Channel",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: contentFontSize,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: spacing),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                      height: contentFontSize,
+                                      width: contentFontSize,
+                                      child: Image.asset(
+                                        'assets/picture/email_pic.png',
+                                      )),
+                                  SizedBox(width: spacing),
+                                  Text(
+                                    "soisiam@gmail.co.th",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: contentFontSize,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: MediaQuery.of(context).size.width * 0.10),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(spacing * 2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                  height: contentFontSize,
-                                  width: contentFontSize,
-                                  child: Image.asset(
-                                    'assets/picture/call_pic.png',
-                                  )),
-                              SizedBox(width: spacing),
-                              Text(
-                                "090-890-xxxx",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: contentFontSize,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: spacing),
-                          Row(
-                            children: [
-                              SizedBox(
-                                  height: contentFontSize,
-                                  width: contentFontSize,
-                                  child: Image.asset(
-                                    'assets/picture/instagram_pic.png',
-                                  )),
-                              SizedBox(width: spacing),
-                              Text(
-                                "SoiSiam",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: contentFontSize,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: spacing),
-                          Row(
-                            children: [
-                              SizedBox(
-                                  height: contentFontSize,
-                                  width: contentFontSize,
-                                  child: Image.asset(
-                                    'assets/picture/youtube_pic.png',
-                                  )),
-                              SizedBox(width: spacing),
-                              Text(
-                                "SoiSiam Channel",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: contentFontSize,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: spacing),
-                          Row(
-                            children: [
-                              SizedBox(
-                                  height: contentFontSize,
-                                  width: contentFontSize,
-                                  child: Image.asset(
-                                    'assets/picture/email_pic.png',
-                                  )),
-                              SizedBox(width: spacing),
-                              Text(
-                                "soisiam@gmail.co.th",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: contentFontSize,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              //SizedBox(height: spacing ),
-              Spacer(),
+              SizedBox(height: spacing),
+              // Spacer(),
               // Fonder Info Section
               Align(
                 alignment: AlignmentGeometry.bottomCenter,

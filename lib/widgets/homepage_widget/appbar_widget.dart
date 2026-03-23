@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 class AppbarCustomWidget extends StatelessWidget {
   final bool showBottom;
   final Function(bool, Offset) onToggle;
+  final bool showExitButton;
 
   const AppbarCustomWidget({
     super.key,
     required this.showBottom,
     required this.onToggle,
+    this.showExitButton = true,
   });
 
   @override
@@ -20,7 +22,7 @@ class AppbarCustomWidget extends StatelessWidget {
     final logoHeight = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
     final logoWidth = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
     final spacing = isLandscape ? screen.width * 0.005 : screen.width * 0.01;
-
+    print("showExitButton: $showExitButton");
     return Container(
       color: Colors.transparent,
       padding: EdgeInsets.all(
@@ -45,6 +47,7 @@ class AppbarCustomWidget extends StatelessWidget {
           ),
         ),
         PopupMenuButton<String>(
+          color: Colors.white,
           offset: Offset(0, screen.height * 0.040),
           borderRadius: BorderRadius.circular(12),
           constraints: BoxConstraints(
@@ -75,28 +78,38 @@ class AppbarCustomWidget extends StatelessWidget {
                 break;
             }
           },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: "english",
-              child: Text("English",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: "setting",
-              child: Text("Setting",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: "store management",
-              child: Text("Store Management",
-                  style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-            PopupMenuItem(
-              value: 'exit',
-              child:
-                  Text("Exit", style: TextStyle(fontSize: screen.width * 0.02)),
-            ),
-          ],
+          itemBuilder: (context) {
+            final items = <PopupMenuEntry<String>>[
+              PopupMenuItem(
+                value: "english",
+                child: Text("English",
+                    style: TextStyle(fontSize: screen.width * 0.02)),
+              ),
+              PopupMenuItem(
+                value: "setting",
+                child: Text("Setting",
+                    style: TextStyle(fontSize: screen.width * 0.02)),
+              ),
+              PopupMenuItem(
+                value: "store management",
+                child: Text("Store Management",
+                    style: TextStyle(fontSize: screen.width * 0.02)),
+              ),
+            ];
+
+            /// 👇 เพิ่ม Exit เฉพาะตอนที่อนุญาต
+            if (showExitButton) {
+              items.add(
+                PopupMenuItem(
+                  value: 'exit',
+                  child: Text("Exit",
+                      style: TextStyle(fontSize: screen.width * 0.02)),
+                ),
+              );
+            }
+
+            return items;
+          },
         ),
       ]),
     );

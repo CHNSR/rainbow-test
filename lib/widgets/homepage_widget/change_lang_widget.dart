@@ -71,7 +71,7 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
       child: Text(text,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: screen.width * 0.008,
+            fontSize: screen.width * 0.015,
           )),
     );
   }

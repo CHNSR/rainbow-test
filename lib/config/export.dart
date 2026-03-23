@@ -37,17 +37,12 @@ export 'package:flutter_application_1/service/food_service.dart';
 // ==============================================================================
 // 🔷 WIDGET EXPORTS
 // ==============================================================================
-export 'package:flutter_application_1/widgets/order_page/category_tabs.dart';
-export 'package:flutter_application_1/widgets/order_page/sub_category_tabs.dart';
-export 'package:flutter_application_1/widgets/order_page/menu_grid.dart';
-export 'package:flutter_application_1/widgets/order_page/menu_card.dart';
-export 'package:flutter_application_1/widgets/order_page/topbar.dart';
-export 'package:flutter_application_1/widgets/order_page/search_widget.dart';
 export 'package:flutter_application_1/widgets/select_category_type.dart/bottom_sheet.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/appbar_widget.dart';
 export 'package:flutter_application_1/widgets/cart_section_widget/cart_section.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/change_lang_widget.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/text_homepage.dart';
+export 'package:flutter_application_1/widgets/order_page/order_page_widget.dart';
 
 // ==============================================================================
 // 🔷 CORE EXPORTS

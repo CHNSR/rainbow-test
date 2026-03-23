@@ -27,3 +27,44 @@ class CartState extends Equatable {
     return cartItems.fold(0, (total, item) => total + item.quantity);
   }
 }
+
+class CartLoadding extends CartState {}
+
+class CartInitial extends CartState {}
+
+class CartLoaded extends CartState {
+  final List<CartItem> cartItems;
+
+  const CartLoaded({this.cartItems = const []});
+
+  @override
+  List<Object?> get props => [cartItems];
+
+  double get totalPrice {
+    return cartItems.fold(
+      0,
+      (total, item) => total + (item.food.foodPrice * item.quantity),
+    );
+  }
+
+  int get totalItems {
+    return cartItems.fold(0, (total, item) => total + item.quantity);
+  }
+
+  CartLoaded copyWith({
+    List<CartItem>? cartItems,
+  }) {
+    return CartLoaded(
+      cartItems: cartItems ?? this.cartItems,
+    );
+  }
+}
+
+class CartError extends CartState {
+  final String message;
+
+  const CartError(this.message);
+
+  @override
+  List<Object?> get props => [message, cartItems];
+}

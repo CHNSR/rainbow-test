@@ -266,3 +266,12 @@ Holiday task
 - bottom sheet ui fix
 - bloc state total price
 - restructure 
+
+Day 23/3/2568
+- Border MenuCard | pass
+- search icon ขอบข้าง ติดเกิน 
+- menu card desc overflow  |fixed
+- bottom sheet UI fix | pass
+- bloc state total price | pass
+- restructure  | pass
+- change lang widget size text bug fix | pass
