@@ -275,3 +275,8 @@ Day 23/3/2568
 - bloc state total price | pass
 - restructure  | pass
 - change lang widget size text bug fix | pass
+
+เอา cartitem มาอยู่ในหน้า bloc 
+คำ ไม่ตรง accept
+select order category scale card and spaceing 
+กรอบ category ตรงเมนูตรง selected
