@@ -1,18 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_application_1/config/export.dart';
 
-class CartState extends Equatable {
+abstract class CartState extends Equatable {
   final List<CartItem> cartItems;
 
   const CartState({this.cartItems = const []});
-
-  CartState copyWith({
-    List<CartItem>? cartItems,
-  }) {
-    return CartState(
-      cartItems: cartItems ?? this.cartItems,
-    );
-  }
 
   @override
   List<Object?> get props => [cartItems];
@@ -28,28 +20,16 @@ class CartState extends Equatable {
   }
 }
 
-class CartLoadding extends CartState {}
+class CartInitial extends CartState {
+  const CartInitial() : super(cartItems: const []);
+}
 
-class CartInitial extends CartState {}
+class CartLoading extends CartState {
+  const CartLoading({super.cartItems});
+}
 
 class CartLoaded extends CartState {
-  final List<CartItem> cartItems;
-
-  const CartLoaded({this.cartItems = const []});
-
-  @override
-  List<Object?> get props => [cartItems];
-
-  double get totalPrice {
-    return cartItems.fold(
-      0,
-      (total, item) => total + (item.food.foodPrice * item.quantity),
-    );
-  }
-
-  int get totalItems {
-    return cartItems.fold(0, (total, item) => total + item.quantity);
-  }
+  const CartLoaded({super.cartItems});
 
   CartLoaded copyWith({
     List<CartItem>? cartItems,
@@ -63,7 +43,7 @@ class CartLoaded extends CartState {
 class CartError extends CartState {
   final String message;
 
-  const CartError(this.message);
+  const CartError(this.message, {super.cartItems});
 
   @override
   List<Object?> get props => [message, cartItems];

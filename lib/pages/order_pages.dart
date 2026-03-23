@@ -16,8 +16,10 @@ class _OrderPagesState extends State<OrderPages> {
   late ScrollController _menuScrollController;
   ScrollController subcategoryScrollController = ScrollController();
   Map<String, GlobalKey> categoryIndexMap = {};
+  bool _isAutoScrolling = false;
+  final GlobalKey _menuGridKey = GlobalKey();
 
-  void scrollToCategory(String catId) {
+  void scrollToCategory(String catId) async {
     final ctx = categoryIndexMap[catId]?.currentContext;
     if (ctx == null) return;
 
@@ -26,37 +28,69 @@ class _OrderPagesState extends State<OrderPages> {
 
     final offset = viewport.getOffsetToReveal(renderObject, 0.0).offset;
 
-    _menuScrollController.animateTo(
+    _isAutoScrolling = true;
+    await _menuScrollController.animateTo(
       offset,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+    _isAutoScrolling = false;
   }
 
   void _onMenuScroll() {
+    if (_isAutoScrolling || !mounted) return;
+
     final menuState = context.read<MenuBloc>().state;
     if (menuState is! MenuLoaded) return;
 
+    final menuGridContext = _menuGridKey.currentContext;
+    if (menuGridContext == null) return;
+
+    final menuGridBox = menuGridContext.findRenderObject() as RenderBox;
+    final triggerOffset = menuGridBox.localToGlobal(Offset.zero).dy +
+        20; // ใช้ค่าคงที่ 20px เผื่อระยะกระแทกขอบ
+
+    String? activeCategoryId;
+
     for (var cat in menuState.filteredCategories) {
       final key = categoryIndexMap[cat.foodCatId];
+      if (key == null || key.currentContext == null) continue;
 
-      if (key == null) continue;
-
-      final contextValue = key.currentContext;
-      if (contextValue == null) continue;
-
-      final box = contextValue.findRenderObject() as RenderBox;
+      final box = key.currentContext!.findRenderObject() as RenderBox;
       final position = box.localToGlobal(Offset.zero);
 
-      const triggerOffset = 120; // ปรับตามความสูง TopBar + CategoryBar
-
-      if (position.dy <= triggerOffset && position.dy > 0) {
-        if (menuState.selectedCategoryId != cat.foodCatId) {
-          context.read<MenuBloc>().add(SelectCategoryEvent(cat.foodCatId));
-          _scrollSubCategory(cat.foodCatId, menuState.filteredCategories,
-              MediaQuery.of(context).size.width * (0.18));
-        }
+      if (position.dy <= triggerOffset) {
+        activeCategoryId = cat.foodCatId;
+      } else {
+        break; // ข้ามตัวที่เหลือเพราะยังไงก็อยู่ข้างใต้
       }
+    }
+
+    if (activeCategoryId == null && menuState.filteredCategories.isNotEmpty) {
+      activeCategoryId = menuState.filteredCategories.first.foodCatId;
+    }
+
+    // กรณีจอใหญ่ (Wide Screen) ScrollView อาจจะยาวไม่พอให้หมวดสุดท้ายไปสุดขอบบน
+    // ถ้าชนขอบล่างสุดแล้ว ให้บังคับเปลี่ยนหมวดเป็นหมวดสุดท้าย
+    if (_menuScrollController.hasClients &&
+        _menuScrollController.position.pixels >=
+            _menuScrollController.position.maxScrollExtent - 5) {
+      if (menuState.filteredCategories.isNotEmpty) {
+        activeCategoryId = menuState.filteredCategories.last.foodCatId;
+      }
+    }
+
+    if (activeCategoryId != null &&
+        menuState.selectedCategoryId != activeCategoryId) {
+      context.read<MenuBloc>().add(SelectCategoryEvent(activeCategoryId));
+
+      final screenSize = MediaQuery.of(context).size;
+      final isLandscape = screenSize.width > screenSize.height;
+      final itemWidth =
+          isLandscape ? screenSize.width * 0.1 : screenSize.width * 0.18;
+
+      _scrollSubCategory(
+          activeCategoryId, menuState.filteredCategories, itemWidth);
     }
   }
 
@@ -89,9 +123,12 @@ class _OrderPagesState extends State<OrderPages> {
   }
 
   void buildCategoryKeys(List<SubFoodCategory> categories) {
-    categoryIndexMap.clear();
+    // ห้าม clear map! เพราะเวลา state เปลี่ยนแค่ highlight สับหมวด กลายเป็นสร้าง Key ใหม่ที่ไม่มี Widget ไปผูก
     for (var cat in categories) {
-      categoryIndexMap[cat.foodCatId] = GlobalKey();
+      final id = cat.foodCatId;
+      if (!categoryIndexMap.containsKey(id)) {
+        categoryIndexMap[id] = GlobalKey();
+      }
     }
   }
 
@@ -130,7 +167,18 @@ class _OrderPagesState extends State<OrderPages> {
                   /// 🔹 LEFT SIDE (MENU)
                   Expanded(
                     child: BlocConsumer<MenuBloc, MenuState>(
-                        listener: (context, state) {
+                        buildWhen: (previous, current) {
+                      if (previous is MenuLoaded && current is MenuLoaded) {
+                        // ให้ Rebuild ทางฝั่งซ้ายใหม่ เฉพาะตอนที่ข้อมูลรายการอาหารหรือหมวดหมู่เปลี่ยน (ไม่ใช่เพราะแค่เลื่อนหมวด)
+                        return previous.selectedSetId !=
+                                current.selectedSetId ||
+                            previous.searchText != current.searchText ||
+                            previous.sets != current.sets ||
+                            previous.menus != current.menus ||
+                            previous.categories != current.categories;
+                      }
+                      return true;
+                    }, listener: (context, state) {
                       if (state is MenuLoaded) {
                         buildCategoryKeys(state.categories);
 
@@ -199,44 +247,43 @@ class _OrderPagesState extends State<OrderPages> {
                             Align(
                               alignment: Alignment.centerLeft,
                               widthFactor: 1,
-                              child: SubCategoryBar(
-                                scrollController: subcategoryScrollController,
-                                categories: menuState.filteredCategories,
-                                selectedCategoryId:
-                                    menuState.selectedCategoryId,
-                                onSelect: (catId) {
-                                  context
-                                      .read<MenuBloc>()
-                                      .add(SelectCategoryEvent(catId));
+                              child: BlocSelector<MenuBloc, MenuState, String?>(
+                                selector: (state) => state is MenuLoaded
+                                    ? state.selectedCategoryId
+                                    : null,
+                                builder: (context, selectedCategoryId) {
+                                  return SubCategoryBar(
+                                    scrollController:
+                                        subcategoryScrollController,
+                                    categories: menuState.filteredCategories,
+                                    selectedCategoryId: selectedCategoryId,
+                                    onSelect: (catId) {
+                                      context
+                                          .read<MenuBloc>()
+                                          .add(SelectCategoryEvent(catId));
 
-                                  // Scroll ไปยัง category ที่เลือก
-                                  WidgetsBinding.instance.addPostFrameCallback((
-                                    _,
-                                  ) {
-                                    scrollToCategory(catId);
-                                  });
+                                      // Scroll ไปยัง category ที่เลือก
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((
+                                        _,
+                                      ) {
+                                        scrollToCategory(catId);
+                                      });
+                                    },
+                                  );
                                 },
                               ),
                             ),
                           ],
                           Expanded(
-                            child: BlocBuilder<CartBloc, CartState>(
-                              builder: (context, cartState) {
-                                return MenuGrid(
-                                  foods: menuState.filteredMenus,
-                                  subcategories: menuState.filteredCategories,
-                                  subcategoryScrollController:
-                                      subcategoryScrollController,
-                                  onAddToCart: (food) {
-                                    context
-                                        .read<CartBloc>()
-                                        .add(AddToCartEvent(food));
-                                  },
-                                  categoryKeys: categoryIndexMap,
-                                  menuScrollController: _menuScrollController,
-                                  cartItems: cartState.cartItems, //
-                                );
-                              },
+                            key: _menuGridKey,
+                            child: MenuGrid(
+                              foods: menuState.filteredMenus,
+                              subcategories: menuState.filteredCategories,
+                              subcategoryScrollController:
+                                  subcategoryScrollController,
+                              categoryKeys: categoryIndexMap,
+                              menuScrollController: _menuScrollController,
                             ),
                           ),
                         ],

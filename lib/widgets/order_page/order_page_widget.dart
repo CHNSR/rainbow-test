@@ -315,12 +315,10 @@ class _SearchWidgetState extends State<SearchWidget> {
 
 class MenuGrid extends StatelessWidget {
   final List<FoodMenu> foods;
-  final Function(FoodMenu)? onAddToCart;
   final List<SubFoodCategory> subcategories;
   final ScrollController? subcategoryScrollController;
   final Map<String, GlobalKey> categoryKeys;
   final ScrollController menuScrollController;
-  final List<CartItem> cartItems;
 
   const MenuGrid({
     super.key,
@@ -329,8 +327,6 @@ class MenuGrid extends StatelessWidget {
     required this.subcategoryScrollController,
     required this.categoryKeys,
     required this.menuScrollController,
-    required this.cartItems,
-    this.onAddToCart,
   });
 
   Map<String, List<FoodMenu>> groupFoodByCategory(List<FoodMenu> foods) {
