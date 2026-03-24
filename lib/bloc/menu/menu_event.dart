@@ -1,5 +1,3 @@
-import 'package:flutter_application_1/config/export.dart';
-
 abstract class MenuEvent {}
 
 class LoadMenuEvent extends MenuEvent {}

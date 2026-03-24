@@ -80,7 +80,7 @@ class _CartSectionState extends State<CartSection> {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
         final cartItems = state.cartItems;
-        return cartItems.isEmpty
+        Widget content = cartItems.isEmpty
             ?
             // No order selected
             Align(
@@ -262,6 +262,31 @@ class _CartSectionState extends State<CartSection> {
                   thickness: 1,
                 ),
               );
+
+        if (state is CartLoading) {
+          return Stack(
+            children: [
+              content,
+              Positioned.fill(
+                child: Container(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (state is CartError) {
+          return Center(
+            child: Text(
+              state.message,
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
+
+        return content;
       },
     );
   }
@@ -316,12 +341,14 @@ class _CartSectionState extends State<CartSection> {
                     top: Responsive.spacing(constraints),
                   ),
                   child: ElevatedButton(
-                    onPressed: () => OrderPageCore().confirmOrder(context),
+                    onPressed: (cartItems.isEmpty || state is CartLoading || state is CartError)
+                        ? null
+                        : () => OrderPageCore().confirmOrder(context),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 35),
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 8),
-                      backgroundColor: cartItems.isEmpty
+                      backgroundColor: (cartItems.isEmpty || state is CartLoading || state is CartError)
                           ? Colors.grey.shade500
                           : Color(0xFF32CD32),
                       shape: RoundedRectangleBorder(
