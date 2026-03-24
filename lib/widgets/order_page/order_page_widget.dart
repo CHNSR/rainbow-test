@@ -3,20 +3,13 @@ import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class TopBar extends StatelessWidget {
-  final bool showSearchBar;
-  final Function() onToggleSearch;
-  final Function(String) onSearchChanged;
-
-  const TopBar({
-    super.key,
-    required this.showSearchBar,
-    required this.onToggleSearch,
-    required this.onSearchChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+class OrderPageWidget {
+  static Widget topBar({
+    required BuildContext context,
+    required bool showSearchBar,
+    required Function() onToggleSearch,
+    required Function(String) onSearchChanged,
+  }) {
     final Size size = MediaQuery.of(context).size;
     final bool isLandscape = size.width > size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -80,7 +73,7 @@ class TopBar extends StatelessWidget {
           /// Search area (ยาวขึ้น)
           Expanded(
             child: showSearchBar
-                ? SearchWidget(
+                ? _SearchWidget(
                     onChanged: onSearchChanged,
                     onClear: onToggleSearch,
                   )
@@ -107,22 +100,13 @@ class TopBar extends StatelessWidget {
       ),
     );
   }
-}
 
-class CategoryBar extends StatelessWidget {
-  final List<FoodSet> sets;
-  final String? selectedSetId;
-  final Function(String) onSelect;
-
-  const CategoryBar({
-    super.key,
-    required this.sets,
-    required this.selectedSetId,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  static Widget categoryBar({
+    required BuildContext context,
+    required List<FoodSet> sets,
+    required String? selectedSetId,
+    required Function(String) onSelect,
+  }) {
     final screen = MediaQuery.of(context).size;
     final screenWidth = screen.width;
     final isLandScape = screen.width > screen.height;
@@ -147,7 +131,7 @@ class CategoryBar extends StatelessWidget {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color:
-                        isSelected ? Color(0xFF02CCFE) : Colors.grey.shade200,
+                        isSelected ? const Color(0xFF02CCFE) : Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(6),
                     border: isSelected
                         ? Border.all(
@@ -173,24 +157,14 @@ class CategoryBar extends StatelessWidget {
       ),
     );
   }
-}
 
-class SubCategoryBar extends StatelessWidget {
-  final List<SubFoodCategory> categories;
-  final String? selectedCategoryId;
-  final Function(String) onSelect;
-  final ScrollController scrollController;
-
-  const SubCategoryBar({
-    super.key,
-    required this.categories,
-    required this.selectedCategoryId,
-    required this.onSelect,
-    required this.scrollController,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  static Widget subCategoryBar({
+    required BuildContext context,
+    required List<SubFoodCategory> categories,
+    required String? selectedCategoryId,
+    required Function(String) onSelect,
+    required ScrollController scrollController,
+  }) {
     final screenSize = MediaQuery.of(context).size;
     final isLandscape = screenSize.width > screenSize.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -245,111 +219,25 @@ class SubCategoryBar extends StatelessWidget {
       ),
     );
   }
-}
 
-class SearchWidget extends StatefulWidget {
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-
-  const SearchWidget({
-    super.key,
-    required this.onChanged,
-    required this.onClear,
-  });
-
-  @override
-  State<SearchWidget> createState() => _SearchWidgetState();
-}
-
-class _SearchWidgetState extends State<SearchWidget> {
-  final TextEditingController controller = TextEditingController();
-
-  void _clear() {
-    if (controller.text.isEmpty) {
-      widget.onClear();
-    } else {
-      controller.clear();
-      widget.onChanged("");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final double screenwidget = MediaQuery.of(context).size.width;
-    final double buttonHeight = ResponsiveSize.backButtonheight(screenwidget);
-    final double textSize = ResponsiveFont.backButton(screenwidget);
-    return SizedBox(
-      height: buttonHeight,
-      child: TextField(
-        controller: controller,
-        onChanged: widget.onChanged,
-        style: TextStyle(fontSize: textSize),
-        decoration: InputDecoration(
-          isDense: true,
-          hint: Text("Search foods...",
-              maxLines: 1, style: TextStyle(fontSize: textSize)),
-
-          /// 🔹 ปรับ icon ให้ชิด text
-          prefixIcon: Padding(
-            padding: EdgeInsets.all(1),
-            child: Icon(Icons.search, size: 12),
-          ),
-
-          prefixIconConstraints: const BoxConstraints(
-            minWidth: 18,
-            minHeight: 18,
-          ),
-
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear, size: textSize),
-            padding: EdgeInsets.zero,
-            onPressed: _clear,
-          ),
-
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
-
-          /// 🔹 ลด padding เพื่อให้ text ไม่โดนตัด
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 1,
-            vertical: 1,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MenuGrid extends StatelessWidget {
-  final List<FoodMenu> foods;
-  final List<SubFoodCategory> subcategories;
-  final ScrollController? subcategoryScrollController;
-  final Map<String, GlobalKey> categoryKeys;
-  final ScrollController menuScrollController;
-
-  const MenuGrid({
-    super.key,
-    required this.foods,
-    required this.subcategories,
-    required this.subcategoryScrollController,
-    required this.categoryKeys,
-    required this.menuScrollController,
-  });
-
-  Map<String, List<FoodMenu>> groupFoodByCategory(List<FoodMenu> foods) {
-    final Map<String, List<FoodMenu>> map = {};
-
-    for (var food in foods) {
-      map.putIfAbsent(food.foodCatId, () => []);
-      map[food.foodCatId]!.add(food);
+  static Widget menuGrid({
+    required BuildContext context,
+    required List<FoodMenu> foods,
+    required List<SubFoodCategory> subcategories,
+    required ScrollController? subcategoryScrollController,
+    required Map<String, GlobalKey> categoryKeys,
+    required ScrollController menuScrollController,
+  }) {
+    Map<String, List<FoodMenu>> groupFoodByCategory(List<FoodMenu> foods) {
+      final Map<String, List<FoodMenu>> map = {};
+      for (var food in foods) {
+        map.putIfAbsent(food.foodCatId, () => []);
+        map[food.foodCatId]!.add(food);
+      }
+      return map;
     }
 
-    return map;
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
-
     final crossAxisCount = orientation == Orientation.landscape ? 4 : 2;
 
     final foodMap = groupFoodByCategory(foods);
@@ -377,7 +265,7 @@ class MenuGrid extends StatelessWidget {
                   style: GoogleFonts.roboto(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF4F4F4F),
+                    color: const Color(0xFF4F4F4F),
                   ),
                 ),
               ),
@@ -390,7 +278,7 @@ class MenuGrid extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate((context, i) {
                   final food = menu[i];
 
-                  return MenuCard(
+                  return menuCard(
                     food: food,
                     onAddToCart: () {
                       context.read<CartBloc>().add(
@@ -412,20 +300,11 @@ class MenuGrid extends StatelessWidget {
       }).toList(),
     );
   }
-}
 
-class MenuCard extends StatelessWidget {
-  final FoodMenu food;
-  final VoidCallback? onAddToCart;
-
-  const MenuCard({
-    super.key,
-    required this.food,
-    this.onAddToCart,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  static Widget menuCard({
+    required FoodMenu food,
+    required Function() onAddToCart,
+  }) {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
         int quantity = 0;
@@ -526,7 +405,7 @@ class MenuCard extends StatelessWidget {
                                             style: GoogleFonts.roboto(
                                               fontWeight: FontWeight.w500,
                                               fontSize: titleSize,
-                                              color: Color(0xFF4F4F4F),
+                                              color: const Color(0xFF4F4F4F),
                                             ),
                                           ),
                                         ],
@@ -548,15 +427,13 @@ class MenuCard extends StatelessWidget {
                                 ],
                               ),
 
-                              //const Spacer(),
-
                               /// PRICE
                               Align(
                                 alignment: Alignment.bottomLeft,
                                 child: Text(
                                   "\$${food.foodPrice}",
                                   style: GoogleFonts.roboto(
-                                    color: Color(0xFF4F4F4F),
+                                    color: const Color(0xFF4F4F4F),
                                     fontWeight: FontWeight.w500,
                                     fontSize: priceSize,
                                   ),
@@ -572,9 +449,80 @@ class MenuCard extends StatelessWidget {
               },
             ),
           ),
-          //),
         );
       },
+    );
+  }
+}
+
+class _SearchWidget extends StatefulWidget {
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  const _SearchWidget({
+    Key? key,
+    required this.onChanged,
+    required this.onClear,
+  }) : super(key: key);
+
+  @override
+  State<_SearchWidget> createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<_SearchWidget> {
+  final TextEditingController controller = TextEditingController();
+
+  void _clear() {
+    if (controller.text.isEmpty) {
+      widget.onClear();
+    } else {
+      controller.clear();
+      widget.onChanged("");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenwidget = MediaQuery.of(context).size.width;
+    final double buttonHeight = ResponsiveSize.backButtonheight(screenwidget);
+    final double textSize = ResponsiveFont.backButton(screenwidget);
+    return SizedBox(
+      height: buttonHeight,
+      child: TextField(
+        controller: controller,
+        onChanged: widget.onChanged,
+        style: TextStyle(fontSize: textSize),
+        decoration: InputDecoration(
+          isDense: true,
+          hint: Text("Search foods...",
+              maxLines: 1, style: TextStyle(fontSize: textSize)),
+
+          /// 🔹 ปรับ icon ให้ชิด text
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(1),
+            child: const Icon(Icons.search, size: 12),
+          ),
+
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 18,
+            minHeight: 18,
+          ),
+
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear, size: textSize),
+            padding: EdgeInsets.zero,
+            onPressed: _clear,
+          ),
+
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+
+          /// 🔹 ลด padding เพื่อให้ text ไม่โดนตัด
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 1,
+            vertical: 1,
+          ),
+        ),
+      ),
     );
   }
 }

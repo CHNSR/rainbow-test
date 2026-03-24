@@ -204,7 +204,8 @@ class _OrderPagesState extends State<OrderPages> {
                       return Column(
                         children: [
                           SizedBox(
-                            child: TopBar(
+                            child: OrderPageWidget.topBar(
+                              context: context,
                               showSearchBar: showSearchBar,
                               onToggleSearch: () {
                                 setState(() {
@@ -224,7 +225,8 @@ class _OrderPagesState extends State<OrderPages> {
                             ),
                           ),
                           if (!showSearchBar) ...[
-                            CategoryBar(
+                            OrderPageWidget.categoryBar(
+                              context: context,
                               sets: menuState.sets,
                               selectedSetId: menuState.selectedSetId,
                               onSelect: (setId) {
@@ -252,7 +254,8 @@ class _OrderPagesState extends State<OrderPages> {
                                     ? state.selectedCategoryId
                                     : null,
                                 builder: (context, selectedCategoryId) {
-                                  return SubCategoryBar(
+                                  return OrderPageWidget.subCategoryBar(
+                                    context: context,
                                     scrollController:
                                         subcategoryScrollController,
                                     categories: menuState.filteredCategories,
@@ -277,7 +280,8 @@ class _OrderPagesState extends State<OrderPages> {
                           ],
                           Expanded(
                             key: _menuGridKey,
-                            child: MenuGrid(
+                            child: OrderPageWidget.menuGrid(
+                              context: context,
                               foods: menuState.filteredMenus,
                               subcategories: menuState.filteredCategories,
                               subcategoryScrollController:
