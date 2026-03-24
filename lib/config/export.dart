@@ -21,7 +21,7 @@ export 'package:flutter_application_1/model/order_item.dart';
 // ==============================================================================
 // 🔷 BLOC EXPORTS
 // ==============================================================================
-export 'package:flutter_application_1/bloc/order_state_bloc/tap_to_order_bloc.dart';
+export 'package:flutter_application_1/bloc/order/order_bloc.dart';
 export 'package:flutter_application_1/bloc/menu/menu_bloc.dart';
 export 'package:flutter_application_1/bloc/menu/menu_event.dart';
 export 'package:flutter_application_1/bloc/menu/menu_state.dart';

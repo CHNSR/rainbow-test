@@ -3,7 +3,7 @@ import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrderPageCore {
-  // confirm order func
+  //confirm order func
   void confirmOrder(BuildContext context) {
     final cartItems = context.read<CartBloc>().state.cartItems;
     final orderItems = cartItems.map((item) {

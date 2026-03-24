@@ -20,7 +20,8 @@ class BottomSheetCustom extends StatelessWidget {
         final spacing =
             isLandscape ? screenSize.width * 0.002 : screenSize.width * 0.008;
         final iconSize =
-            isLandscape ? screenSize.width * 0.002 : screenSize.width * 0.019;
+            isLandscape ? screenSize.width * 0.012 : screenSize.width * 0.012;
+        print("Screen size.width: ${iconSize} ");
 
         // Your layout logic here
         return Container(

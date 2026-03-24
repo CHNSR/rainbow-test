@@ -4,15 +4,20 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:meta/meta.dart';
 
-part 'tap_to_order_event.dart';
-part 'tap_to_order_state.dart';
+part 'order_event.dart';
+part 'order_state.dart';
 
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
-  OrderBloc() : super(const OrderState()) {
-    /// เลือกประเภท order
+  //
+  OrderBloc() : super(OrderLoaded()) {
+    /// select category order
     on<SetOrderType>((event, emit) {
       print("[Bloc] OrderType selected: ${event.orderType}");
-      emit(state.copyWith(orderType: event.orderType));
+      if (state is OrderLoaded) {
+        emit((state as OrderLoaded).copyWith(orderType: event.orderType));
+      } else {
+        emit(OrderLoaded(orderType: event.orderType));
+      }
     });
 
     /// confirm order
@@ -24,7 +29,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         return;
       }
 
-      /// Map -> OrderItem
+      // Map -> OrderItem
       final newOrders = event.items.map((item) {
         return OrderItem(
           foodId: item['foodId'],
@@ -65,10 +70,18 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         );
       }
 
-      print("Orders before: ${state.orders.length}");
-      print("Orders after: ${updatedOrders.length}");
+      if (state is OrderLoaded) {
+        final currentState = state as OrderLoaded;
+        print("Orders before: ${currentState.orders.length}");
+        print("Orders after: ${updatedOrders.length}");
 
-      emit(state.copyWith(orders: updatedOrders));
+        // สามารถสั่ง emit(OrderLoading()) ตรงนี้ถ้าต้องการทำ Loading State ได้ในอนาคต
+        emit(currentState.copyWith(orders: updatedOrders));
+      } else {
+        print("Orders before: 0");
+        print("Orders after: ${updatedOrders.length}");
+        emit(OrderLoaded(orders: updatedOrders));
+      }
 
       print("[Bloc] State updated successfully");
     });
