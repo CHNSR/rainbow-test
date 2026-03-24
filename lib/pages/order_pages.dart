@@ -297,9 +297,11 @@ class _OrderPagesState extends State<OrderPages> {
                         ? screenWidth * 0.20
                         : DeviceType.isTablet(context)
                             ? screenWidth * 0.25
-                            : screenWidth * 0.30,
+                            : screenWidth * 0.35,
                     child: Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
+                        padding: EdgeInsets.only(
+                            left: screenWidth * 0.01,
+                            right: screenWidth * 0.01),
                         child: CartSection()),
                   ),
                 ],

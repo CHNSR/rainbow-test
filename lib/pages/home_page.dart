@@ -161,10 +161,12 @@ class _HomePageState extends State<HomePage> {
                   });
                 },
               ),
-              SizedBox(height: MediaQuery.of(context).size.width / 20),
+              SizedBox(height: MediaQuery.of(context).size.width * 0.15),
               //Text title
-              TextHomepage(),
-              //_textHomePage(screenWidth, screenHeight),
+              TextHomepage(
+                note: "Accept only Credit  Card",
+              ),
+
               SizedBox(height: MediaQuery.of(context).size.width / 20),
 
               _tapToOrderButton(
@@ -226,10 +228,10 @@ class _HomePageState extends State<HomePage> {
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(
           horizontal: isLandscape ? screenWidth * 0.035 : screenWidth * 0.095,
-          vertical: isLandscape ? screenWidth * 0.02 : screenWidth * 0.055,
+          vertical: isLandscape ? screenWidth * 0.02 : screenWidth * 0.048,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(screenWidth * 0.01),
         ),
         backgroundColor: const Color(0xFF496EE2),
       ),

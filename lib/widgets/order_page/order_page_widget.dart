@@ -25,7 +25,7 @@ class TopBar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(
           right: 6,
-          top: isLandscape ? screenWidth * 0.015 : screenWidth * 0.05,
+          top: isLandscape ? screenWidth * 0.015 : screenWidth * 0.06,
           bottom: isLandscape ? screenWidth * 0.01 : screenWidth * 0.02),
       child: Row(
         children: [
@@ -149,6 +149,12 @@ class CategoryBar extends StatelessWidget {
                     color:
                         isSelected ? Color(0xFF02CCFE) : Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(6),
+                    border: isSelected
+                        ? Border.all(
+                            color: Colors.grey.shade500,
+                            width: 1.0,
+                          )
+                        : null,
                   ),
                   child: Text(
                     set.foodSetName ?? "",

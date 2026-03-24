@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TextHomepage extends StatelessWidget {
-  const TextHomepage({super.key});
+  final String note;
+
+  const TextHomepage({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +12,7 @@ class TextHomepage extends StatelessWidget {
     final isLandscape = screenWidth > screenHeight;
 
     final titleSize = isLandscape ? screenWidth / 30 : screenWidth / 9;
-    final subTitleSize = isLandscape ? screenWidth / 120 : screenWidth * 0.025;
+    final subTitleSize = isLandscape ? screenWidth / 120 : screenWidth * 0.028;
     final iconSize = isLandscape ? screenWidth / 110 : screenWidth / 25;
     final noteSize = isLandscape ? screenWidth / 110 : screenWidth / 40;
 
@@ -31,7 +33,7 @@ class TextHomepage extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: subTitleSize,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Colors.grey.shade600,
           ),
         ),
@@ -55,7 +57,7 @@ class TextHomepage extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  "Accept only Credit Card",
+                  note,
                   style: TextStyle(
                     color: Colors.red,
                     fontSize: noteSize,

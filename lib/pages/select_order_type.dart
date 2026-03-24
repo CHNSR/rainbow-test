@@ -46,12 +46,12 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                                 bottomOffset = offset;
                               });
                             }),
-                        //_appBarWidget(screen, isLandscape),
+
                         SizedBox(
                             height: isLandscape
                                 ? screen.width * 0.001
-                                : screen.width * 0.08),
-                        TextHomepage(),
+                                : screen.width * 0.15),
+                        TextHomepage(note: "Accept only Credit Card "),
                         SizedBox(
                             height: isLandscape
                                 ? screen.width * 0.03
@@ -93,7 +93,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
             );
           },
         ),
-        SizedBox(width: 10),
+        SizedBox(width: screenWidth * 0.025),
         _categoryButton(
           title: 'Togo Walk-in',
           imagePath: 'assets/picture/togo_walk_in.gif',
@@ -125,7 +125,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
   }) {
     final isLandscape = screenWidth > screenHeight;
     final cardWidth = isLandscape ? screenWidth * 0.12 : screenWidth * 0.4;
-    final cardHeight = isLandscape ? screenWidth * 0.14 : screenWidth * 0.5;
+    final cardHeight = isLandscape ? screenWidth * 0.14 : screenWidth * 0.47;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -158,7 +158,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
             ),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: cardHeight * 0.08),
+              padding: EdgeInsets.symmetric(vertical: cardHeight * 0.065),
               decoration: BoxDecoration(
                 color: buttonColor,
                 borderRadius: const BorderRadius.vertical(

@@ -341,14 +341,18 @@ class _CartSectionState extends State<CartSection> {
                     top: Responsive.spacing(constraints),
                   ),
                   child: ElevatedButton(
-                    onPressed: (cartItems.isEmpty || state is CartLoading || state is CartError)
+                    onPressed: (cartItems.isEmpty ||
+                            state is CartLoading ||
+                            state is CartError)
                         ? null
                         : () => OrderPageCore().confirmOrder(context),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 35),
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 8),
-                      backgroundColor: (cartItems.isEmpty || state is CartLoading || state is CartError)
+                      backgroundColor: (cartItems.isEmpty ||
+                              state is CartLoading ||
+                              state is CartError)
                           ? Colors.grey.shade500
                           : Color(0xFF32CD32),
                       shape: RoundedRectangleBorder(
@@ -356,7 +360,7 @@ class _CartSectionState extends State<CartSection> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(screenWidth * 0.005),
+                      padding: EdgeInsets.all(screenWidth * 0.006),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Row(

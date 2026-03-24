@@ -16,9 +16,11 @@ class BottomSheetCustom extends StatelessWidget {
         final titleFontSize =
             isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.022;
         final contentFontSize =
-            isLandscape ? screenSize.width * 0.009 : screenSize.width * 0.018;
+            isLandscape ? screenSize.width * 0.009 : screenSize.width * 0.012;
         final spacing =
-            isLandscape ? screenSize.width * 0.002 : screenSize.width * 0.002;
+            isLandscape ? screenSize.width * 0.002 : screenSize.width * 0.008;
+        final iconSize =
+            isLandscape ? screenSize.width * 0.002 : screenSize.width * 0.019;
 
         // Your layout logic here
         return Container(
@@ -81,8 +83,8 @@ class BottomSheetCustom extends StatelessWidget {
                               child: Row(
                                 children: [
                                   SizedBox(
-                                      height: contentFontSize,
-                                      width: contentFontSize,
+                                      height: iconSize,
+                                      width: iconSize,
                                       child: Image.asset(
                                         'assets/picture/call_pic.png',
                                       )),
@@ -105,8 +107,8 @@ class BottomSheetCustom extends StatelessWidget {
                               child: Row(
                                 children: [
                                   SizedBox(
-                                      height: contentFontSize,
-                                      width: contentFontSize,
+                                      height: iconSize,
+                                      width: iconSize,
                                       child: Image.asset(
                                         'assets/logo/instagram.png',
                                       )),
@@ -129,8 +131,8 @@ class BottomSheetCustom extends StatelessWidget {
                               child: Row(
                                 children: [
                                   SizedBox(
-                                      height: contentFontSize,
-                                      width: contentFontSize,
+                                      height: iconSize,
+                                      width: iconSize,
                                       child: Image.asset(
                                         'assets/picture/youtube_pic.png',
                                       )),
@@ -156,8 +158,8 @@ class BottomSheetCustom extends StatelessWidget {
                               child: Row(
                                 children: [
                                   SizedBox(
-                                      height: contentFontSize,
-                                      width: contentFontSize,
+                                      height: iconSize,
+                                      width: iconSize,
                                       child: Image.asset(
                                         'assets/picture/email_pic.png',
                                       )),

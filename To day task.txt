@@ -280,3 +280,4 @@ Day 23/3/2568
 คำ ไม่ตรง accept
 select order category scale card and spaceing 
 กรอบ category ตรงเมนูตรง selected
+fl
