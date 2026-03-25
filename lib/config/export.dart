@@ -10,6 +10,7 @@ export 'package:flutter_application_1/pages/home_page.dart';
 export 'package:flutter_application_1/pages/order_pages.dart';
 export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
+export 'package:flutter_application_1/pages/config_printer.dart';
 // ==============================================================================
 // 🔷 MODEL EXPORTS
 // ==============================================================================
@@ -17,6 +18,7 @@ export 'package:flutter_application_1/model/food_menu.dart';
 export 'package:flutter_application_1/model/food_category.dart';
 export 'package:flutter_application_1/model/cart_item.dart';
 export 'package:flutter_application_1/model/order_item.dart';
+export 'package:flutter_application_1/model/print_result.dart';
 
 // ==============================================================================
 // 🔷 BLOC EXPORTS
@@ -28,6 +30,7 @@ export 'package:flutter_application_1/bloc/menu/menu_state.dart';
 export 'package:flutter_application_1/bloc/cart/cart_bloc.dart';
 export 'package:flutter_application_1/bloc/cart/cart_event.dart';
 export 'package:flutter_application_1/bloc/cart/cart_state.dart';
+export 'package:flutter_application_1/bloc/printer/printer_bloc.dart';
 
 // ==============================================================================
 // 🔷 SERVICE EXPORTS
@@ -50,6 +53,7 @@ export 'package:flutter_application_1/widgets/order_page/order_page_widget.dart'
 export 'package:flutter_application_1/utils/menu_filter.dart';
 export 'package:flutter_application_1/core/order_page_core.dart';
 export 'package:flutter_application_1/core/home_page_core.dart';
+export 'package:flutter_application_1/core/printter.dart';
 
 // ==============================================================================
 // 🔷 UTILS EXPORTS

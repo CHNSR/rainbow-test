@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/config/export.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -56,17 +57,9 @@ class _SettingPageState extends State<SettingPage> {
 
           const Divider(height: 1, indent: 16, endIndent: 16),
 
-          // 5. Setting Timing
-          _buildNavigationTile(
-            title: "Setting Timing",
-            onTap: () {
-              // TODO: Navigate to timing settings
-            },
-          ),
-
           const Divider(height: 1, indent: 16, endIndent: 16),
 
-          // 6. First Page Show Food Set Toggle
+          // 5. First Page Show Food Set Toggle
           _buildToggleTile(
             title: "First Page Show Food Set",
             subtitle: "Show Food Set",
@@ -77,6 +70,19 @@ class _SettingPageState extends State<SettingPage> {
               });
             },
           ),
+
+          // 6. Setting Timing
+          _buildNavigationTile(
+            title: "Setting Timing",
+            onTap: () {},
+          ),
+
+          // 7. Config
+          _buildNavigationTile(
+              title: "Config Printer",
+              onTap: () {
+                AppNavigator.goToConfigPrinter(context);
+              })
         ],
       ),
     );

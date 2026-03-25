@@ -281,3 +281,12 @@ Day 23/3/2568
 select order category scale card and spaceing 
 กรอบ category ตรงเมนูตรง selected
 fl
+------------------------------------------------------------------------
+
+Day 25/3/2568
+- config page ui | pass
+- create bloc state to store printer config | pass
+- core func printer | pass
+- imprement receipt | inprogress
+
+- send order from bloc to printer | to do

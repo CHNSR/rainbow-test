@@ -11,6 +11,7 @@ void main() {
         BlocProvider(create: (context) => OrderBloc()),
         BlocProvider(create: (context) => MenuBloc()),
         BlocProvider(create: (context) => CartBloc()),
+        BlocProvider(create: (context) => PrinterBloc()),
       ],
       child: const MainApp(),
     ),

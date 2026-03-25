@@ -8,6 +8,7 @@ class AppRoutes {
   static const String order = '/order';
   static const String setting = '/setting';
   static const String storeManagement = '/store-management';
+  static const String configPrinter = '/config-printer';
 }
 
 /// ✅ Route generator - สร้าง routes
@@ -25,6 +26,9 @@ class AppRouter {
 
       case AppRoutes.setting:
         return MaterialPageRoute(builder: (_) => const SettingPage());
+
+      case AppRoutes.configPrinter:
+        return MaterialPageRoute(builder: (_) => const PrinterConfigPage());
 
       default:
         return MaterialPageRoute(
@@ -66,6 +70,10 @@ class AppNavigator {
   /// ไปหน้า store management
   static void goToStoreManagement(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.storeManagement);
+  }
+
+  static void goToConfigPrinter(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.configPrinter);
   }
 
   /// ย้อนกลับ

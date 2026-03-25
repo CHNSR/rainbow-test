@@ -29,7 +29,10 @@ class OrderLoaded extends OrderState {
   }
 }
 
-class OrderSuccess extends OrderState {}
+class OrderSuccess extends OrderState {
+  final List<OrderItem> orders;
+  OrderSuccess(this.orders);
+}
 
 class OrderFailure extends OrderState {
   final String message;

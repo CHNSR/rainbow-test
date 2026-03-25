@@ -155,164 +155,197 @@ class _OrderPagesState extends State<OrderPages> {
     final double screenWidth = screenSize.width;
     bool isLandscape = screenSize.width > screenSize.height;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.only(left: screenWidth * 0.02),
-              child: Row(
-                children: [
-                  /// 🔹 LEFT SIDE (MENU)
-                  Expanded(
-                    child: BlocConsumer<MenuBloc, MenuState>(
-                        buildWhen: (previous, current) {
-                      if (previous is MenuLoaded && current is MenuLoaded) {
-                        // ให้ Rebuild ทางฝั่งซ้ายใหม่ เฉพาะตอนที่ข้อมูลรายการอาหารหรือหมวดหมู่เปลี่ยน (ไม่ใช่เพราะแค่เลื่อนหมวด)
-                        return previous.selectedSetId !=
-                                current.selectedSetId ||
-                            previous.searchText != current.searchText ||
-                            previous.sets != current.sets ||
-                            previous.menus != current.menus ||
-                            previous.categories != current.categories;
-                      }
-                      return true;
-                    }, listener: (context, state) {
-                      if (state is MenuLoaded) {
-                        buildCategoryKeys(state.categories);
+    return BlocListener<OrderBloc, OrderState>(
+      listener: (context, state) {
+        if (state is OrderSuccess) {
+          final config = context.read<PrinterBloc>().state.config;
 
-                        if (state.selectedCategoryId == null &&
-                            state.filteredCategories.isNotEmpty) {
-                          context.read<MenuBloc>().add(
-                                SelectCategoryEvent(
-                                  state.filteredCategories.first.foodCatId!,
-                                ),
-                              );
+          if (config == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("❌ ยังไม่ได้ตั้งค่า Printer")),
+            );
+            return;
+          }
+
+          final printerService = PrinterService();
+
+          printerService.printRecept(
+            config: config,
+            orders: state.orders,
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("🧾 พิมพ์ใบเสร็จแล้ว")),
+          );
+        }
+
+        if (state is OrderFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("❌ ${state.message}")),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(left: screenWidth * 0.02),
+                child: Row(
+                  children: [
+                    /// 🔹 LEFT SIDE (MENU)
+                    Expanded(
+                      child: BlocConsumer<MenuBloc, MenuState>(
+                          buildWhen: (previous, current) {
+                        if (previous is MenuLoaded && current is MenuLoaded) {
+                          // ให้ Rebuild ทางฝั่งซ้ายใหม่ เฉพาะตอนที่ข้อมูลรายการอาหารหรือหมวดหมู่เปลี่ยน (ไม่ใช่เพราะแค่เลื่อนหมวด)
+                          return previous.selectedSetId !=
+                                  current.selectedSetId ||
+                              previous.searchText != current.searchText ||
+                              previous.sets != current.sets ||
+                              previous.menus != current.menus ||
+                              previous.categories != current.categories;
                         }
-                      }
-                    }, builder: (context, menuState) {
-                      if (menuState is MenuLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (menuState is MenuError) {
-                        return Center(
-                            child: Text("Error: ${menuState.message}"));
-                      } else if (menuState is! MenuLoaded) {
-                        return const SizedBox();
-                      }
+                        return true;
+                      }, listener: (context, state) {
+                        if (state is MenuLoaded) {
+                          buildCategoryKeys(state.categories);
 
-                      return Column(
-                        children: [
-                          SizedBox(
-                            child: OrderPageWidget.topBar(
-                              context: context,
-                              showSearchBar: showSearchBar,
-                              onToggleSearch: () {
-                                setState(() {
-                                  showSearchBar = !showSearchBar;
-                                });
-                                if (!showSearchBar) {
+                          if (state.selectedCategoryId == null &&
+                              state.filteredCategories.isNotEmpty) {
+                            context.read<MenuBloc>().add(
+                                  SelectCategoryEvent(
+                                    state.filteredCategories.first.foodCatId!,
+                                  ),
+                                );
+                          }
+                        }
+                      }, builder: (context, menuState) {
+                        if (menuState is MenuLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (menuState is MenuError) {
+                          return Center(
+                              child: Text("Error: ${menuState.message}"));
+                        } else if (menuState is! MenuLoaded) {
+                          return const SizedBox();
+                        }
+
+                        return Column(
+                          children: [
+                            SizedBox(
+                              child: OrderPageWidget.topBar(
+                                context: context,
+                                showSearchBar: showSearchBar,
+                                onToggleSearch: () {
+                                  setState(() {
+                                    showSearchBar = !showSearchBar;
+                                  });
+                                  if (!showSearchBar) {
+                                    context
+                                        .read<MenuBloc>()
+                                        .add(SearchMenuEvent(""));
+                                  }
+                                },
+                                onSearchChanged: (value) {
                                   context
                                       .read<MenuBloc>()
-                                      .add(SearchMenuEvent(""));
-                                }
-                              },
-                              onSearchChanged: (value) {
-                                context
-                                    .read<MenuBloc>()
-                                    .add(SearchMenuEvent(value));
-                              },
-                            ),
-                          ),
-                          if (!showSearchBar) ...[
-                            OrderPageWidget.categoryBar(
-                              context: context,
-                              sets: menuState.sets,
-                              selectedSetId: menuState.selectedSetId,
-                              onSelect: (setId) {
-                                context
-                                    .read<MenuBloc>()
-                                    .add(SelectSetEvent(setId));
-
-                                // Scroll ไปยัง item แรก
-                                _menuScrollController.animateTo(
-                                  0.0,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                            ),
-                            SizedBox(
-                                height: isLandscape
-                                    ? screenWidth * 0.005
-                                    : screenWidth * 0.015),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              widthFactor: 1,
-                              child: BlocSelector<MenuBloc, MenuState, String?>(
-                                selector: (state) => state is MenuLoaded
-                                    ? state.selectedCategoryId
-                                    : null,
-                                builder: (context, selectedCategoryId) {
-                                  return OrderPageWidget.subCategoryBar(
-                                    context: context,
-                                    scrollController:
-                                        subcategoryScrollController,
-                                    categories: menuState.filteredCategories,
-                                    selectedCategoryId: selectedCategoryId,
-                                    onSelect: (catId) {
-                                      context
-                                          .read<MenuBloc>()
-                                          .add(SelectCategoryEvent(catId));
-
-                                      // Scroll ไปยัง category ที่เลือก
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((
-                                        _,
-                                      ) {
-                                        scrollToCategory(catId);
-                                      });
-                                    },
-                                  );
+                                      .add(SearchMenuEvent(value));
                                 },
                               ),
                             ),
-                          ],
-                          Expanded(
-                            key: _menuGridKey,
-                            child: OrderPageWidget.menuGrid(
-                              context: context,
-                              foods: menuState.filteredMenus,
-                              subcategories: menuState.filteredCategories,
-                              subcategoryScrollController:
-                                  subcategoryScrollController,
-                              categoryKeys: categoryIndexMap,
-                              menuScrollController: _menuScrollController,
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
-                  ),
+                            if (!showSearchBar) ...[
+                              OrderPageWidget.categoryBar(
+                                context: context,
+                                sets: menuState.sets,
+                                selectedSetId: menuState.selectedSetId,
+                                onSelect: (setId) {
+                                  context
+                                      .read<MenuBloc>()
+                                      .add(SelectSetEvent(setId));
 
-                  /// 🔹 RIGHT SIDE (CART)
-                  SizedBox(
-                    width: DeviceType.isDesktop(context)
-                        ? screenWidth * 0.20
-                        : DeviceType.isTablet(context)
-                            ? screenWidth * 0.25
-                            : screenWidth * 0.35,
-                    child: Padding(
-                        padding: EdgeInsets.only(
-                            left: screenWidth * 0.01,
-                            right: screenWidth * 0.01),
-                        child: CartSection()),
-                  ),
-                ],
+                                  // Scroll ไปยัง item แรก
+                                  _menuScrollController.animateTo(
+                                    0.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                              ),
+                              SizedBox(
+                                  height: isLandscape
+                                      ? screenWidth * 0.005
+                                      : screenWidth * 0.015),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: 1,
+                                child:
+                                    BlocSelector<MenuBloc, MenuState, String?>(
+                                  selector: (state) => state is MenuLoaded
+                                      ? state.selectedCategoryId
+                                      : null,
+                                  builder: (context, selectedCategoryId) {
+                                    return OrderPageWidget.subCategoryBar(
+                                      context: context,
+                                      scrollController:
+                                          subcategoryScrollController,
+                                      categories: menuState.filteredCategories,
+                                      selectedCategoryId: selectedCategoryId,
+                                      onSelect: (catId) {
+                                        context
+                                            .read<MenuBloc>()
+                                            .add(SelectCategoryEvent(catId));
+
+                                        // Scroll ไปยัง category ที่เลือก
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((
+                                          _,
+                                        ) {
+                                          scrollToCategory(catId);
+                                        });
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                            Expanded(
+                              key: _menuGridKey,
+                              child: OrderPageWidget.menuGrid(
+                                context: context,
+                                foods: menuState.filteredMenus,
+                                subcategories: menuState.filteredCategories,
+                                subcategoryScrollController:
+                                    subcategoryScrollController,
+                                categoryKeys: categoryIndexMap,
+                                menuScrollController: _menuScrollController,
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
+
+                    /// 🔹 RIGHT SIDE (CART)
+                    SizedBox(
+                      width: DeviceType.isDesktop(context)
+                          ? screenWidth * 0.20
+                          : DeviceType.isTablet(context)
+                              ? screenWidth * 0.25
+                              : screenWidth * 0.35,
+                      child: Padding(
+                          padding: EdgeInsets.only(
+                              left: screenWidth * 0.01,
+                              right: screenWidth * 0.01),
+                          child: CartSection()),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

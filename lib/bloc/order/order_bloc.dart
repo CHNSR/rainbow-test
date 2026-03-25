@@ -21,7 +21,72 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     });
 
     /// confirm order
-    on<ConfirmOrderEvent>((event, emit) {
+    // on<ConfirmOrderEvent>((event, emit) {
+    //   print("[Bloc] ConfirmOrderEvent received");
+
+    //   if (event.items.isEmpty) {
+    //     print("[Bloc] Cart is empty");
+    //     return;
+    //   }
+
+    //   // Map -> OrderItem
+    //   final newOrders = event.items.map((item) {
+    //     return OrderItem(
+    //       foodId: item['foodId'],
+    //       quantity: item['quantity'],
+    //       foodName: '',
+    //       foodPrice: 0,
+    //       foodSetId: '',
+    //     );
+    //   }).toList();
+
+    //   /// 🔹 print newOrders
+    //   print("----------- NEW ORDERS -----------");
+
+    //   for (int i = 0; i < newOrders.length; i++) {
+    //     final order = newOrders[i];
+
+    //     print(
+    //       "[Order $i] "
+    //       "foodId: ${order.foodId} | "
+    //       "quantity: ${order.quantity}",
+    //     );
+    //   }
+
+    //   /// รวมกับ order เก่า
+    //   //final updatedOrders = [...state.orders, ...newOrders];
+    //   final updatedOrders = [...newOrders];
+
+    //   /// 🔹 print updatedOrders
+    //   print("----------- ALL ORDERS IN STATE -----------");
+
+    //   for (int i = 0; i < updatedOrders.length; i++) {
+    //     final order = updatedOrders[i];
+
+    //     print(
+    //       "[State Order $i] "
+    //       "foodId: ${order.foodId} | "
+    //       "quantity: ${order.quantity}",
+    //     );
+    //   }
+
+    //   if (state is OrderLoaded) {
+    //     final currentState = state as OrderLoaded;
+    //     print("Orders before: ${currentState.orders.length}");
+    //     print("Orders after: ${updatedOrders.length}");
+
+    //     // สามารถสั่ง emit(OrderLoading()) ตรงนี้ถ้าต้องการทำ Loading State ได้ในอนาคต
+    //     emit(currentState.copyWith(orders: updatedOrders));
+    //   } else {
+    //     print("Orders before: 0");
+    //     print("Orders after: ${updatedOrders.length}");
+    //     emit(OrderLoaded(orders: updatedOrders));
+    //   }
+
+    //   print("[Bloc] State updated successfully");
+    // });
+
+    on<ConfirmOrderEvent>((event, emit) async {
       print("[Bloc] ConfirmOrderEvent received");
 
       if (event.items.isEmpty) {
@@ -29,7 +94,6 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         return;
       }
 
-      // Map -> OrderItem
       final newOrders = event.items.map((item) {
         return OrderItem(
           foodId: item['foodId'],
@@ -40,50 +104,22 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         );
       }).toList();
 
-      /// 🔹 print newOrders
-      print("----------- NEW ORDERS -----------");
-
-      for (int i = 0; i < newOrders.length; i++) {
-        final order = newOrders[i];
-
-        print(
-          "[Order $i] "
-          "foodId: ${order.foodId} | "
-          "quantity: ${order.quantity}",
-        );
-      }
-
-      /// รวมกับ order เก่า
-      //final updatedOrders = [...state.orders, ...newOrders];
       final updatedOrders = [...newOrders];
-
-      /// 🔹 print updatedOrders
-      print("----------- ALL ORDERS IN STATE -----------");
-
-      for (int i = 0; i < updatedOrders.length; i++) {
-        final order = updatedOrders[i];
-
-        print(
-          "[State Order $i] "
-          "foodId: ${order.foodId} | "
-          "quantity: ${order.quantity}",
-        );
-      }
 
       if (state is OrderLoaded) {
         final currentState = state as OrderLoaded;
-        print("Orders before: ${currentState.orders.length}");
-        print("Orders after: ${updatedOrders.length}");
 
-        // สามารถสั่ง emit(OrderLoading()) ตรงนี้ถ้าต้องการทำ Loading State ได้ในอนาคต
         emit(currentState.copyWith(orders: updatedOrders));
+
+        /// 🔥 ตรงนี้สำคัญ
+        emit(OrderSuccess(updatedOrders));
       } else {
-        print("Orders before: 0");
-        print("Orders after: ${updatedOrders.length}");
         emit(OrderLoaded(orders: updatedOrders));
+
+        emit(OrderSuccess(updatedOrders));
       }
 
-      print("[Bloc] State updated successfully");
+      print("[Bloc] Order Success emitted");
     });
   }
 }

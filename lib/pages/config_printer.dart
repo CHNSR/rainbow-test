@@ -1,0 +1,205 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/bloc/printer/printer_bloc.dart';
+import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class PrinterConfigPage extends StatefulWidget {
+  const PrinterConfigPage({super.key});
+
+  @override
+  State<PrinterConfigPage> createState() => _PrinterConfigPageState();
+}
+
+class _PrinterConfigPageState extends State<PrinterConfigPage> {
+  String printerType = "network"; // network / bluetooth
+  final ipController = TextEditingController();
+  final portController = TextEditingController(text: "9100");
+  String paperSize = "80"; // 58 / 80
+
+  final printerService = PrinterService();
+
+  void onTestPrint() async {
+    final result = await printerService.testPrintNetwork(
+      ip: ipController.text,
+      port: int.tryParse(portController.text) ?? 9100,
+      paperSize: paperSize,
+    );
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result.success ? "✅ ${result.message}" : "❌ ${result.message}",
+        ),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final config = context.read<PrinterBloc>().state.config;
+
+    if (config != null) {
+      ipController.text = config.ip;
+      portController.text = config.port.toString();
+      paperSize = config.paperSize;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: const Text("Config Printer")),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // 🔘 เลือกประเภท
+            _buildSectionTitle("Printer Type"),
+            Row(
+              children: [
+                Expanded(
+                  child: RadioListTile(
+                    title: const Text("Network"),
+                    value: "network",
+                    groupValue: printerType,
+                    onChanged: (value) {
+                      setState(() => printerType = value!);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: RadioListTile(
+                    title: const Text("Bluetooth"),
+                    value: "bluetooth",
+                    groupValue: printerType,
+                    onChanged: (value) {
+                      setState(() => printerType = value!);
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🌐 NETWORK FORM
+            if (printerType == "network") ...[
+              _buildSectionTitle("Network Settings"),
+              TextField(
+                controller: ipController,
+                decoration: const InputDecoration(
+                  labelText: "IP Address",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: portController,
+                decoration: const InputDecoration(
+                  labelText: "Port",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+
+            // 🔵 BLUETOOTH
+            if (printerType == "bluetooth") ...[
+              _buildSectionTitle("Bluetooth"),
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: scan printer
+                },
+                child: const Text("Scan Printer"),
+              ),
+              const SizedBox(height: 10),
+              const Text("Select printer from list..."),
+            ],
+
+            const SizedBox(height: 20),
+
+            // 📄 Paper Size
+            _buildSectionTitle("Paper Size"),
+            DropdownButtonFormField(
+              value: paperSize,
+              items: const [
+                DropdownMenuItem(value: "58", child: Text("58 mm")),
+                DropdownMenuItem(value: "80", child: Text("80 mm")),
+              ],
+              onChanged: (value) {
+                setState(() => paperSize = value!);
+              },
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // 🧪 Test Print
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  onTestPrint();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                ),
+                child: const Text("Test Printer"),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // 💾 Save
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (printerType == "network") {
+                    final config = PrinterConfig(
+                      ip: ipController.text,
+                      port: int.tryParse(portController.text) ?? 9100,
+                      paperSize: paperSize,
+                    );
+
+                    context.read<PrinterBloc>().add(
+                          SetPrinterConfig(config: config),
+                        );
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("✅ Saved")),
+                    );
+                  }
+                },
+                child: const Text("Save"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+}
