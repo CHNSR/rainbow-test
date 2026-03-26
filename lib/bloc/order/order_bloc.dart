@@ -96,28 +96,56 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
       final newOrders = event.items.map((item) {
         return OrderItem(
-          foodId: item['foodId'],
-          quantity: item['quantity'],
-          foodName: '',
-          foodPrice: 0,
-          foodSetId: '',
+          foodId: item['foodId'] as String,
+          quantity: item['quantity'] as int,
+          foodName: item['foodName'] as String,
+          foodPrice: (item['foodPrice'] as num).toDouble(),
+          foodSetId: item['foodSetId'] as String,
         );
       }).toList();
 
+      print("\n[Bloc] 📦 Parsed ${newOrders.length} items for order:");
+      for (var o in newOrders) {
+        print(
+            "       -> x${o.quantity} [${o.foodId}] ${o.foodName} | \$${o.foodPrice}");
+      }
+
       final updatedOrders = [...newOrders];
 
-      if (state is OrderLoaded) {
-        final currentState = state as OrderLoaded;
+      // Get the current state, or a default OrderLoaded state if it's not loaded yet.
+      final currentState =
+          state is OrderLoaded ? (state as OrderLoaded) : OrderLoaded();
 
-        emit(currentState.copyWith(orders: updatedOrders));
+      print("\n========== 🧾 ORDER SUCCESS ==========");
 
-        /// 🔥 ตรงนี้สำคัญ
-        emit(OrderSuccess(updatedOrders));
-      } else {
-        emit(OrderLoaded(orders: updatedOrders));
+      print("Total items: ${updatedOrders.length}");
 
-        emit(OrderSuccess(updatedOrders));
+      double total = 0;
+
+      for (int i = 0; i < updatedOrders.length; i++) {
+        final o = updatedOrders[i];
+
+        print(
+          "[Item $i] "
+          "x${o.quantity} | "
+          "ID: ${o.foodId} | "
+          "Name: ${o.foodName} | "
+          "Price: ${o.foodPrice} | "
+          "Total: ${o.totalPrice}",
+        );
+
+        total += o.totalPrice;
       }
+
+      print("--------------------------------------");
+      print("TOTAL PRICE: $total");
+      print("======================================\n");
+
+      // First, emit the success state for the listener to catch.
+      emit(OrderSuccess(updatedOrders));
+
+      // Then, immediately emit the new loaded state to keep the UI consistent and stable.
+      emit(currentState.copyWith(orders: updatedOrders));
 
       print("[Bloc] Order Success emitted");
     });

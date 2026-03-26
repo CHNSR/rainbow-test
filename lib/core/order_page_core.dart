@@ -10,6 +10,9 @@ class OrderPageCore {
       return {
         "foodId": item.food.foodId,
         "quantity": item.quantity,
+        "foodName": item.food.foodName,
+        "foodPrice": item.food.foodPrice,
+        "foodSetId": item.food.foodSetId,
       };
     }).toList();
 

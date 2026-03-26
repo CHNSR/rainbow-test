@@ -46,6 +46,7 @@ export 'package:flutter_application_1/widgets/cart_section_widget/cart_section.d
 export 'package:flutter_application_1/widgets/homepage_widget/change_lang_widget.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/text_homepage.dart';
 export 'package:flutter_application_1/widgets/order_page/order_page_widget.dart';
+export 'package:flutter_application_1/widgets/receipt_widget.dart';
 
 // ==============================================================================
 // 🔷 CORE EXPORTS

@@ -290,3 +290,24 @@ Day 25/3/2568
 - imprement receipt | inprogress
 
 - send order from bloc to printer | to do
+
+Day 26 / 3 / 2568
+- learn each method for printer package
+- learn step to setup code for print 
+- clear state event (Bloc) | pass
+- clear config button | pass
+- print receipt | pass
+- image | pass
+- row |pass
+- column |pass
+- barcode | force
+- cut |pass 
+- qr code |force
+
+------------------------------
+- capture widget and covert to recipt |inprogress
+- create widget recipt | pass
+- RepaintBoundary func |
+- capture func |
+- send print to scan capture |
+- wait for capture widget bug

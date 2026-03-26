@@ -10,3 +10,5 @@ class SetPrinterConfig extends PrinterEvent {
 
   SetPrinterConfig({required this.config});
 }
+
+class ClearPrinterConfig extends PrinterEvent {}

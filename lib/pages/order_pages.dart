@@ -18,6 +18,8 @@ class _OrderPagesState extends State<OrderPages> {
   Map<String, GlobalKey> categoryIndexMap = {};
   bool _isAutoScrolling = false;
   final GlobalKey _menuGridKey = GlobalKey();
+  final GlobalKey repaintKey = GlobalKey(); // for capture
+  final PrinterService _printerService = PrinterService();
 
   void scrollToCategory(String catId) async {
     final ctx = categoryIndexMap[catId]?.currentContext;
@@ -161,18 +163,48 @@ class _OrderPagesState extends State<OrderPages> {
           final config = context.read<PrinterBloc>().state.config;
 
           if (config == null) {
+            print("❌ [OrderPages] Error: ยังไม่ได้ตั้งค่า Printer Config");
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("❌ ยังไม่ได้ตั้งค่า Printer")),
             );
             return;
           }
 
-          final printerService = PrinterService();
+          // ================= VIRTUAL RECEIPT LOG =================
+          print("\n========================================");
+          print("🧾 VIRTUAL RECEIPT LOG");
+          print("========================================");
+          print(
+              "🖨️ Printer IP: ${config.ip}:${config.port} | Paper: ${config.paperSize}mm");
+          print("----------------------------------------");
+          double grandTotal = 0;
+          for (var item in state.orders) {
+            double itemTotal = item.foodPrice * item.quantity;
+            grandTotal += itemTotal;
+            print(
+                "x${item.quantity}  ${item.foodName}  -> \$${itemTotal.toStringAsFixed(2)}");
+            print("      (@ \$${item.foodPrice.toStringAsFixed(2)}/ea)");
+          }
+          print("----------------------------------------");
+          print("💰 TOTAL: \$${grandTotal.toStringAsFixed(2)}");
+          print("========================================\n");
+          // =======================================================
 
-          printerService.printRecept(
+          // -----------------------------------------------------------
+          print("🚀 [OrderPages] Sending job to PrinterService...");
+          // printerService.printRecept(
+          //   config: config,
+          //   orders: state.orders,
+          // );
+
+          /// print capture recipt widget func
+          _printerService.printWidgetReceipt(
             config: config,
+            repaintKey: repaintKey,
             orders: state.orders,
           );
+
+          // -----------------------------------------------------------
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("🧾 พิมพ์ใบเสร็จแล้ว")),
@@ -343,6 +375,24 @@ class _OrderPagesState extends State<OrderPages> {
                   ],
                 ),
               ),
+            ),
+            // Hidden Receipt Widget for Capturing
+            BlocBuilder<OrderBloc, OrderState>(
+              builder: (context, state) {
+                List<OrderItem> currentOrders = [];
+                if (state is OrderSuccess) {
+                  currentOrders = state.orders;
+                } else if (state is OrderLoaded) {
+                  currentOrders = state.orders;
+                }
+                return Offstage(
+                  offstage: true,
+                  child: _printerService.buildReceiptWidget(
+                    orders: currentOrders,
+                    repaintKey: repaintKey,
+                  ),
+                );
+              },
             ),
           ],
         ),

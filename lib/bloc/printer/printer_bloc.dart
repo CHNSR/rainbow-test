@@ -12,5 +12,11 @@ class PrinterBloc extends Bloc<PrinterEvent, PrinterState> {
     on<SetPrinterConfig>((event, emit) {
       emit(state.copyWith(config: event.config));
     });
+
+    on<ClearPrinterConfig>((event, emit) {
+      // คืนค่า State ใหม่ที่ว่างเปล่า (config เป็น null)
+      log("Bloc config clear: null");
+      emit(const PrinterState());
+    });
   }
 }

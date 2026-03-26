@@ -51,140 +51,190 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("Config Printer")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // 🔘 เลือกประเภท
-            _buildSectionTitle("Printer Type"),
-            Row(
+    return BlocListener<PrinterBloc, PrinterState>(
+        listener: (context, state) {
+          if (state.config == null) {
+            // เมื่อ config ถูกล้างค่า ให้เคลียร์ค่าในฟอร์มด้วย
+            setState(() {
+              ipController.clear();
+              portController.text = "9100"; // คืนค่าเริ่มต้น
+              paperSize = "80"; // คืนค่าเริ่มต้น
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("🗑️ ล้างการตั้งค่าแล้ว")),
+            );
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: const Text("Config Printer"),
+            backgroundColor: Colors.white,
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               children: [
-                Expanded(
-                  child: RadioListTile(
-                    title: const Text("Network"),
-                    value: "network",
-                    groupValue: printerType,
-                    onChanged: (value) {
-                      setState(() => printerType = value!);
+                // 🔘 เลือกประเภท
+                _buildSectionTitle("Printer Type"),
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile(
+                        title: const Text("Network"),
+                        value: "network",
+                        groupValue: printerType,
+                        onChanged: (value) {
+                          setState(() => printerType = value!);
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile(
+                        title: const Text("Bluetooth"),
+                        value: "bluetooth",
+                        groupValue: printerType,
+                        onChanged: (value) {
+                          setState(() => printerType = value!);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // 🌐 NETWORK FORM
+                if (printerType == "network") ...[
+                  // 🧪 Test Print
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSectionTitle("Network Settings"),
+                      ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                          ),
+                          onPressed: () {
+                            onTestPrint();
+                          },
+                          label: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(Icons.connect_without_contact,
+                                  color: Colors.black),
+                              Text(
+                                "Test printer",
+                                style: TextStyle(color: Colors.black),
+                              )
+                            ],
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: ipController,
+                    decoration: const InputDecoration(
+                      labelText: "IP Address",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: portController,
+                    decoration: const InputDecoration(
+                      labelText: "Port",
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+
+                // 🔵 BLUETOOTH
+                if (printerType == "bluetooth") ...[
+                  _buildSectionTitle("Bluetooth"),
+                  ElevatedButton(
+                    onPressed: () {
+                      // TODO: scan printer
                     },
+                    child: const Text("Scan Printer"),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text("Select printer from list..."),
+                ],
+
+                const SizedBox(height: 20),
+
+                // 📄 Paper Size
+                _buildSectionTitle("Paper Size"),
+                DropdownButtonFormField(
+                  value: paperSize,
+                  items: const [
+                    DropdownMenuItem(value: "58", child: Text("58 mm")),
+                    DropdownMenuItem(value: "80", child: Text("80 mm")),
+                  ],
+                  onChanged: (value) {
+                    setState(() => paperSize = value!);
+                  },
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
                   ),
                 ),
-                Expanded(
-                  child: RadioListTile(
-                    title: const Text("Bluetooth"),
-                    value: "bluetooth",
-                    groupValue: printerType,
-                    onChanged: (value) {
-                      setState(() => printerType = value!);
-                    },
-                  ),
+
+                const SizedBox(height: 30),
+
+                // 💾 Save
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        onPressed: () {
+                          if (printerType == "network") {
+                            final config = PrinterConfig(
+                              ip: ipController.text,
+                              port: int.tryParse(portController.text) ?? 9100,
+                              paperSize: paperSize,
+                            );
+
+                            context.read<PrinterBloc>().add(
+                                  SetPrinterConfig(config: config),
+                                );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("✅ Saved")),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          context.read<PrinterBloc>().add(ClearPrinterConfig());
+                        },
+                        child: const Text(
+                          "Clear Config",
+                          style: TextStyle(color: Colors.blueGrey),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-
-            const SizedBox(height: 20),
-
-            // 🌐 NETWORK FORM
-            if (printerType == "network") ...[
-              _buildSectionTitle("Network Settings"),
-              TextField(
-                controller: ipController,
-                decoration: const InputDecoration(
-                  labelText: "IP Address",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: portController,
-                decoration: const InputDecoration(
-                  labelText: "Port",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-
-            // 🔵 BLUETOOTH
-            if (printerType == "bluetooth") ...[
-              _buildSectionTitle("Bluetooth"),
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: scan printer
-                },
-                child: const Text("Scan Printer"),
-              ),
-              const SizedBox(height: 10),
-              const Text("Select printer from list..."),
-            ],
-
-            const SizedBox(height: 20),
-
-            // 📄 Paper Size
-            _buildSectionTitle("Paper Size"),
-            DropdownButtonFormField(
-              value: paperSize,
-              items: const [
-                DropdownMenuItem(value: "58", child: Text("58 mm")),
-                DropdownMenuItem(value: "80", child: Text("80 mm")),
-              ],
-              onChanged: (value) {
-                setState(() => paperSize = value!);
-              },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // 🧪 Test Print
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  onTestPrint();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                ),
-                child: const Text("Test Printer"),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // 💾 Save
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (printerType == "network") {
-                    final config = PrinterConfig(
-                      ip: ipController.text,
-                      port: int.tryParse(portController.text) ?? 9100,
-                      paperSize: paperSize,
-                    );
-
-                    context.read<PrinterBloc>().add(
-                          SetPrinterConfig(config: config),
-                        );
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("✅ Saved")),
-                    );
-                  }
-                },
-                child: const Text("Save"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget _buildSectionTitle(String title) {
