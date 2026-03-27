@@ -17,22 +17,10 @@ class OrderPageCore {
     }).toList();
 
     if (cartItems.isNotEmpty) {
-      /// clear cart
-      context.read<CartBloc>().add(
-            ClearCartEvent(),
-          );
-
       /// send order ใหม่
       context.read<OrderBloc>().add(
             ConfirmOrderEvent(orderItems),
           );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Order confirmed!"),
-          backgroundColor: Colors.green,
-        ),
-      );
     }
   }
 

@@ -147,51 +147,119 @@ class PrinterService {
     }
   }
 
-  Widget buildReceiptWidget(
-      {required List<OrderItem> orders, required GlobalKey repaintKey}) {
-    return RepaintBoundary(
-      key: repaintKey,
-      child: ReceiptWidget(orders: orders),
-    );
-  }
+  // Widget buildReceiptWidget(
+  //     {required List<OrderItem> orders, required GlobalKey repaintKey}) {
+  //   return RepaintBoundary(
+  //     key: repaintKey,
+  //     child: OrderPageWidget.recieptWidget(orders: orders, ),
+  //     //ReceiptWidget(orders: orders),
+  //   );
+  // }
 
   Future<Uint8List> capture(GlobalKey repaintKey) async {
-    final boundary =
-        repaintKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    // ✅ รอ frame render เสร็จจริง ๆ
+    await WidgetsBinding.instance.endOfFrame;
+
+    final context = repaintKey.currentContext;
+
+    if (context == null) {
+      throw Exception("Context is null");
+    }
+
+    final boundary = context.findRenderObject();
+
+    if (boundary == null || boundary is! RenderRepaintBoundary) {
+      throw Exception("Not a RepaintBoundary");
+    }
+
+    // ✅ กัน paint ยังไม่เสร็จ
+    if (boundary.debugNeedsPaint) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      return capture(repaintKey); // retry
+    }
 
     final image = await boundary.toImage(pixelRatio: 3);
     final byteData = await image.toByteData(format: ImageByteFormat.png);
 
-    return byteData!.buffer.asUint8List();
+    if (byteData == null) {
+      throw Exception("Failed to convert image");
+    }
+
+    return byteData.buffer.asUint8List();
   }
 
-  // print recept func
-  Future<void> printWidgetReceipt({
+  Future<bool> printWidgetReceipt({
     required PrinterConfig config,
     required GlobalKey repaintKey,
     required List<OrderItem> orders,
   }) async {
-    final service = FlutterThermalPrinterNetwork(config.ip, port: config.port);
+    final service = FlutterThermalPrinterNetwork(
+      config.ip,
+      port: config.port,
+    );
+
     try {
-      await service.connect();
+      /// 1. CONNECT
+      final connected = await service.connect().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          print("[printWidgetReceipt] ❌ Connect timeout");
+          throw Exception("Connect timeout");
+        },
+      );
+
+      if (connected != true) {
+        print("[printWidgetReceipt] ❌ Connect failed");
+        return false;
+      }
+
+      /// 2. LOAD PROFILE
       final profile = await CapabilityProfile.load();
       final generator = Generator(
         config.paperSize == "58" ? PaperSize.mm58 : PaperSize.mm80,
         profile,
       );
-      //delay for wait capture widget
-      await Future.delayed(Duration(milliseconds: 100));
+
+      final targetWidth = config.paperSize == "58" ? 384 : 576;
+
+      /// 3. CAPTURE WIDGET
+      await Future.delayed(const Duration(milliseconds: 120));
+
       final captured = await capture(repaintKey);
       img.Image? image = img.decodeImage(captured);
 
-      image = img.copyResize(image!, width: 384);
+      if (image == null) {
+        print("❌ Image decode failed");
+        return false;
+      }
 
+      image = img.copyResize(image, width: targetWidth);
+
+      /// 4. GENERATE BYTES
       List<int> bytes = [];
       bytes += generator.image(image);
+      bytes += generator.feed(2);
+      bytes += generator.cut();
 
-      await service.printTicket(bytes);
+      /// 5. SEND TO PRINTER
+      final result = await service.printTicket(bytes).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          print("❌ Print timeout");
+          throw Exception("Print timeout");
+        },
+      );
+
+      /// บาง lib จะไม่ return อะไร → ให้ถือว่า success ถ้าไม่ throw
+      print("✅ Print sent");
+      return true;
+    } catch (e) {
+      print("❌ Print error: $e");
+      return false;
     } finally {
-      await service.disconnect();
+      try {
+        await service.disconnect();
+      } catch (_) {}
     }
   }
 }

@@ -158,10 +158,10 @@ class _OrderPagesState extends State<OrderPages> {
     bool isLandscape = screenSize.width > screenSize.height;
 
     return BlocListener<OrderBloc, OrderState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is OrderSuccess) {
           final config = context.read<PrinterBloc>().state.config;
-
+          double recieptWidth = config?.paperSize == "80" ? 384 : 300;
           if (config == null) {
             print("❌ [OrderPages] Error: ยังไม่ได้ตั้งค่า Printer Config");
             ScaffoldMessenger.of(context).showSnackBar(
@@ -169,52 +169,29 @@ class _OrderPagesState extends State<OrderPages> {
             );
             return;
           }
-
-          // ================= VIRTUAL RECEIPT LOG =================
-          print("\n========================================");
-          print("🧾 VIRTUAL RECEIPT LOG");
-          print("========================================");
-          print(
-              "🖨️ Printer IP: ${config.ip}:${config.port} | Paper: ${config.paperSize}mm");
-          print("----------------------------------------");
-          double grandTotal = 0;
-          for (var item in state.orders) {
-            double itemTotal = item.foodPrice * item.quantity;
-            grandTotal += itemTotal;
-            print(
-                "x${item.quantity}  ${item.foodName}  -> \$${itemTotal.toStringAsFixed(2)}");
-            print("      (@ \$${item.foodPrice.toStringAsFixed(2)}/ea)");
-          }
-          print("----------------------------------------");
-          print("💰 TOTAL: \$${grandTotal.toStringAsFixed(2)}");
-          print("========================================\n");
-          // =======================================================
-
           // -----------------------------------------------------------
           print("🚀 [OrderPages] Sending job to PrinterService...");
-          // printerService.printRecept(
-          //   config: config,
-          //   orders: state.orders,
-          // );
 
-          /// print capture recipt widget func
-          _printerService.printWidgetReceipt(
-            config: config,
-            repaintKey: repaintKey,
+          final statusPrint = await OrderPageWidget().showReceiptAndPrint(
+            context: context,
             orders: state.orders,
+            config: config,
+            receptWidth: recieptWidth,
           );
 
-          // -----------------------------------------------------------
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("🧾 พิมพ์ใบเสร็จแล้ว")),
-          );
-        }
-
-        if (state is OrderFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("❌ ${state.message}")),
-          );
+          if (statusPrint == false) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("❌ การพิมพ์ล้มเหลว")),
+            );
+          } else {
+            // clear cart after print receipt
+            context.read<CartBloc>().add(
+                  ClearCartEvent(),
+                );
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("🧾 พิมพ์ใบเสร็จแล้ว")),
+            );
+          }
         }
       },
       child: Scaffold(
@@ -248,7 +225,7 @@ class _OrderPagesState extends State<OrderPages> {
                               state.filteredCategories.isNotEmpty) {
                             context.read<MenuBloc>().add(
                                   SelectCategoryEvent(
-                                    state.filteredCategories.first.foodCatId!,
+                                    state.filteredCategories.first.foodCatId,
                                   ),
                                 );
                           }
@@ -375,24 +352,6 @@ class _OrderPagesState extends State<OrderPages> {
                   ],
                 ),
               ),
-            ),
-            // Hidden Receipt Widget for Capturing
-            BlocBuilder<OrderBloc, OrderState>(
-              builder: (context, state) {
-                List<OrderItem> currentOrders = [];
-                if (state is OrderSuccess) {
-                  currentOrders = state.orders;
-                } else if (state is OrderLoaded) {
-                  currentOrders = state.orders;
-                }
-                return Offstage(
-                  offstage: true,
-                  child: _printerService.buildReceiptWidget(
-                    orders: currentOrders,
-                    repaintKey: repaintKey,
-                  ),
-                );
-              },
             ),
           ],
         ),

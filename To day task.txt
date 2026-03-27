@@ -311,3 +311,24 @@ Day 26 / 3 / 2568
 - capture func |
 - send print to scan capture |
 - wait for capture widget bug
+
+
+27/3/2569
+- capture widget and covert to recipt |pass
+- RepaintBoundary func | pass
+- capture func | pass
+- send print to scan capture | pass
+- wait for capture widget bug | pass
+
+- paper scale widget 80 mm | pass
+- config receipt | in progress
+- cancel receipt button | pass
+- redesign preview receipt | pass
+- bloc step send data to receipt must to store data before click confirm print receipt not confirm sub total | pass
+
+- check connection before printing  | pass
+- check status before connect printer | 
+- fix order bloc status now bloc don't check status connection and send snack bar success  |
+
+- check connection with printer status bloc |
+- check bug between print order send one more order |

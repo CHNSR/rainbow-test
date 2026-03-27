@@ -1,7 +1,9 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class OrderPageWidget {
   static Widget topBar({
@@ -130,8 +132,9 @@ class OrderPageWidget {
                   ),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color:
-                        isSelected ? const Color(0xFF02CCFE) : Colors.grey.shade200,
+                    color: isSelected
+                        ? const Color(0xFF02CCFE)
+                        : Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(6),
                     border: isSelected
                         ? Border.all(
@@ -447,6 +450,357 @@ class OrderPageWidget {
                   ],
                 );
               },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Widget recieptWidget(
+      {required List<OrderItem> orders, required double width}) {
+    double total = orders.fold<double>(0, (sum, item) => sum + item.totalPrice);
+
+    return Container(
+      color: Colors.white,
+      width: width,
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          //  🖼️ Logo 🏪 Shop Name
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: Column(
+              children: [
+                DottedLine(
+                  direction: Axis.horizontal,
+                  lineLength: double.infinity,
+                  lineThickness: 1.1,
+                  dashLength: 4.0,
+                  dashColor: Colors.black,
+                  dashGapLength: 2.0,
+                ),
+                const SizedBox(height: 2),
+                DottedLine(
+                  direction: Axis.horizontal,
+                  lineLength: double.infinity,
+                  lineThickness: 1.1,
+                  dashLength: 4.0,
+                  dashColor: Colors.black,
+                  dashGapLength: 2.0,
+                )
+              ],
+            ),
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/logo/smile_logo.png',
+                width: 18,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                "Soi Siam Restaurant",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+
+          const Center(child: Text("Authentic Thai Cuisine")),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: Column(
+              children: [
+                DottedLine(
+                  direction: Axis.horizontal,
+                  lineLength: double.infinity,
+                  lineThickness: 1.0,
+                  dashLength: 4.0,
+                  dashColor: Colors.black,
+                  dashGapLength: 2.0,
+                ),
+                const SizedBox(height: 2),
+                DottedLine(
+                  direction: Axis.horizontal,
+                  lineLength: double.infinity,
+                  lineThickness: 1.0,
+                  dashLength: 4.0,
+                  dashColor: Colors.black,
+                  dashGapLength: 2.0,
+                )
+              ],
+            ),
+          ),
+
+          // ☎️ Phone
+          const Text("Tel : 66-5842111"),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Date: ${DateFormat.yMd().format(DateTime.now())}"),
+              Text("Time: ${DateFormat.Hm().format(DateTime.now())}")
+            ],
+          ),
+
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: DottedLine(
+              direction: Axis.horizontal,
+              lineLength: double.infinity,
+              lineThickness: 1.0,
+              dashLength: 4.0,
+              dashColor: Colors.black,
+              dashGapLength: 2.0,
+            ),
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(flex: 1, child: Text("QTY")),
+              Expanded(flex: 7, child: Text("ITEM")),
+              Expanded(
+                  flex: 2,
+                  child: Align(
+                      alignment: Alignment.centerRight, child: Text("PRICE"))),
+            ],
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: DottedLine(
+              direction: Axis.horizontal,
+              lineLength: double.infinity,
+              lineThickness: 1.0,
+              dashLength: 4.0,
+              dashColor: Colors.black,
+              dashGapLength: 2.0,
+            ),
+          ),
+
+          // 📦 Items
+          ...orders.map((order) {
+            return Row(
+              children: [
+                Expanded(flex: 1, child: Text("${order.quantity}")),
+                Expanded(
+                  flex: 7,
+                  child: Text(" ${order.foodName}"),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(order.foodPrice.toStringAsFixed(2)),
+                  ),
+                ),
+              ],
+            );
+          }),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: DottedLine(
+              direction: Axis.horizontal,
+              lineLength: double.infinity,
+              lineThickness: 1.0,
+              dashLength: 4.0,
+              dashColor: Colors.black,
+              dashGapLength: 2.0,
+            ),
+          ),
+
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            const Text("Subtotal:"),
+            Text(total.toStringAsFixed(2))
+          ]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text("TAX (0%)"), Text("0.00")],
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: DottedLine(
+              direction: Axis.horizontal,
+              lineLength: double.infinity,
+              lineThickness: 1.0,
+              dashLength: 4.0,
+              dashColor: Colors.black,
+              dashGapLength: 2.0,
+            ),
+          ),
+          // 💰 TOTAL
+          Row(
+            children: [
+              const Expanded(
+                flex: 6,
+                child: Text(
+                  "TOTAL",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                flex: 6,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "\$ ${total.toStringAsFixed(2)}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: _divider(
+              amountLine: 2,
+              thickness: 1.0,
+              dashLength: 4.0,
+              dashGap: 2.0,
+              spacing: 2.0,
+            ),
+          ),
+
+          Center(
+              child: Column(
+            children: [
+              Text("Thank you for your visit! "),
+              Text("Please come back and see us.")
+            ],
+          )),
+          const SizedBox(height: 5),
+        ],
+      ),
+    );
+  }
+
+  static Widget _divider({
+    int amountLine = 1,
+    double thickness = 1,
+    double dashLength = 4,
+    double dashGap = 2,
+    double spacing = 2,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(amountLine, (index) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DottedLine(
+              direction: Axis.horizontal,
+              lineLength: double.infinity,
+              lineThickness: thickness,
+              dashLength: dashLength,
+              dashGapLength: dashGap,
+              dashColor: Colors.black,
+            ),
+
+            // ❗ เว้นช่องเฉพาะ "ไม่ใช่ตัวสุดท้าย"
+            if (index != amountLine - 1) SizedBox(height: spacing),
+          ],
+        );
+      }),
+    );
+  }
+
+  Future<bool?> showReceiptAndPrint({
+    required BuildContext context,
+    required List<OrderItem> orders,
+    required PrinterConfig config,
+    required double receptWidth,
+  }) async {
+    final GlobalKey repaintKey = GlobalKey();
+    final printerService = PrinterService();
+    final Size screenSize = MediaQuery.of(context).size;
+    bool isLandscape = screenSize.width > screenSize.height;
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            width:
+                isLandscape ? screenSize.width * 0.2 : screenSize.width * 0.85,
+            child: Column(
+              children: [
+                /// 🧾 Receipt
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        RepaintBoundary(
+                          key: repaintKey,
+                          child: recieptWidget(
+                            orders: orders,
+                            width: receptWidth,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /// 🔘 ปุ่ม
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          final success =
+                              await printerService.printWidgetReceipt(
+                            config: config,
+                            repaintKey: repaintKey,
+                            orders: orders,
+                          );
+
+                          Navigator.pop(context, success); // ✅ ส่งค่ากลับ
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade400,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text("🖨️ Print"),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      InkWell(
+                        onTap: () =>
+                            Navigator.pop(context, false), // ❌ cancel = false
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade400,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         );
