@@ -1,1 +1,0 @@
-enum OrderType { tapToStay, tapToGoWalkIn }

@@ -77,7 +77,7 @@ class _CartSectionState extends State<CartSection> {
 
   Widget _cardItem(Size screenSize, bool isLandscape) {
     final screenWidth = screenSize.width;
-    return BlocBuilder<CartBloc, CartState>(
+    return BlocBuilder<OrderfullBloc, OrderfullState>(
       builder: (context, state) {
         final cartItems = state.cartItems;
         Widget content = cartItems.isEmpty
@@ -178,7 +178,9 @@ class _CartSectionState extends State<CartSection> {
                                               /// minus
                                               GestureDetector(
                                                 onTap: () {
-                                                  context.read<CartBloc>().add(
+                                                  context
+                                                      .read<OrderfullBloc>()
+                                                      .add(
                                                         RemoveFromCartEvent(
                                                             cartItem.food),
                                                       );
@@ -221,7 +223,9 @@ class _CartSectionState extends State<CartSection> {
                                               /// plus
                                               GestureDetector(
                                                 onTap: () {
-                                                  context.read<CartBloc>().add(
+                                                  context
+                                                      .read<OrderfullBloc>()
+                                                      .add(
                                                         AddToCartEvent(
                                                             cartItem.food),
                                                       );
@@ -263,7 +267,7 @@ class _CartSectionState extends State<CartSection> {
                 ),
               );
 
-        if (state is CartLoading) {
+        if (state is OrderfullLoading) {
           return Stack(
             children: [
               content,
@@ -277,7 +281,7 @@ class _CartSectionState extends State<CartSection> {
           );
         }
 
-        if (state is CartError) {
+        if (state is OrderfullFailure) {
           return Center(
             child: Text(
               state.message,
@@ -292,7 +296,7 @@ class _CartSectionState extends State<CartSection> {
   }
 
   Widget _subTotalSession(double screenWidth, bool isLandscape) {
-    return BlocBuilder<CartBloc, CartState>(
+    return BlocBuilder<OrderfullBloc, OrderfullState>(
       builder: (context, state) {
         final cartItems = state.cartItems;
         return Padding(
@@ -317,14 +321,14 @@ class _CartSectionState extends State<CartSection> {
                   ),
                   Expanded(
                     child: Text(
-                      "\$${OrderPageCore().cartTotal(cartItems)}",
+                      "\$${OrderFullPageCore().cartTotal(cartItems)}",
                       maxLines: 1,
                       textAlign: TextAlign.right,
                       style: GoogleFonts.workSans(
                         fontSize: isLandscape
                             ? screenWidth * 0.011
                             : screenWidth * 0.025,
-                        color: OrderPageCore().cartTotal(cartItems) == 0
+                        color: OrderFullPageCore().cartTotal(cartItems) == 0
                             ? Color(0xFF4F4F4F)
                             : Color(0xFF7B61FF),
                         fontWeight: FontWeight.w500,
@@ -342,17 +346,17 @@ class _CartSectionState extends State<CartSection> {
                   ),
                   child: ElevatedButton(
                     onPressed: (cartItems.isEmpty ||
-                            state is CartLoading ||
-                            state is CartError)
+                            state is OrderfullLoading ||
+                            state is OrderfullFailure)
                         ? null
-                        : () => OrderPageCore().confirmOrder(context),
+                        : () => OrderFullPageCore().confirmOrder(context),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 35),
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 8),
                       backgroundColor: (cartItems.isEmpty ||
-                              state is CartLoading ||
-                              state is CartError)
+                              state is OrderfullLoading ||
+                              state is OrderfullFailure)
                           ? Colors.grey.shade500
                           : Color(0xFF32CD32),
                       shape: RoundedRectangleBorder(

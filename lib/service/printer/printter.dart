@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:ui';
 
+import 'package:barcode_widget/barcode_widget.dart' as bw;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/config/export.dart';
@@ -9,6 +11,9 @@ import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 
 class PrinterService {
+  final List<Future<bool> Function()> _queue = [];
+  bool _isProcessing = false;
+
   Future<PrintResult> testPrintNetwork({
     required String ip,
     required int port,
@@ -65,6 +70,7 @@ class PrinterService {
     required PrinterConfig config,
     required List<OrderItem> orders,
   }) async {
+    // ✅ Wraps the entire operation in a try-catch block for robust error handling.
     final service = FlutterThermalPrinterNetwork(config.ip, port: config.port);
     try {
       await service.connect();
@@ -142,19 +148,14 @@ class PrinterService {
 
       // ✅ print ครั้งเดียว
       await service.printTicket(bytes);
+    } catch (e) {
+      // ✅ Logs any errors that occur during the printing process.
+      print("❌ Error printing receipt: $e");
     } finally {
+      // ✅ Ensures the printer connection is always disconnected.
       await service.disconnect();
     }
   }
-
-  // Widget buildReceiptWidget(
-  //     {required List<OrderItem> orders, required GlobalKey repaintKey}) {
-  //   return RepaintBoundary(
-  //     key: repaintKey,
-  //     child: OrderPageWidget.recieptWidget(orders: orders, ),
-  //     //ReceiptWidget(orders: orders),
-  //   );
-  // }
 
   Future<Uint8List> capture(GlobalKey repaintKey) async {
     // ✅ รอ frame render เสร็จจริง ๆ
@@ -191,28 +192,15 @@ class PrinterService {
   Future<bool> printWidgetReceipt({
     required PrinterConfig config,
     required GlobalKey repaintKey,
-    required List<OrderItem> orders,
   }) async {
+    print(
+        "[printWidgetReceipt] show config: ${config.ip}:${config.port}, paperSize: ${config.paperSize}");
     final service = FlutterThermalPrinterNetwork(
       config.ip,
       port: config.port,
     );
 
     try {
-      /// 1. CONNECT
-      final connected = await service.connect().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          print("[printWidgetReceipt] ❌ Connect timeout");
-          throw Exception("Connect timeout");
-        },
-      );
-
-      if (connected != true) {
-        print("[printWidgetReceipt] ❌ Connect failed");
-        return false;
-      }
-
       /// 2. LOAD PROFILE
       final profile = await CapabilityProfile.load();
       final generator = Generator(
@@ -261,5 +249,45 @@ class PrinterService {
         await service.disconnect();
       } catch (_) {}
     }
+  }
+
+  Future<bool> addPrintJob(
+    Future<bool> Function() job,
+  ) async {
+    final completer = Completer<bool>();
+
+    _queue.add(() async {
+      final result = await job();
+      completer.complete(result);
+      return result;
+    });
+
+    _processQueue();
+
+    return completer.future;
+  }
+
+  Future<void> _processQueue() async {
+    if (_isProcessing) return;
+    _isProcessing = true;
+
+    while (_queue.isNotEmpty) {
+      final job = _queue.removeAt(0);
+      try {
+        await job();
+      } catch (e) {
+        print("Print job error: $e");
+      }
+    }
+
+    _isProcessing = false;
+  }
+
+  Widget createBarCode(String data) {
+    return bw.BarcodeWidget(barcode: bw.Barcode.code128(), data: data);
+  }
+
+  Widget createQrCode(String data) {
+    return bw.BarcodeWidget(barcode: bw.Barcode.qrCode(), data: data);
   }
 }

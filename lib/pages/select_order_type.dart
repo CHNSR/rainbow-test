@@ -86,7 +86,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           onTap: () {
-            context.read<OrderBloc>().add(SetOrderType("stay"));
+            context.read<OrderfullBloc>().add(SetOrderTypeEvent("stay"));
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => OrderPages()),
@@ -101,7 +101,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           onTap: () {
-            context.read<OrderBloc>().add(SetOrderType("togo"));
+            context.read<OrderfullBloc>().add(SetOrderTypeEvent("togo"));
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => OrderPages()),

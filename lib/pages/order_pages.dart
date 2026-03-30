@@ -157,9 +157,9 @@ class _OrderPagesState extends State<OrderPages> {
     final double screenWidth = screenSize.width;
     bool isLandscape = screenSize.width > screenSize.height;
 
-    return BlocListener<OrderBloc, OrderState>(
+    return BlocListener<OrderfullBloc, OrderfullState>(
       listener: (context, state) async {
-        if (state is OrderSuccess) {
+        if (state is OrderfullSuccess) {
           final config = context.read<PrinterBloc>().state.config;
           double recieptWidth = config?.paperSize == "80" ? 384 : 300;
           if (config == null) {
@@ -185,7 +185,7 @@ class _OrderPagesState extends State<OrderPages> {
             );
           } else {
             // clear cart after print receipt
-            context.read<CartBloc>().add(
+            context.read<OrderfullBloc>().add(
                   ClearCartEvent(),
                 );
             ScaffoldMessenger.of(context).showSnackBar(

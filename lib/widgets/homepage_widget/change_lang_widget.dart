@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 
-class ChangeLangWidget extends StatefulWidget {
-  const ChangeLangWidget({super.key});
+class ChangeLangWidget extends StatelessWidget {
+  final bool showExitButton;
 
-  @override
-  State<ChangeLangWidget> createState() => _ChangeLangWidgetState();
-}
+  const ChangeLangWidget({super.key, this.showExitButton = true});
 
-class _ChangeLangWidgetState extends State<ChangeLangWidget> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
     final screenWidth = screen.width;
     final isLandscape = screen.width > screen.height;
-    double flagSize = isLandscape ? screenWidth * 0.03 : screenWidth * 0.06;
+    double flagSize = isLandscape ? screenWidth * 0.03 : screenWidth * 0.07;
+    double fontSize = isLandscape ? screenWidth * 0.02 : screenWidth * 0.03;
     return Builder(
       builder: (context) {
         return SizedBox(
@@ -54,10 +52,12 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
               }
             },
             itemBuilder: (context) => [
-              _buildItem("english", "English", screen),
-              _buildItem("setting", "Setting", screen),
-              _buildItem("store management", "Store Management", screen),
-              _buildItem("exit", "Exit", screen),
+              _buildItem("english", "English", fontSize),
+              _buildItem("setting", "Setting", fontSize),
+              _buildItem("store management", "Store Management", fontSize),
+
+              if (showExitButton)
+                _buildItem("exit", "Exit", fontSize), // เงื่อนไขแสดง Exit
             ],
           ),
         );
@@ -65,13 +65,13 @@ class _ChangeLangWidgetState extends State<ChangeLangWidget> {
     );
   }
 
-  PopupMenuItem<String> _buildItem(String value, String text, Size screen) {
+  PopupMenuItem<String> _buildItem(String value, String text, double fontSize) {
     return PopupMenuItem(
       value: value,
       child: Text(text,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: screen.width * 0.015,
+            fontSize: fontSize,
           )),
     );
   }

@@ -17,7 +17,12 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Setting"), elevation: 0),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+          title: const Text("Setting"),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 16),
         children: [

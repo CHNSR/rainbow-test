@@ -332,3 +332,17 @@ Day 26 / 3 / 2568
 
 - check connection with printer status bloc |
 - check bug between print order send one more order |
+
+30/3/2569
+- printer can print | pass
+- make que fubc| pass
+- UI setting | Pass
+- Popup menu Item | pass
+- make Barcode | pass
+- make qr code | pass
+- Marge Bloc order page and subcategory | pass
+----------------------------------------------------------
+- Make media query in util(Ex.isLandscape ) | 50% 
+- delete class Responsive |
+- Move CreditCardInfoCard to widget file
+- delete device type Land scape |

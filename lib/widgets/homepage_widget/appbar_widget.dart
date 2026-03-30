@@ -46,71 +46,9 @@ class AppbarCustomWidget extends StatelessWidget {
             ],
           ),
         ),
-        PopupMenuButton<String>(
-          color: Colors.white,
-          offset: Offset(0, screen.height * 0.040),
-          borderRadius: BorderRadius.circular(12),
-          constraints: BoxConstraints(
-            maxHeight: isLandscape ? screen.width * 0.15 : screen.height * 0.35,
-            maxWidth: isLandscape ? screen.width * 0.25 : screen.width * 0.35,
-          ),
-          icon: Image.asset(
-            "assets/picture/usa_flag.png",
-            width: logoWidth,
-            height: logoHeight,
-          ),
-          onSelected: (value) {
-            switch (value) {
-              case "english":
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Language set to English")),
-                );
-                break;
-              case "setting":
-                AppNavigator.goToSetting(context);
-                break;
-              case "store management":
-                AppNavigator.goToStoreManagement(context);
-                break;
-              case "exit":
-                // Close the application
-                Navigator.of(context).pop();
-                break;
-            }
-          },
-          itemBuilder: (context) {
-            final items = <PopupMenuEntry<String>>[
-              PopupMenuItem(
-                value: "english",
-                child: Text("English",
-                    style: TextStyle(fontSize: screen.width * 0.02)),
-              ),
-              PopupMenuItem(
-                value: "setting",
-                child: Text("Setting",
-                    style: TextStyle(fontSize: screen.width * 0.02)),
-              ),
-              PopupMenuItem(
-                value: "store management",
-                child: Text("Store Management",
-                    style: TextStyle(fontSize: screen.width * 0.02)),
-              ),
-            ];
-
-            /// 👇 เพิ่ม Exit เฉพาะตอนที่อนุญาต
-            if (showExitButton) {
-              items.add(
-                PopupMenuItem(
-                  value: 'exit',
-                  child: Text("Exit",
-                      style: TextStyle(fontSize: screen.width * 0.02)),
-                ),
-              );
-            }
-
-            return items;
-          },
-        ),
+        ChangeLangWidget(
+          showExitButton: showExitButton,
+        )
       ]),
     );
   }

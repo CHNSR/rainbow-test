@@ -23,19 +23,20 @@ export 'package:flutter_application_1/model/print_result.dart';
 // ==============================================================================
 // 🔷 BLOC EXPORTS
 // ==============================================================================
-export 'package:flutter_application_1/bloc/order/order_bloc.dart';
+// export 'package:flutter_application_1/bloc/order/order_bloc.dart';
 export 'package:flutter_application_1/bloc/menu/menu_bloc.dart';
 export 'package:flutter_application_1/bloc/menu/menu_event.dart';
 export 'package:flutter_application_1/bloc/menu/menu_state.dart';
-export 'package:flutter_application_1/bloc/cart/cart_bloc.dart';
-export 'package:flutter_application_1/bloc/cart/cart_event.dart';
-export 'package:flutter_application_1/bloc/cart/cart_state.dart';
+// export 'package:flutter_application_1/bloc/cart/cart_bloc.dart';
+// export 'package:flutter_application_1/bloc/cart/cart_event.dart';
+// export 'package:flutter_application_1/bloc/cart/cart_state.dart';
 export 'package:flutter_application_1/bloc/printer/printer_bloc.dart';
+export 'package:flutter_application_1/bloc/order_page/orderfull_bloc.dart';
 
 // ==============================================================================
 // 🔷 SERVICE EXPORTS
 // ==============================================================================
-export 'package:flutter_application_1/service/food_service.dart';
+export 'package:flutter_application_1/service/API/food_service.dart';
 
 // ==============================================================================
 // 🔷 WIDGET EXPORTS
@@ -46,17 +47,17 @@ export 'package:flutter_application_1/widgets/cart_section_widget/cart_section.d
 export 'package:flutter_application_1/widgets/homepage_widget/change_lang_widget.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/text_homepage.dart';
 export 'package:flutter_application_1/widgets/order_page/order_page_widget.dart';
-export 'package:flutter_application_1/widgets/receipt_widget.dart';
 
 // ==============================================================================
 // 🔷 CORE EXPORTS
 // ==============================================================================
 export 'package:flutter_application_1/utils/menu_filter.dart';
-export 'package:flutter_application_1/core/order_page_core.dart';
 export 'package:flutter_application_1/core/home_page_core.dart';
-export 'package:flutter_application_1/core/printter.dart';
+export 'package:flutter_application_1/service/printer/printter.dart';
+export 'package:flutter_application_1/core/orderfull_page_core.dart';
 
 // ==============================================================================
 // 🔷 UTILS EXPORTS
 // ==============================================================================
 export 'package:flutter_application_1/utils/responsive.dart';
+export 'package:flutter_application_1/utils/landscape.dart';

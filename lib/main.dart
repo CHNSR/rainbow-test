@@ -8,10 +8,9 @@ void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => OrderBloc()),
         BlocProvider(create: (context) => MenuBloc()),
-        BlocProvider(create: (context) => CartBloc()),
         BlocProvider(create: (context) => PrinterBloc()),
+        BlocProvider(create: (context) => OrderfullBloc()),
       ],
       child: const MainApp(),
     ),

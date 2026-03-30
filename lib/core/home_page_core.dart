@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 class HomePageCore {
-  static toggleBottomSheet({
+  static void toggleBottomSheet({
     required bool showBottom,
     required Function(bool, Offset) setStateCallback,
   }) async {

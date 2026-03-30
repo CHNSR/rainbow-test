@@ -1,8 +1,12 @@
+import 'dart:math';
+import 'dart:io';
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:barcode/barcode.dart';
 import 'package:intl/intl.dart';
 
 class OrderPageWidget {
@@ -284,7 +288,7 @@ class OrderPageWidget {
                   return menuCard(
                     food: food,
                     onAddToCart: () {
-                      context.read<CartBloc>().add(
+                      context.read<OrderfullBloc>().add(
                             AddToCartEvent(food),
                           );
                     },
@@ -308,7 +312,7 @@ class OrderPageWidget {
     required FoodMenu food,
     required Function() onAddToCart,
   }) {
-    return BlocBuilder<CartBloc, CartState>(
+    return BlocBuilder<OrderfullBloc, OrderfullState>(
       builder: (context, state) {
         int quantity = 0;
 
@@ -664,6 +668,28 @@ class OrderPageWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: _divider(
+              amountLine: 1,
+              thickness: 1.0,
+              dashLength: 4.0,
+              dashGap: 2.0,
+              spacing: 2.0,
+            ),
+          ),
+
+          //barcode qr code section
+          Center(
+            child: BarcodeWidget(
+              barcode: Barcode.code128(),
+              data: "https://soisiam.com",
+              width: double.infinity,
+              height: 30,
+              drawText: false,
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: _divider(
               amountLine: 2,
               thickness: 1.0,
               dashLength: 4.0,
@@ -673,10 +699,39 @@ class OrderPageWidget {
           ),
 
           Center(
-              child: Column(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Thank you for your visit! "),
-              Text("Please come back and see us.")
+              Column(
+                children: [
+                  SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: FutureBuilder<Widget>(
+                      future: Future.value(
+                          PrinterService().createQrCode("https://soisiam.com")),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) return snapshot.data!;
+                        return const SizedBox(width: 10, height: 10);
+                      },
+                    ),
+                  ),
+                  Text(
+                    "feedback us!",
+                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text("Thank you for your visit!",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 10)),
+                  Text("Please come back and see us.",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 10)),
+                ],
+              ),
             ],
           )),
           const SizedBox(height: 5),
@@ -764,13 +819,15 @@ class OrderPageWidget {
                       InkWell(
                         onTap: () async {
                           final success =
-                              await printerService.printWidgetReceipt(
-                            config: config,
-                            repaintKey: repaintKey,
-                            orders: orders,
-                          );
+                              await printerService.addPrintJob(() async {
+                            return await printerService.printWidgetReceipt(
+                              config: config,
+                              repaintKey: repaintKey,
+                              //orders: orders,
+                            );
+                          });
 
-                          Navigator.pop(context, success); // ✅ ส่งค่ากลับ
+                          Navigator.pop(context, success); // ✅ ใช้ได้แล้ว
                         },
                         child: Container(
                           padding: const EdgeInsets.all(10),

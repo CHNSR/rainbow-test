@@ -18,6 +18,8 @@ dependencies:
   flutter_thermal_printer: ^2.0.1
   intl: ^0.20.2
   dotted_line: ^3.2.3
+  barcode: ^2.2.9
+  barcode_widget: ^2.0.4
 
 dev_dependencies:
   flutter_test:
