@@ -13,8 +13,8 @@ class CartSection extends StatefulWidget {
 class _CartSectionState extends State<CartSection> {
   @override
   Widget build(BuildContext context) {
-    final Size screen = MediaQuery.of(context).size;
-    bool isLandscape = screen.width > screen.height;
+    final Size screen = LandScapeUtils.getResponsiveScreenSize(context);
+    bool isLandscape = LandScapeUtils.isLandscape(context);
     final double screenWidth = screen.width;
 
     return Container(

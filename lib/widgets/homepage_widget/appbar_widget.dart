@@ -16,13 +16,12 @@ class AppbarCustomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size screen = MediaQuery.of(context).size;
-    final isLandscape = screen.width > screen.height;
+    final Size screen = LandScapeUtils.getResponsiveScreenSize(context);
+    final isLandscape = LandScapeUtils.isLandscape(context);
     final fontSized = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
     final logoHeight = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
     final logoWidth = isLandscape ? screen.width * 0.012 : screen.width * 0.03;
     final spacing = isLandscape ? screen.width * 0.005 : screen.width * 0.01;
-    print("showExitButton: $showExitButton");
     return Container(
       color: Colors.transparent,
       padding: EdgeInsets.all(

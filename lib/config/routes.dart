@@ -9,6 +9,7 @@ class AppRoutes {
   static const String setting = '/setting';
   static const String storeManagement = '/store-management';
   static const String configPrinter = '/config-printer';
+  static const String printerList = '/printer_list';
 }
 
 /// ✅ Route generator - สร้าง routes
@@ -29,6 +30,9 @@ class AppRouter {
 
       case AppRoutes.configPrinter:
         return MaterialPageRoute(builder: (_) => const PrinterConfigPage());
+
+      case AppRoutes.printerList:
+        return MaterialPageRoute(builder: (_) => const PrinterListPage());
 
       default:
         return MaterialPageRoute(
@@ -74,6 +78,10 @@ class AppNavigator {
 
   static void goToConfigPrinter(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.configPrinter);
+  }
+
+  static void goToPrinterList(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.printerList);
   }
 
   /// ย้อนกลับ

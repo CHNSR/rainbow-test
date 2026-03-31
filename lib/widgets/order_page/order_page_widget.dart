@@ -4,6 +4,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/widgets/order_page/receipt_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:barcode/barcode.dart';
@@ -16,9 +17,9 @@ class OrderPageWidget {
     required Function() onToggleSearch,
     required Function(String) onSearchChanged,
   }) {
-    final Size size = MediaQuery.of(context).size;
-    final bool isLandscape = size.width > size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final Size size = LandScapeUtils.getResponsiveScreenSize(context);
+    final bool isLandscape = LandScapeUtils.isLandscape(context);
+    final double screenWidth = size.width;
     final double iconSize = ResponsiveSize.backButtonSize(screenWidth);
 
     return Padding(
@@ -113,9 +114,8 @@ class OrderPageWidget {
     required String? selectedSetId,
     required Function(String) onSelect,
   }) {
-    final screen = MediaQuery.of(context).size;
-    final screenWidth = screen.width;
-    final isLandScape = screen.width > screen.height;
+    final screenWidth = LandScapeUtils.getResponsiveScreenSize(context).width;
+    final isLandScape = LandScapeUtils.isLandscape(context);
     return SizedBox(
       height: ResponsiveSize.subcategoryheight(screenWidth),
       child: ListView.builder(
@@ -172,9 +172,9 @@ class OrderPageWidget {
     required Function(String) onSelect,
     required ScrollController scrollController,
   }) {
-    final screenSize = MediaQuery.of(context).size;
-    final isLandscape = screenSize.width > screenSize.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenSize = LandScapeUtils.getResponsiveScreenSize(context);
+    final isLandscape = LandScapeUtils.isLandscape(context);
+    final screenWidth = screenSize.width;
     final itemWidth = isLandscape ? screenWidth * 0.1 : screenWidth * 0.18;
 
     return Align(
@@ -775,11 +775,12 @@ class OrderPageWidget {
     required List<OrderItem> orders,
     required PrinterConfig config,
     required double receptWidth,
+    required String category,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final printerService = PrinterService();
-    final Size screenSize = MediaQuery.of(context).size;
-    bool isLandscape = screenSize.width > screenSize.height;
+    final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
+    bool isLandscape = LandScapeUtils.isLandscape(context);
 
     return await showDialog<bool>(
       context: context,
@@ -787,7 +788,8 @@ class OrderPageWidget {
       builder: (context) {
         return Dialog(
           child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.7,
+            height:
+                LandScapeUtils.getResponsiveScreenSize(context).height * 0.7,
             width:
                 isLandscape ? screenSize.width * 0.2 : screenSize.width * 0.85,
             child: Column(
@@ -799,10 +801,15 @@ class OrderPageWidget {
                       children: [
                         RepaintBoundary(
                           key: repaintKey,
-                          child: recieptWidget(
-                            orders: orders,
-                            width: receptWidth,
-                          ),
+                          child: category == "kitchen"
+                              ? ReceiptWidget.kitchenRecieptWidget(
+                                  orders: orders,
+                                  width: receptWidth,
+                                )
+                              : ReceiptWidget.customerRecieptWidget(
+                                  orders: orders,
+                                  width: receptWidth,
+                                ),
                         ),
                         const SizedBox(height: 10),
                       ],
@@ -841,7 +848,117 @@ class OrderPageWidget {
                       const SizedBox(width: 10),
                       InkWell(
                         onTap: () =>
-                            Navigator.pop(context, false), // ❌ cancel = false
+                            Navigator.pop(context, null), // ❌ cancel = null
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade400,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool?> showReceiptAndPrintMulti({
+    required BuildContext context,
+    required List<OrderItem> orders,
+    required List<PrinterConfig> configs,
+    required double receptWidth,
+    required String category,
+  }) async {
+    final GlobalKey repaintKey = GlobalKey();
+    final printerService = PrinterService();
+    final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
+    bool isLandscape = LandScapeUtils.isLandscape(context);
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          child: SizedBox(
+            height:
+                LandScapeUtils.getResponsiveScreenSize(context).height * 0.7,
+            width:
+                isLandscape ? screenSize.width * 0.2 : screenSize.width * 0.85,
+            child: Column(
+              children: [
+                /// 🧾 Receipt
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        RepaintBoundary(
+                          key: repaintKey,
+                          child: category == "kitchen"
+                              ? ReceiptWidget.kitchenRecieptWidget(
+                                  orders: orders,
+                                  width: receptWidth,
+                                )
+                              : ReceiptWidget.customerRecieptWidget(
+                                  orders: orders,
+                                  width: receptWidth,
+                                ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /// 🔘 ปุ่ม
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          bool allSuccess = true;
+
+                          for (final config in configs) {
+                            final success =
+                                await printerService.addPrintJob(() async {
+                              return await printerService.printWidgetReceipt(
+                                config: config,
+                                repaintKey: repaintKey,
+                              );
+                            });
+
+                            if (success == false) {
+                              allSuccess = false;
+                              break;
+                            }
+                          }
+
+                          Navigator.pop(context, allSuccess);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade400,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text("🖨️ Print"),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      InkWell(
+                        onTap: () =>
+                            Navigator.pop(context, null), // ❌ cancel = null
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(

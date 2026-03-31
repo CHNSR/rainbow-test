@@ -15,7 +15,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-    final isLandscape = screen.width > screen.height;
+    final isLandscape = LandScapeUtils.isLandscape(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -49,21 +49,26 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
 
                         SizedBox(
                             height: isLandscape
-                                ? screen.width * 0.001
-                                : screen.width * 0.15),
+                                ? LandScapeUtils.getResponsiveWidth(
+                                    context, 0.001)
+                                : LandScapeUtils.getResponsiveWidth(
+                                    context, 0.15)),
                         TextHomepage(note: "Accept only Credit Card "),
                         SizedBox(
                             height: isLandscape
-                                ? screen.width * 0.03
-                                : screen.width * 0.075),
+                                ? LandScapeUtils.getResponsiveWidth(
+                                    context, 0.03) //screen.width * 0.03
+                                : LandScapeUtils.getResponsiveWidth(
+                                    context, 0.075)),
                         _selectCatagory(screen.width, screen.height),
                       ],
                     ),
                   ),
                 ),
                 SizedBox(
-                    height:
-                        isLandscape ? screen.width * 0.11 : screen.width * 0.30,
+                    height: isLandscape
+                        ? LandScapeUtils.getResponsiveWidth(context, 0.11)
+                        : LandScapeUtils.getResponsiveWidth(context, 0.30),
                     child: BottomSheetCustom()),
               ],
             ),
@@ -123,9 +128,13 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
     required double screenWidth,
     required double screenHeight,
   }) {
-    final isLandscape = screenWidth > screenHeight;
-    final cardWidth = isLandscape ? screenWidth * 0.12 : screenWidth * 0.4;
-    final cardHeight = isLandscape ? screenWidth * 0.14 : screenWidth * 0.47;
+    final isLandscape = LandScapeUtils.isLandscape(context);
+    final cardWidth = isLandscape
+        ? LandScapeUtils.getResponsiveWidth(context, 0.12)
+        : LandScapeUtils.getResponsiveWidth(context, 0.4);
+    final cardHeight = isLandscape
+        ? LandScapeUtils.getResponsiveWidth(context, 0.14)
+        : LandScapeUtils.getResponsiveWidth(context, 0.47);
     return GestureDetector(
       onTap: onTap,
       child: Container(

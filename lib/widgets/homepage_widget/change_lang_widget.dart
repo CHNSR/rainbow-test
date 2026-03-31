@@ -8,9 +8,9 @@ class ChangeLangWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
+    final screen = LandScapeUtils.getResponsiveScreenSize(context);
     final screenWidth = screen.width;
-    final isLandscape = screen.width > screen.height;
+    final isLandscape = LandScapeUtils.isLandscape(context);
     double flagSize = isLandscape ? screenWidth * 0.03 : screenWidth * 0.07;
     double fontSize = isLandscape ? screenWidth * 0.02 : screenWidth * 0.03;
     return Builder(

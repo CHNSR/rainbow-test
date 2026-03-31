@@ -13,4 +13,9 @@ class LandScapeUtils {
   static double getResponsiveHeight(BuildContext context, double scale) {
     return MediaQuery.of(context).size.height * scale;
   }
+
+  static Size getResponsiveScreenSize(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size;
+  }
 }

@@ -346,3 +346,31 @@ Day 26 / 3 / 2568
 - delete class Responsive |
 - Move CreditCardInfoCard to widget file
 - delete device type Land scape |
+
+31/3/2569
+- Make media query in util(Ex.isLandscape ) | pass
+- delete class Responsive | can't delete
+- Move CreditCardInfoCard to widget file | delete [pass]
+- delete device type Land scape |
+-----------------------------------------
+- make muti printer func can select  printer test|
+ - make list page for printer | pass
+ - bloc store list of printer | pass
+ - select in config page can print 2 category in 1 printer | pass
+ - config page add category | in progress
+
+ - fix bug print fail between search printer 1 or 2 |
+	- solution : if can't search printer 2. Use 1 printer else if can find any printer show error and freez order in cart
+
+ - edit func printer | pass
+ - test printer in list page | pass
+ 
+- Scan printer | freeze
+- change Receipt UI in page for kitchen page | in progress
+- stack cart after click cancel | pass
+- call 1 time each category of printer | pass
+----------------------------------------------------------
+tomorrow task
+- implement hive_ce to store data
+- implement func scan network printer and make ui for scan 
+- change Receipt UI in page for kitchen page | in progress

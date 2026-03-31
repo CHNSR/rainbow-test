@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isLandscape = size.width > size.height;
+    final isLandscape = LandScapeUtils.isLandscape(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
 
   //Tap to order button
   Widget _tapToOrderButton(double screenWidth, double screenHeight) {
-    bool isLandscape = screenWidth > screenHeight;
+    bool isLandscape = LandScapeUtils.isLandscape(context);
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(
@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _textHomePage(double screenWidth, double screenHeight) {
-    bool isLandscape = screenWidth > screenHeight;
+    bool isLandscape = LandScapeUtils.isLandscape(context);
     final titleSize = isLandscape ? screenWidth / 15 : screenWidth / 9;
     final subTitleSize = isLandscape ? screenWidth / 60 : screenWidth * 0.025;
     final iconSize = isLandscape ? screenWidth / 80 : screenWidth / 25;

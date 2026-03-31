@@ -131,7 +131,7 @@ class OrderfullBloc extends Bloc<OrderfullEvent, OrderfullState> {
       ));
 
       emit(OrderfullLoaded(
-        cartItems: [], // เคลียร์ cart
+        cartItems: prevState.cartItems, // เคลียร์ cart
         orders: newOrders,
         orderType: prevState.orderType,
       ));

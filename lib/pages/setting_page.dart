@@ -86,7 +86,8 @@ class _SettingPageState extends State<SettingPage> {
           _buildNavigationTile(
               title: "Config Printer",
               onTap: () {
-                AppNavigator.goToConfigPrinter(context);
+                //AppNavigator.goToConfigPrinter(context);
+                AppNavigator.goToPrinterList(context);
               })
         ],
       ),

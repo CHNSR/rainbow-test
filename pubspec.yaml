@@ -20,6 +20,7 @@ dependencies:
   dotted_line: ^3.2.3
   barcode: ^2.2.9
   barcode_widget: ^2.0.4
+  hive_ce: ^2.19.3
 
 dev_dependencies:
   flutter_test:

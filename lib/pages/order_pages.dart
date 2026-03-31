@@ -87,7 +87,7 @@ class _OrderPagesState extends State<OrderPages> {
       context.read<MenuBloc>().add(SelectCategoryEvent(activeCategoryId));
 
       final screenSize = MediaQuery.of(context).size;
-      final isLandscape = screenSize.width > screenSize.height;
+      final isLandscape = LandScapeUtils.isLandscape(context);
       final itemWidth =
           isLandscape ? screenSize.width * 0.1 : screenSize.width * 0.18;
 
@@ -155,43 +155,84 @@ class _OrderPagesState extends State<OrderPages> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
-    bool isLandscape = screenSize.width > screenSize.height;
+    bool isLandscape = LandScapeUtils.isLandscape(context);
 
     return BlocListener<OrderfullBloc, OrderfullState>(
       listener: (context, state) async {
         if (state is OrderfullSuccess) {
-          final config = context.read<PrinterBloc>().state.config;
-          double recieptWidth = config?.paperSize == "80" ? 384 : 300;
-          if (config == null) {
-            print("❌ [OrderPages] Error: ยังไม่ได้ตั้งค่า Printer Config");
+          final printers = context.read<PrinterBloc>().state.printers;
+
+          if (printers == null || printers.isEmpty) {
+            print("❌ [OrderPages] Error: ไม่มี Printer");
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("❌ ยังไม่ได้ตั้งค่า Printer")),
             );
             return;
           }
-          // -----------------------------------------------------------
-          print("🚀 [OrderPages] Sending job to PrinterService...");
 
-          final statusPrint = await OrderPageWidget().showReceiptAndPrint(
-            context: context,
-            orders: state.orders,
-            config: config,
-            receptWidth: recieptWidth,
-          );
+          // ✅ แยก printer
+          final kitchenPrinter =
+              printers.where((p) => p.category == "kitchen").toList();
 
-          if (statusPrint == false) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("❌ การพิมพ์ล้มเหลว")),
+          final cashierPrinter =
+              printers.where((p) => p.category == "cashier").toList();
+
+          print("🍳 Kitchen printers: ${kitchenPrinter.length}");
+          print("💰 Cashier printers: ${cashierPrinter.length}");
+
+          // -----------------------------
+          // 🔥 1. พิมพ์ Kitchen ก่อน
+          // -----------------------------
+
+          if (kitchenPrinter.isNotEmpty) {
+            final status = await OrderPageWidget().showReceiptAndPrintMulti(
+              context: context,
+              orders: state.orders,
+              configs: kitchenPrinter,
+              receptWidth: 384,
+              category: "kitchen",
             );
-          } else {
-            // clear cart after print receipt
-            context.read<OrderfullBloc>().add(
-                  ClearCartEvent(),
-                );
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("🧾 พิมพ์ใบเสร็จแล้ว")),
-            );
+
+            if (status == null) return;
+
+            if (status == false) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("❌ พิมพ์ครัวล้มเหลว")),
+              );
+              return;
+            }
           }
+
+          // -----------------------------
+          // 💰 2. พิมพ์ Cashier
+          // -----------------------------
+          if (cashierPrinter.isNotEmpty) {
+            final status = await OrderPageWidget().showReceiptAndPrintMulti(
+              context: context,
+              orders: state.orders,
+              configs: cashierPrinter,
+              receptWidth: 384,
+              category: "cashier",
+            );
+
+            if (status == null) return;
+
+            if (status == false) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("❌ พิมพ์ใบเสร็จล้มเหลว")),
+              );
+              return;
+            }
+          }
+
+          // -----------------------------
+          // ✅ success ทั้งหมด
+          // -----------------------------
+          context.read<OrderfullBloc>().add(ClearCartEvent());
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("🧾 พิมพ์ครบทุกใบแล้ว")),
+          );
         }
       },
       child: Scaffold(

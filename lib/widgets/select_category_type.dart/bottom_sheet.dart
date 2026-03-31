@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/utils/landscape.dart';
 
 class BottomSheetCustom extends StatelessWidget {
   const BottomSheetCustom({super.key});
@@ -7,8 +8,8 @@ class BottomSheetCustom extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final screenSize = MediaQuery.of(context).size;
-        final isLandscape = screenSize.width > screenSize.height;
+        final screenSize = LandScapeUtils.getResponsiveScreenSize(context);
+        final isLandscape = LandScapeUtils.isLandscape(context);
         final horizontalPadding =
             isLandscape ? screenSize.width * 0.01 : screenSize.width * 0.07;
         final verticalPadding =

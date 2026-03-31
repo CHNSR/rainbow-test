@@ -5,10 +5,23 @@ sealed class PrinterEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class SetPrinterConfig extends PrinterEvent {
+class AddPrinter extends PrinterEvent {
   final PrinterConfig config;
 
-  SetPrinterConfig({required this.config});
+  AddPrinter(this.config);
+}
+
+class RemovePrinter extends PrinterEvent {
+  final int index;
+
+  RemovePrinter(this.index);
+}
+
+class EditPrinter extends PrinterEvent {
+  final int index;
+  final PrinterConfig config;
+
+  EditPrinter(this.index, this.config);
 }
 
 class ClearPrinterConfig extends PrinterEvent {}

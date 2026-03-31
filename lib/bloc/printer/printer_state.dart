@@ -1,14 +1,17 @@
 part of 'printer_bloc.dart';
 
-class PrinterState {
-  final PrinterConfig? config;
+class PrinterState extends Equatable {
+  final List<PrinterConfig>? printers;
 
-  const PrinterState({this.config});
+  const PrinterState({this.printers = const []});
 
-  PrinterState copyWith({PrinterConfig? config}) {
-    log("Bloc config save: ${config?.ip}, ${config?.port}, ${config?.paperSize}");
+  PrinterState copyWith({List<PrinterConfig>? printers}) {
+    log("Bloc config save: ${printers?.first.ip}, ${printers?.first.port}, ${printers?.first.paperSize}, ${printers?.first.category}");
     return PrinterState(
-      config: config ?? this.config,
+      printers: printers ?? this.printers,
     );
   }
+
+  @override
+  List<Object?> get props => [printers];
 }

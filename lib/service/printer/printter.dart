@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:barcode_widget/barcode_widget.dart' as bw;
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
@@ -289,5 +291,59 @@ class PrinterService {
 
   Widget createQrCode(String data) {
     return bw.BarcodeWidget(barcode: bw.Barcode.qrCode(), data: data);
+  }
+
+  // scan func
+  static Future<List<ScanPrinterDevice>> scanNetworkPrinters({
+    required String subnet,
+    List<int> ports = const [9100, 515, 631],
+    int start = 1,
+    int end = 254,
+    Duration timeout = const Duration(milliseconds: 300),
+    int concurrency = 50,
+  }) async {
+    final List<ScanPrinterDevice> results = [];
+    final List<Future<void>> tasks = [];
+
+    for (int i = start; i <= end; i++) {
+      final ip = '$subnet.$i';
+
+      tasks.add(_scanIp(ip, ports, timeout, results));
+
+      // จำกัด concurrency
+      if (tasks.length >= concurrency) {
+        await Future.wait(tasks);
+        tasks.clear();
+      }
+    }
+
+    // ✅ สำคัญ: run ที่เหลือ
+    if (tasks.isNotEmpty) {
+      await Future.wait(tasks);
+    }
+
+    // ✅ สำคัญ: return ค่า
+    return results;
+  }
+
+  static Future<void> _scanIp(
+    String ip,
+    List<int> ports,
+    Duration timeout,
+    List<ScanPrinterDevice> results,
+  ) async {
+    for (final port in ports) {
+      try {
+        final socket = await Socket.connect(ip, port, timeout: timeout);
+
+        results.add(ScanPrinterDevice(ip: ip, port: port));
+        socket.destroy();
+
+        // เจอ port นึงพอแล้ว ไม่ต้อง scan port อื่นต่อ
+        break;
+      } catch (_) {
+        // ignore
+      }
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/utils/landscape.dart';
 
 class TextHomepage extends StatelessWidget {
   final String note;
@@ -7,9 +8,9 @@ class TextHomepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final isLandscape = screenWidth > screenHeight;
+    final double screenWidth =
+        LandScapeUtils.getResponsiveScreenSize(context).width;
+    final isLandscape = LandScapeUtils.isLandscape(context);
 
     final titleSize = isLandscape ? screenWidth / 30 : screenWidth / 9;
     final subTitleSize = isLandscape ? screenWidth / 120 : screenWidth * 0.028;
