@@ -339,7 +339,11 @@ class ReceiptWidget {
             ],
           ),
 
-          const Center(child: Text("Kitchen Reciept")),
+          const Center(
+              child: Text(
+            "Kitchen Reciept",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          )),
 
           Padding(
             padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
