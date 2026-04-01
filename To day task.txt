@@ -392,10 +392,8 @@ plugin
 	สามารถส่งพิมพ์ใบเสร็จหลายพร้อมกันได้ต้องจัดการ การส่งได้อย่างถูกต้อง | Todo
 	ส่งพิมพ์ ขณะเครื่องปริ้นไม่พร้อมใช้งานต้องสามารถทราบได้ | Todo
 
-
-
 	1. 🔌 หมวดการเชื่อมต่อ (Connection)
-	- connectNetwork(ip, port) - เชื่อมต่อผ่าน WiFi / LAN (ที่เราทำไปแล้ว) | pass
+	- connectNetwork(ip, port) - เชื่อมต่อผ่าน WiFi / LAN (ที่เราทำไปแล้ว) | [Bug] scanner sometime not see printer
 	- connectBluetooth(macAddress) - เชื่อมต่อปริ้นเตอร์บลูทูธพกพา | Not rquire
 	- connectUsb(device) - เชื่อมต่อปริ้นเตอร์ผ่านสาย USB OTG | want to test
 	- disconnect() - ตัดการเชื่อมต่อ | pass
@@ -411,7 +409,7 @@ plugin
 	3. 🖼️ หมวดกราฟิก (Graphics & Codes)
 	อันนี้ร้านค้าขาดไม่ได้เลยครับ:
 
-	- printBarcode(data, type) - พิมพ์บาร์โค้ดแท่งๆ | error
+	- printBarcode(data, type) - พิมพ์บาร์โค้ดแท่งๆ | error can not send to printer
 	- printQRCode(data) - พิมพ์ QR Code (เช่น พร้อมเพย์) | error (Sizing error must to have size)
 	- printImage(bytes) - วาดใบเสร็จเป็นรูปภาพใน Flutter แล้วส่งเป็นก้อนรูปภาพไปให้ปริ้นเตอร์ปริ้นท์ครับ | pass
 
