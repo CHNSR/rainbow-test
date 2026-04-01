@@ -374,3 +374,52 @@ tomorrow task
 - implement hive_ce to store data
 - implement func scan network printer and make ui for scan 
 - change Receipt UI in page for kitchen page | in progress
+
+----------------------------------------------------------
+1/4/2569
+PrinterTest
+1.สร้าง Project เป็นplugin ให้เรียกใช้function การทำงานผ่านplugin 
+plugin 
+   
+สามารถเเสกนหาprinter ได้ผ่าน IP เเละ USB | pass
+สามารถ สั่งพิมพ์Text ปรับขนาด | 80% format must to change from 1 2 3 4 to h1 - h4
+สามารถพิมพ์รูปได้ | pass
+สามรถพิมพ์กลับหัวได้ | pass
+ส่งพิมพ์ใบเสร็จให้มีขนาดยาวมากๆได้ | To do
+	--------------------------------
+	app
+	ทำประวัติเพื่อรู้ว่าส่งพิมพ์สำเร็จหรือไม่ | Todo
+	สามารถส่งพิมพ์ใบเสร็จหลายพร้อมกันได้ต้องจัดการ การส่งได้อย่างถูกต้อง | Todo
+	ส่งพิมพ์ ขณะเครื่องปริ้นไม่พร้อมใช้งานต้องสามารถทราบได้ | Todo
+
+
+
+	1. 🔌 หมวดการเชื่อมต่อ (Connection)
+	- connectNetwork(ip, port) - เชื่อมต่อผ่าน WiFi / LAN (ที่เราทำไปแล้ว) | pass
+	- connectBluetooth(macAddress) - เชื่อมต่อปริ้นเตอร์บลูทูธพกพา | Not rquire
+	- connectUsb(device) - เชื่อมต่อปริ้นเตอร์ผ่านสาย USB OTG | want to test
+	- disconnect() - ตัดการเชื่อมต่อ | pass
+	- getConnectionStatus() - เช็คสถานะแบบ Real-time ว่าเครื่องยังต่ออยู่ไหม หรือกระดาษหมดไหม | pass
+
+	2. 📝 หมวดควบคุมข้อความ (Text Formatting)
+	เครื่องปริ้นเตอร์ใบเสร็จรับคำสั่งภาษาที่ชื่อว่า ESC/POS ฟังก์ชันในหมวดนี้คือการส่งชุดคำสั่งเฉพาะเพื่อจัดหน้ากระดาษ:
+
+	- printText(text, isBold, size) - ปริ้นท์ข้อความปกติ (ปรับตัวหนา, ขยายไซต์ x2 x3) | pass
+	- setAlign(align) - จัดหน้า (ชิดซ้าย, ตรงกลาง, ชิดขวา) | pass
+	- feedPaper(lines) - สั่งเลื่อนกระดาษลงมากี่บรรทัด (สำคัญมากเวลาปริ้นท์เสร็จต้องดันกระดาษให้พ้นใบมีด) | pass
+	
+	3. 🖼️ หมวดกราฟิก (Graphics & Codes)
+	อันนี้ร้านค้าขาดไม่ได้เลยครับ:
+
+	- printBarcode(data, type) - พิมพ์บาร์โค้ดแท่งๆ | error
+	- printQRCode(data) - พิมพ์ QR Code (เช่น พร้อมเพย์) | error (Sizing error must to have size)
+	- printImage(bytes) - วาดใบเสร็จเป็นรูปภาพใน Flutter แล้วส่งเป็นก้อนรูปภาพไปให้ปริ้นเตอร์ปริ้นท์ครับ | pass
+
+	
+	4. ✂️ หมวดควบคุมฮาร์ดแวร์ (Hardware Actions)
+	cutPaper() - สั่งตัดกระดาษอัตโนมัติ (Cut / Partial Cut) | pass
+	openCashDrawer() - สั่งเด้งลิ้นชักเก็บเงิน (เครื่องปริ้นจะส่งพัลส์ไฟฟ้าไปดีดลิ้นชักที่ต่อสายไว้) | Not rquire 
+	beep() - สั่งเครื่องปริ้นท์ส่งเสียงร้องปิ๊บๆ (เตือนว่าออเดอร์เข้าในครัว) | Not rquire
+	
+	5. 🛠️ God Mode (ท่าไม้ตาย)
+	sendRawBytes(List<int> bytes) - รับค่า Data ดิบๆ มาเป็นก้อน Array หรือ Uint8List แล้วแตะส่งลง Network ตรงๆ เลย | pass
