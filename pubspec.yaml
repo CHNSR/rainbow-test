@@ -25,6 +25,7 @@ dependencies:
     git:
       url: https://github.com/CHNSR/plug-in_printer.git
       ref: main
+      path: flutter_printer_01
 
 dev_dependencies:
   flutter_test:
