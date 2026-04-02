@@ -421,3 +421,16 @@ plugin
 	
 	5. 🛠️ God Mode (ท่าไม้ตาย)
 	sendRawBytes(List<int> bytes) - รับค่า Data ดิบๆ มาเป็นก้อน Array หรือ Uint8List แล้วแตะส่งลง Network ตรงๆ เลย | pass
+2/4/2569
+สามารถเเสกนหาprinter ได้ผ่าน IP เเละ USB | pass
+สามารถ สั่งพิมพ์Text ปรับขนาด | in progress 50% save and print follow template
+สามารถพิมพ์รูปได้ | pass
+สามรถพิมพ์กลับหัวได้ | pass
+ส่งพิมพ์ใบเสร็จให้มีขนาดยาวมากๆได้ | To do
+
+- setting template each printer | pass
+- select category bar code setting | pass
+- re UI page graphic 1 | in progress
+- re UI hardware setting 2 | in progress
+- size กระดาษ 
+- save data template setting and pull to use in printer | in progress

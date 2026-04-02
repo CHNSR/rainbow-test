@@ -12,6 +12,12 @@ export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
 export 'package:flutter_application_1/pages/config_printer.dart';
 export 'package:flutter_application_1/pages/printer_list.dart';
+export 'package:flutter_application_1/pages/connection_printer2.dart';
+export 'package:flutter_application_1/pages/scan_network_screen.dart';
+export 'package:flutter_application_1/pages/printer_setting/printer_setting.dart';
+export 'package:flutter_application_1/pages/printer_setting/text_page.dart';
+export 'package:flutter_application_1/pages/printer_setting/graphic_page.dart';
+export 'package:flutter_application_1/pages/printer_setting/hardware_page.dart';
 // ==============================================================================
 // 🔷 MODEL EXPORTS
 // ==============================================================================
@@ -48,6 +54,7 @@ export 'package:flutter_application_1/widgets/cart_section_widget/cart_section.d
 export 'package:flutter_application_1/widgets/homepage_widget/change_lang_widget.dart';
 export 'package:flutter_application_1/widgets/homepage_widget/text_homepage.dart';
 export 'package:flutter_application_1/widgets/order_page/order_page_widget.dart';
+export 'package:flutter_application_1/widgets/shared_widgets.dart';
 
 // ==============================================================================
 // 🔷 CORE EXPORTS

@@ -109,6 +109,19 @@ class _PrinterListPageState extends State<PrinterListPage> {
                         children: [
                           TextButton.icon(
                             onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const PrinterSetting(),
+                                ),
+                              );
+                            },
+                            icon:
+                                const Icon(Icons.settings, color: Colors.grey),
+                            label: const Text("Template Settings"),
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
                               PrinterService().testPrintNetwork(
                                 ip: printer.ip,
                                 port: printer.port,
