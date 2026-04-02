@@ -1,4 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:hive_ce/hive_ce.dart';
+
+part 'print_result.g.dart';
 
 class PrintResult {
   final bool success;
@@ -7,11 +10,17 @@ class PrintResult {
   PrintResult({required this.success, required this.message});
 }
 
+@HiveType(typeId: 0)
 class PrinterConfig extends Equatable {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final String ip;
+  @HiveField(2)
   final int port;
+  @HiveField(3)
   final String paperSize;
+  @HiveField(4)
   final String category; // kitchen / cashier
 
   const PrinterConfig({

@@ -22,15 +22,15 @@ dependencies:
   barcode_widget: ^2.0.4
   hive_ce: ^2.19.3
   flutter_printer_01:
-    git:
-      url: https://github.com/CHNSR/plug-in_printer.git
-      ref: main
-      path: flutter_printer_01
+    path: C:\Github\plug-in_printer\flutter_printer_01
+  hive_ce_flutter: ^2.3.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  hive_ce_generator: ^1.11.1
+  build_runner: ^2.13.1
 
 flutter:
   uses-material-design: true

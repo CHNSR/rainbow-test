@@ -4,6 +4,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/service/myprinter/myprinter.dart';
 import 'package:flutter_application_1/widgets/order_page/receipt_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -709,7 +710,8 @@ class OrderPageWidget {
                     height: 30,
                     child: FutureBuilder<Widget>(
                       future: Future.value(
-                          PrinterService().createQrCode("https://soisiam.com")),
+                          // PrinterService().createQrCode("https://soisiam.com")
+                          Myprinter().createQrCode("https://soisiam.com")),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) return snapshot.data!;
                         return const SizedBox(width: 10, height: 10);
@@ -778,7 +780,8 @@ class OrderPageWidget {
     required String category,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
-    final printerService = PrinterService();
+    // final printerService = PrinterService();
+    final myprinter = Myprinter();
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 
@@ -826,8 +829,10 @@ class OrderPageWidget {
                       InkWell(
                         onTap: () async {
                           final success =
-                              await printerService.addPrintJob(() async {
-                            return await printerService.printWidgetReceipt(
+                              // await printerService.addPrintJob(() async {
+                              await myprinter.addPrintJob(() async {
+                            return await myprinter.printWidgetReceipt(
+                              //printerService.printWidgetReceipt(
                               config: config,
                               repaintKey: repaintKey,
                               //orders: orders,
@@ -880,7 +885,8 @@ class OrderPageWidget {
     required String category,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
-    final printerService = PrinterService();
+    // final printerService = PrinterService();
+    final myprinter = Myprinter();
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 
@@ -931,8 +937,10 @@ class OrderPageWidget {
 
                           for (final config in configs) {
                             final success =
-                                await printerService.addPrintJob(() async {
-                              return await printerService.printWidgetReceipt(
+                                // await printerService.addPrintJob(() async {
+                                //   return await printerService.printWidgetReceipt(
+                                await myprinter.addPrintJob(() async {
+                              return await myprinter.printWidgetReceipt(
                                 config: config,
                                 repaintKey: repaintKey,
                               );

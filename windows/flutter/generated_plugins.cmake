@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  flutter_printer_01
   flutter_thermal_printer
   universal_ble
 )
