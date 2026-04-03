@@ -21,5 +21,8 @@ class SetOrderTypeEvent extends OrderfullEvent {
 }
 
 class ConfirmOrderEvent extends OrderfullEvent {
-  ConfirmOrderEvent();
+  final String status;
+  final String printer;
+
+  ConfirmOrderEvent({this.status = "Success", this.printer = "Unknown"});
 }

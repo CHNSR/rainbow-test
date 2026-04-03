@@ -80,7 +80,8 @@ class Myprinter {
     required List<OrderItem> orders,
   }) async {
     try {
-      bool connected = await _printer.connection.connectPrinter(config.ip, config.port);
+      bool connected =
+          await _printer.connection.connectPrinter(config.ip, config.port);
       if (!connected) {
         throw 'ไม่สามารถเชื่อมต่อ ${config.ip}:${config.port}';
       }
@@ -97,7 +98,8 @@ class Myprinter {
       final ByteData data = await rootBundle.load('assets/logo/smile_logo.png');
       final Uint8List imageBytes = data.buffer.asUint8List();
       final img.Image? rawImage = img.decodeImage(imageBytes);
-      final img.Image? image = rawImage != null ? img.copyResize(rawImage, width: 300) : null;
+      final img.Image? image =
+          rawImage != null ? img.copyResize(rawImage, width: 300) : null;
 
       if (image != null) bytes += generator.image(image);
 
@@ -118,7 +120,10 @@ class Myprinter {
       // Items
       for (final order in orders) {
         bytes += generator.row([
-          PosColumn(text: "x${order.quantity} ${order.foodName}", width: 8, styles: PosStyles()),
+          PosColumn(
+              text: "x${order.quantity} ${order.foodName}",
+              width: 8,
+              styles: PosStyles()),
           PosColumn(
             text: order.foodPrice.toStringAsFixed(2),
             width: 4,
@@ -132,7 +137,9 @@ class Myprinter {
       bytes += generator.row([
         PosColumn(text: "TOTAL", width: 6, styles: const PosStyles(bold: true)),
         PosColumn(
-          text: orders.fold<double>(0, (sum, item) => sum + item.totalPrice).toStringAsFixed(2),
+          text: orders
+              .fold<double>(0, (sum, item) => sum + item.totalPrice)
+              .toStringAsFixed(2),
           width: 6,
           styles: const PosStyles(align: PosAlign.right, bold: true),
         ),
@@ -163,7 +170,7 @@ class Myprinter {
 
     if (boundary.debugNeedsPaint) {
       await Future.delayed(const Duration(milliseconds: 50));
-      return capture(repaintKey); 
+      return capture(repaintKey);
     }
 
     final image = await boundary.toImage(pixelRatio: 3);
@@ -178,10 +185,12 @@ class Myprinter {
     required PrinterConfig config,
     required GlobalKey repaintKey,
   }) async {
-    print("[printWidgetReceipt] show config: ${config.ip}:${config.port}, paperSize: ${config.paperSize}");
-    
+    print(
+        "[printWidgetReceipt] show config: ${config.ip}:${config.port}, paperSize: ${config.paperSize}");
+
     try {
-      bool connected = await _printer.connection.connectPrinter(config.ip, config.port);
+      bool connected =
+          await _printer.connection.connectPrinter(config.ip, config.port);
       if (!connected) throw 'ไม่สามารถเชื่อมต่อ ${config.ip}:${config.port}';
 
       final profile = await CapabilityProfile.load();
@@ -259,6 +268,18 @@ class Myprinter {
     _isProcessing = false;
   }
 
+  /// ตรวจสอบการเชื่อมต่อ Printer ผ่าน IP และ Port (Ping)
+  Future<bool> checkConnection(String ip, int port) async {
+    try {
+      final socket =
+          await Socket.connect(ip, port, timeout: const Duration(seconds: 2));
+      socket.destroy();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Widget createBarCode(String data) {
     return bw.BarcodeWidget(barcode: bw.Barcode.code128(), data: data);
   }
@@ -325,5 +346,9 @@ class Myprinter {
   /// ส่งบรรทัดพร้อม newline
   Future<void> println(String line) async {
     await write('$line\n');
+  }
+
+  Future<void> check(int lines) async {
+    await write('\n' * lines);
   }
 }

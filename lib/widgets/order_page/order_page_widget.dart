@@ -828,18 +828,39 @@ class OrderPageWidget {
                     children: [
                       InkWell(
                         onTap: () async {
-                          final success =
-                              // await printerService.addPrintJob(() async {
-                              await myprinter.addPrintJob(() async {
+                          // 1. แจ้งกำลังตรวจสอบการเชื่อมต่อ
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("⏳ Checking printer connection..."),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+
+                          // 2. เช็ค IP ว่าพร้อมไหม
+                          final isConnected = await myprinter.checkConnection(
+                              config.ip, config.port);
+                          if (!isConnected) {
+                            final messenger = ScaffoldMessenger.of(context);
+                            Navigator.pop(context, false); // ❌ ปิด Dialog ก่อน
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "❌ ไม่สามารถเชื่อมต่อปริ้นเตอร์ ${config.name} (${config.ip}) ได้"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return; // หยุดการทำงาน
+                          }
+
+                          // 3. ถ้าเชื่อมต่อสำเร็จ สั่งพิมพ์ปกติ
+                          final success = await myprinter.addPrintJob(() async {
                             return await myprinter.printWidgetReceipt(
-                              //printerService.printWidgetReceipt(
                               config: config,
                               repaintKey: repaintKey,
-                              //orders: orders,
                             );
                           });
 
-                          Navigator.pop(context, success); // ✅ ใช้ได้แล้ว
+                          Navigator.pop(context, success);
                         },
                         child: Container(
                           padding: const EdgeInsets.all(10),
@@ -907,6 +928,15 @@ class OrderPageWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        Row(
+                          children: [
+                            Text(
+                                "Preview Receipt for ${configs.length} printers",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
                         RepaintBoundary(
                           key: repaintKey,
                           child: category == "kitchen"
@@ -934,11 +964,60 @@ class OrderPageWidget {
                       InkWell(
                         onTap: () async {
                           bool allSuccess = true;
+                          List<PrinterConfig> readyPrinters = [];
+                          final messenger = ScaffoldMessenger.of(context);
 
+                          // 1. แจ้งกำลังตรวจสอบ
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text("⏳ Checking printers connection..."),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+
+                          // 2. ตรวจสอบการเชื่อมต่อทีละเครื่อง
                           for (final config in configs) {
+                            final isConnected = await myprinter.checkConnection(
+                                config.ip, config.port);
+                            if (isConnected) {
+                              readyPrinters.add(config);
+                            } else {
+                              allSuccess = false;
+                            }
+                          }
+
+                          // ถ้าไม่มีเครื่องไหนพร้อมเลย ให้หยุดเลย
+                          if (readyPrinters.isEmpty) {
+                            Navigator.pop(context, false); // ❌ ปิด Dialog ก่อน
+                            for (final config in configs) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      "❌ ไม่สามารถเชื่อมต่อปริ้นเตอร์ ${config.name} (${config.ip}) ได้"),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                            return;
+                          }
+
+                          // 🔹 แจ้งเตือนเครื่องที่เชื่อมต่อไม่ได้ (กรณีมีบางเครื่องพร้อมทำงาน)
+                          for (final config in configs) {
+                            if (!readyPrinters.contains(config)) {
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      "❌ ไม่สามารถเชื่อมต่อปริ้นเตอร์ ${config.name} (${config.ip}) ได้"),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+
+                          // 3. สั่งพิมพ์เฉพาะเครื่องที่พร้อม
+                          for (final config in readyPrinters) {
                             final success =
-                                // await printerService.addPrintJob(() async {
-                                //   return await printerService.printWidgetReceipt(
                                 await myprinter.addPrintJob(() async {
                               return await myprinter.printWidgetReceipt(
                                 config: config,
@@ -948,7 +1027,6 @@ class OrderPageWidget {
 
                             if (success == false) {
                               allSuccess = false;
-                              break;
                             }
                           }
 

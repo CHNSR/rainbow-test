@@ -4,12 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OrderFullPageCore {
   //confirm order func
-  void confirmOrder(BuildContext context) {
+  void confirmOrder(
+    BuildContext context, {
+    String status = "Success",
+    String printer = "Unknown",
+  }) {
     final cartItems = context.read<OrderfullBloc>().state.cartItems;
 
     if (cartItems.isNotEmpty) {
       context.read<OrderfullBloc>().add(
-            ConfirmOrderEvent(),
+            ConfirmOrderEvent(status: status, printer: printer),
           );
     }
   }

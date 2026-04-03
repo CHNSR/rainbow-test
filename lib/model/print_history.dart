@@ -1,5 +1,7 @@
 import 'package:hive_ce/hive_ce.dart';
 
+part 'print_history.g.dart';
+
 @HiveType(typeId: 1)
 enum PrintStatus {
   @HiveField(0)

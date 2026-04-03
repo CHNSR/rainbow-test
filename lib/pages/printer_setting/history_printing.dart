@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/model/receipt.dart';
+import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
 import 'package:intl/intl.dart';
 
 /// สถานะของการพิมพ์
@@ -32,175 +34,149 @@ class HistoryPrinting extends StatefulWidget {
 }
 
 class _HistoryPrintingState extends State<HistoryPrinting> {
-  // ข้อมูลจำลอง (Mock Data)
-  final List<PrintHistoryItem> _history = [
-    PrintHistoryItem(
-      id: 'ORD-0001',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      totalAmount: 250.0,
-      status: PrintStatus.success,
-    ),
-    PrintHistoryItem(
-      id: 'ORD-0002',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
-      totalAmount: 120.0,
-      status: PrintStatus.fail,
-    ),
-    PrintHistoryItem(
-      id: 'ORD-0003',
-      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-      totalAmount: 850.0,
-      status: PrintStatus.success,
-    ),
-  ];
+  List<Receipt> receipts = [];
 
-  /// ฟังก์ชันจำลองการสั่งพิมพ์ซ้ำ
-  Future<void> _reprint(PrintHistoryItem item) async {
-    // 1. เปลี่ยนสถานะเป็น รอคิวพิมพ์ (Waiting)
-    setState(() => item.status = PrintStatus.waiting);
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    // 2. เปลี่ยนสถานะเป็น กำลังพิมพ์ (Printing)
-    setState(() => item.status = PrintStatus.printing);
-
-    // TODO: เรียกใช้ PrinterService().printRecept(...) หรือ printWidgetReceipt(...) ตรงนี้
-    await Future.delayed(
-        const Duration(seconds: 2)); // จำลองเวลาเครื่องปริ้นทำงาน
-
-    // 3. อัปเดตสถานะเมื่อสำเร็จ (Success) หรือ ล้มเหลว (Fail)
-    if (mounted) {
-      setState(() => item.status = PrintStatus.success);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('✅ พิมพ์ใบเสร็จ ${item.id} ซ้ำสำเร็จ'),
-          backgroundColor: Colors.green.shade700,
-        ),
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    _loadReceipts();
   }
 
-  /// Helper สำหรับแปลง Status เป็น สี
-  Color _getStatusColor(PrintStatus status) {
-    switch (status) {
-      case PrintStatus.success:
-        return Colors.green.shade600;
-      case PrintStatus.fail:
-        return Colors.red.shade600;
-      case PrintStatus.printing:
-        return Colors.blue.shade600;
-      case PrintStatus.waiting:
-        return Colors.orange.shade600;
-    }
-  }
-
-  /// Helper สำหรับแปลง Status เป็น ข้อความ
-  String _getStatusText(PrintStatus status) {
-    switch (status) {
-      case PrintStatus.success:
-        return 'Print Success';
-      case PrintStatus.fail:
-        return 'Print Fail';
-      case PrintStatus.printing:
-        return 'Printing...';
-      case PrintStatus.waiting:
-        return 'Waiting...';
-    }
-  }
-
-  /// Helper สำหรับแปลง Status เป็น Icon
-  IconData _getStatusIcon(PrintStatus status) {
-    switch (status) {
-      case PrintStatus.success:
-        return Icons.check_circle;
-      case PrintStatus.fail:
-        return Icons.error;
-      case PrintStatus.printing:
-        return Icons.print;
-      case PrintStatus.waiting:
-        return Icons.hourglass_empty;
-    }
+  void _loadReceipts() {
+    setState(() {
+      receipts = HiveService.getReceipts();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('History Printing',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: cs.inversePrimary,
-        centerTitle: true,
+        title: const Text("History Receipts"),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: _history.isEmpty
-          ? const Center(child: Text('ไม่มีประวัติการพิมพ์'))
-          : ListView.separated(
+      body: receipts.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.receipt_long, size: 80, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "No Receipts Yet",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: _history.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemCount: receipts.length,
               itemBuilder: (context, index) {
-                final item = _history[index];
-                final isProcessing = item.status == PrintStatus.printing ||
-                    item.status == PrintStatus.waiting;
-
+                final receipt = receipts[index];
                 return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
                   elevation: 2,
-                  color: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        // ไอคอนสถานะ
-                        Icon(_getStatusIcon(item.status),
-                            color: _getStatusColor(item.status), size: 36),
-                        const SizedBox(width: 16),
-
-                        // รายละเอียดออเดอร์
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ExpansionTile(
+                    title: Text(
+                      "Order #${receipt.id.substring(receipt.id.length - 6)}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat('dd MMM yyyy, HH:mm')
+                                .format(receipt.date),
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
                             children: [
-                              Text(
-                                'Order: ${item.id}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border:
+                                      Border.all(color: Colors.blue.shade200),
+                                ),
+                                child: Text(
+                                  receipt.orderType,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: receipt.orderType == "stay"
+                                          ? Colors.blue.shade700
+                                          : Colors.orange.shade700),
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                DateFormat('dd MMM yyyy, HH:mm')
-                                    .format(item.timestamp),
-                                style: TextStyle(
-                                    color: Colors.grey.shade600, fontSize: 13),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color:
+                                      receipt.status.toLowerCase() == 'success'
+                                          ? Colors.green.shade50
+                                          : Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                      color: receipt.status.toLowerCase() ==
+                                              'success'
+                                          ? Colors.green.shade200
+                                          : Colors.red.shade200),
+                                ),
+                                child: Text(
+                                  receipt.status,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: receipt.status.toLowerCase() ==
+                                            'success'
+                                        ? Colors.green.shade700
+                                        : Colors.red.shade700,
+                                  ),
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _getStatusText(item.status),
-                                style: TextStyle(
-                                    color: _getStatusColor(item.status),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  "🖨️ ${receipt.printer}",
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey[700]),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-
-                        // ปุ่ม Reprint
-                        FilledButton.tonalIcon(
-                          onPressed: isProcessing ? null : () => _reprint(item),
-                          icon: isProcessing
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2))
-                              : const Icon(Icons.print, size: 18),
-                          label: Text(isProcessing ? 'Wait' : 'Reprint'),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    trailing: Text(
+                      "\$${receipt.totalAmount.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.green,
+                      ),
+                    ),
+                    children: [
+                      const Divider(),
+                      ...receipt.items.map((item) => ListTile(
+                            title: Text("${item.quantity}x ${item.foodName}"),
+                            trailing: Text(
+                                "\$${(item.foodPrice * item.quantity).toStringAsFixed(2)}"),
+                          )),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 );
               },

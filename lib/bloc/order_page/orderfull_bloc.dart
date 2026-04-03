@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_application_1/model/order_item.dart';
+import 'package:flutter_application_1/model/receipt.dart';
+import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
 
 part 'orderfull_event.dart';
 part 'orderfull_state.dart';
@@ -109,7 +111,7 @@ class OrderfullBloc extends Bloc<OrderfullEvent, OrderfullState> {
       },
     );
 
-    on<ConfirmOrderEvent>((event, emit) {
+    on<ConfirmOrderEvent>((event, emit) async {
       if (state.cartItems.isEmpty) return;
 
       final newOrders = state.cartItems.map((item) {
@@ -123,6 +125,36 @@ class OrderfullBloc extends Bloc<OrderfullEvent, OrderfullState> {
       }).toList();
 
       final prevState = state;
+
+      // 1. คำนวณยอดรวมสุทธิ
+      final totalAmount = prevState.cartItems.fold<double>(
+        0.0,
+        (sum, item) =>
+            sum + ((item.food.foodPrice as num).toDouble() * item.quantity),
+      );
+
+      // 2. แปลงรายการสั่งซื้อเป็น ReceiptItem สำหรับบันทึกลง Database
+      final receiptItems = prevState.cartItems
+          .map((item) => ReceiptItem(
+                foodName: item.food.foodName,
+                foodPrice: (item.food.foodPrice as num).toDouble(),
+                quantity: item.quantity,
+              ))
+          .toList();
+
+      // 3. สร้าง Object ใบเสร็จเพื่อจัดเก็บ
+      final receipt = Receipt(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        date: DateTime.now(),
+        totalAmount: totalAmount,
+        orderType: prevState.orderType ?? 'Unknown',
+        items: receiptItems,
+        status: event.status,
+        printer: event.printer,
+      );
+
+      // 4. บันทึกลง Hive Database
+      await HiveService.addReceipt(receipt);
 
       emit(OrderfullSuccess(
         cartItems: prevState.cartItems,

@@ -19,7 +19,6 @@ class _OrderPagesState extends State<OrderPages> {
   bool _isAutoScrolling = false;
   final GlobalKey _menuGridKey = GlobalKey();
   final GlobalKey repaintKey = GlobalKey(); // for capture
-  final PrinterService _printerService = PrinterService();
 
   void scrollToCategory(String catId) async {
     final ctx = categoryIndexMap[catId]?.currentContext;
