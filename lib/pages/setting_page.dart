@@ -65,6 +65,16 @@ class _SettingPageState extends State<SettingPage> {
               _buildPaymentMethodTile(),
               _buildDivider(),
               _buildShowOrderTile(),
+              _buildDivider(),
+              _buildNavigationTile(
+                icon: Icons.history_outlined,
+                title: "History Printing",
+                subtitle: "View past print jobs and receipts",
+                onTap: () {
+                  AppNavigator.goToHistoryPrinting(context);
+                },
+              ),
+              _buildDivider(),
             ],
           ),
           _buildSection(

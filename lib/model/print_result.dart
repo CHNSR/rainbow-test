@@ -22,6 +22,12 @@ class PrinterConfig extends Equatable {
   final String paperSize;
   @HiveField(4)
   final String category; // kitchen / cashier
+  @HiveField(5)
+  final Map<String, dynamic>? textTemplate;
+  @HiveField(6)
+  final Map<String, dynamic>? hardwareTemplate;
+  @HiveField(7)
+  final Map<String, dynamic>? graphicsTemplate;
 
   const PrinterConfig({
     required this.name,
@@ -29,10 +35,22 @@ class PrinterConfig extends Equatable {
     required this.port,
     required this.paperSize,
     required this.category,
+    this.textTemplate,
+    this.hardwareTemplate,
+    this.graphicsTemplate,
   });
 
   @override
-  List<Object?> get props => [name, ip, port, paperSize, category];
+  List<Object?> get props => [
+        name,
+        ip,
+        port,
+        paperSize,
+        category,
+        textTemplate,
+        hardwareTemplate,
+        graphicsTemplate
+      ];
 }
 
 class ScanPrinterDevice {

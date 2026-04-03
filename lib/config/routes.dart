@@ -10,6 +10,15 @@ class AppRoutes {
   static const String storeManagement = '/store-management';
   static const String configPrinter = '/config-printer';
   static const String printerList = '/printer_list';
+  static const String historyPrinting = '/history-printing';
+  static const String scanNetwork = '/scan-network';
+  static const String textPage = '/text-page';
+  static const String graphicPage = '/graphic-page';
+  static const String hardwarePage = '/hardware-page';
+  static const String configPage = '/config-page';
+  static const String printerConfigPage = '/printer-config-page';
+  static const String printerListPage = '/printer-list-page';
+  static const String printerSettingPage = '/printer-setting-page';
 }
 
 /// ✅ Route generator - สร้าง routes
@@ -33,6 +42,12 @@ class AppRouter {
 
       case AppRoutes.printerList:
         return MaterialPageRoute(builder: (_) => const PrinterListPage());
+
+      case AppRoutes.historyPrinting:
+        return MaterialPageRoute(builder: (_) => const HistoryPrinting());
+
+      case AppRoutes.printerConfigPage:
+        return MaterialPageRoute(builder: (_) => const PrinterConfigPage());
 
       default:
         return MaterialPageRoute(
@@ -82,6 +97,10 @@ class AppNavigator {
 
   static void goToPrinterList(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.printerList);
+  }
+
+  static void goToHistoryPrinting(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.historyPrinting);
   }
 
   /// ย้อนกลับ

@@ -11,12 +11,14 @@ export 'package:flutter_application_1/pages/order_pages.dart';
 export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
 export 'package:flutter_application_1/pages/config_printer.dart';
-export 'package:flutter_application_1/pages/printer_list.dart';
 
+export 'package:flutter_application_1/pages/printer_setting/printer_list.dart';
 export 'package:flutter_application_1/pages/printer_setting/scan_network_screen.dart';
 export 'package:flutter_application_1/pages/printer_setting/text_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/graphic_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/hardware_page.dart';
+export 'package:flutter_application_1/pages/printer_setting/history_printing.dart';
+
 // ==============================================================================
 // 🔷 MODEL EXPORTS
 // ==============================================================================

@@ -22,13 +22,16 @@ class PrinterConfigAdapter extends TypeAdapter<PrinterConfig> {
       port: (fields[2] as num).toInt(),
       paperSize: fields[3] as String,
       category: fields[4] as String,
+      textTemplate: (fields[5] as Map?)?.cast<String, dynamic>(),
+      hardwareTemplate: (fields[6] as Map?)?.cast<String, dynamic>(),
+      graphicsTemplate: (fields[7] as Map?)?.cast<String, dynamic>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, PrinterConfig obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -38,7 +41,13 @@ class PrinterConfigAdapter extends TypeAdapter<PrinterConfig> {
       ..writeByte(3)
       ..write(obj.paperSize)
       ..writeByte(4)
-      ..write(obj.category);
+      ..write(obj.category)
+      ..writeByte(5)
+      ..write(obj.textTemplate)
+      ..writeByte(6)
+      ..write(obj.hardwareTemplate)
+      ..writeByte(7)
+      ..write(obj.graphicsTemplate);
   }
 
   @override

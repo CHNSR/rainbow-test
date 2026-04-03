@@ -115,9 +115,9 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
         // isBeep: _isBeep,
         // printPrice: _printPrice,
         //
-        // textTemplate: _textTemplate,
-        // hardwareTemplate: _hardwareTemplate,
-        // graphicsTemplate: _graphicsTemplate,
+        textTemplate: _textTemplate,
+        hardwareTemplate: _hardwareTemplate,
+        graphicsTemplate: _graphicsTemplate,
       );
 
       if (widget.index != null) {
@@ -161,9 +161,9 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
       // _isAutoCut = c.isAutoCut;
       // _isBeep = c.isBeep;
       // _printPrice = c.printPrice;
-      // _textTemplate = c.textTemplate;
-      // _hardwareTemplate = c.hardwareTemplate;
-      // _graphicsTemplate = c.graphicsTemplate;
+      _textTemplate = c.textTemplate;
+      _hardwareTemplate = c.hardwareTemplate;
+      _graphicsTemplate = c.graphicsTemplate;
     }
   }
 
