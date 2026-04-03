@@ -434,3 +434,10 @@ plugin
 - re UI hardware setting 2 | in progress
 - size กระดาษ 
 - save data template setting and pull to use in printer | in progress
+
+app
+	ทำประวัติเพื่อรู้ว่าส่งพิมพ์สำเร็จหรือไม่ | pass
+	สามารถส่งพิมพ์ใบเสร็จหลายพร้อมกันได้ต้องจัดการ การส่งได้อย่างถูกต้อง | Pass
+	ส่งพิมพ์ ขณะเครื่องปริ้นไม่พร้อมใช้งานต้องสามารถทราบได้ | pass
+
+	-error bug click cancel but save data to hive in confirm bottons

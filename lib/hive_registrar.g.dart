@@ -11,7 +11,6 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(PrinterConfigAdapter());
     registerAdapter(PrintHistoryItemAdapter());
-    registerAdapter(PrinterConfigAdapter());
     registerAdapter(ReceiptAdapter());
     registerAdapter(ReceiptItemAdapter());
   }
@@ -21,7 +20,6 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(PrinterConfigAdapter());
     registerAdapter(PrintHistoryItemAdapter());
-    registerAdapter(PrinterConfigAdapter());
     registerAdapter(ReceiptAdapter());
     registerAdapter(ReceiptItemAdapter());
   }
