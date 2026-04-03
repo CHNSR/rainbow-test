@@ -441,3 +441,4 @@ app
 	ส่งพิมพ์ ขณะเครื่องปริ้นไม่พร้อมใช้งานต้องสามารถทราบได้ | pass
 
 	-error bug click cancel but save data to hive in confirm bottons
+	-error delete state in bloc (find printer form state)
