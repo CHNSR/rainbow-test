@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_printer_01/flutter_printer_01.dart';
@@ -39,36 +40,6 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
         _status = msg;
         _isLoading = false;
       });
-
-  // ── Print Widget (Receipt Preview) ───────────────────────────────────────
-  Future<void> _printWidget() async {
-    setState(() => _isLoading = true);
-    try {
-      final ok = await widget.plugin.graphics
-          .printFromKey(_repaintKey, pixelRatio: 2.0);
-      _setStatus(ok, ok ? '✅ พิมพ์ Widget สำเร็จ' : '❌ พิมพ์ Widget ล้มเหลว');
-    } catch (e) {
-      _setStatus(false, 'Error: $e');
-    }
-  }
-
-  // ── Capture Preview (แสดงให้ดูก่อนปริ้น) ────────────────────────────────
-  Uint8List? _previewPng;
-
-  Future<void> _capturePreview() async {
-    setState(() => _isLoading = true);
-    try {
-      final bytes = await widget.plugin.graphics.captureFromKey(_repaintKey);
-      setState(() {
-        _previewPng = bytes;
-        _isLoading = false;
-        _status = '📸 Capture สำเร็จ — ตรวจสอบ Preview ด้านล่าง';
-        _success = true;
-      });
-    } catch (e) {
-      _setStatus(false, 'Error: $e');
-    }
-  }
 
   // ── Print QR ─────────────────────────────────────────────────────────────
   Future<void> _printQr() async {
@@ -121,69 +92,10 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // ── Print Widget ─────────────────────────────────────────
-          const SectionHeader(
-              icon: Icons.widgets_outlined,
-              label: 'Print Widget (Capture → Raster)'),
-          const SizedBox(height: 12),
-          _InfoCard(
-            message:
-                'ห่อ Widget ที่ต้องการพิมพ์ด้วย RepaintBoundary แล้วส่ง GlobalKey มา\n'
-                'ระบบจะ Capture เป็น PNG แล้วแปลงเป็น ESC/POS GS v 0 raster bytes',
-          ),
-          const SizedBox(height: 14),
-
-          // ── ตัวอย่าง Receipt Widget ที่จะ print ─────────────────
-          const Text('Preview (Widget ที่จะพิมพ์):',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-          const SizedBox(height: 8),
-          RepaintBoundary(
-            key: _repaintKey,
-            child: const _SampleReceiptWidget(),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: !_isLoading ? _capturePreview : null,
-                  icon: const Icon(Icons.camera_alt_outlined, size: 18),
-                  label: const Text('Preview PNG'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ActionButton(
-                  label: 'Print Widget',
-                  icon: Icons.print_outlined,
-                  onTap: (!_isLoading) ? _printWidget : null,
-                  loading: _isLoading,
-                ),
-              ),
-            ],
-          ),
-
-          // PNG Preview
-          if (_previewPng != null) ...[
-            const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.memory(_previewPng!, fit: BoxFit.contain),
-            ),
-          ],
-
-          const SizedBox(height: 28),
-          const Divider(),
-          const SizedBox(height: 16),
-
           // ── QR Code (Native) ──────────────────────────────────────
           const SectionHeader(
               icon: Icons.qr_code_2_outlined,
               label: 'QR Code (Native ESC/POS)'),
-          const SizedBox(height: 12),
-          _InfoCard(
-              message:
-                  'ใช้ GS ( k command — เครื่องพิมพ์ Generate QR เองโดยไม่ต้องส่งรูปภาพ'),
           const SizedBox(height: 12),
           TextField(
             controller: _qrController,
@@ -219,7 +131,7 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
             ],
           ),
           ActionButton(
-            label: 'Print QR Code',
+            label: 'Test Print QR Code',
             icon: Icons.qr_code_2,
             onTap: (!_isLoading) ? _printQr : null,
             loading: _isLoading,
@@ -233,10 +145,6 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
           const SectionHeader(
               icon: Icons.barcode_reader,
               label: 'Barcode Code128 (Native ESC/POS)'),
-          const SizedBox(height: 12),
-          _InfoCard(
-              message:
-                  'ใช้ GS k command — สนับสนุน Code128 barcode\nESC/POS จะ Generate barcode โดยตรงบน Printer'),
           const SizedBox(height: 12),
           TextField(
             controller: _barcodeController,
@@ -303,120 +211,25 @@ class _GraphicsScreenState extends State<GraphicsScreen> {
                     ))
                 .toList(),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 28),
           ActionButton(
-            label: 'Print Barcode',
-            icon: Icons.barcode_reader,
-            onTap: (!_isLoading) ? _printBarcode : null,
-            loading: _isLoading,
+            label: 'Save Graphic Config',
+            icon: Icons.save,
+            onTap: () {
+              final templateData = {
+                'qrModuleSize': _qrModuleSize,
+                'barcodeHeight': _barcodeHeight,
+                'barcodeWidth': _barcodeWidth,
+                'hri': _hri.name,
+              };
+
+              log('📤 Sending Graphic Template: $templateData');
+              Navigator.pop(context, templateData);
+            },
           ),
 
-          if (_status.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            StatusCard(isConnected: _success, status: _status),
-          ],
           const SizedBox(height: 20),
         ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────── Sub Widgets ─────────────────────────────────────
-
-class _InfoCard extends StatelessWidget {
-  final String message;
-  const _InfoCard({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cs.primaryContainer.withOpacity(0.25),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: cs.primary.withOpacity(0.2)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline_rounded, size: 18, color: cs.primary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(message,
-                style: TextStyle(
-                    fontSize: 12, color: cs.onSurfaceVariant, height: 1.5)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// ตัวอย่าง Receipt Widget สวยๆ สำหรับทดสอบ Print Widget
-class _SampleReceiptWidget extends StatelessWidget {
-  const _SampleReceiptWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      color: Colors.white,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text('🏪 My Shop',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black)),
-          const Text('123 Main Street, City',
-              style: TextStyle(fontSize: 11, color: Colors.black54)),
-          const SizedBox(height: 8),
-          const Divider(color: Colors.black26),
-          const SizedBox(height: 4),
-          _ReceiptRow('Item A x2', '฿60.00'),
-          _ReceiptRow('Item B x1', '฿35.00'),
-          _ReceiptRow('Item C x3', '฿90.00'),
-          const SizedBox(height: 4),
-          const Divider(color: Colors.black26),
-          _ReceiptRow('Subtotal', '฿185.00', bold: true),
-          _ReceiptRow('VAT 7%', '฿12.95'),
-          const Divider(color: Colors.black),
-          _ReceiptRow('TOTAL', '฿197.95', bold: true, large: true),
-          const SizedBox(height: 8),
-          const Text('Thank you! Please come again 🙏',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 11, color: Colors.black54)),
-          const SizedBox(height: 4),
-        ],
-      ),
-    );
-  }
-}
-
-class _ReceiptRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool bold;
-  final bool large;
-  const _ReceiptRow(this.label, this.value,
-      {this.bold = false, this.large = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final style = TextStyle(
-      fontSize: large ? 15 : 12,
-      fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-      color: Colors.black,
-    );
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [Text(label, style: style), Text(value, style: style)],
       ),
     );
   }

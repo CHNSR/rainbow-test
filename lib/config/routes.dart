@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/pages/connection_printer2.dart';
 
 /// ✅ Route names - ใช้ reference ชื่อ route
 class AppRoutes {

@@ -77,21 +77,6 @@ class _SettingPageState extends State<SettingPage> {
                 onTap: () => AppNavigator.goToPrinterList(context),
               ),
               _buildDivider(),
-              _buildNavigationTile(
-                icon: Icons.settings_ethernet,
-                title: "Connect Setting",
-                subtitle: "Setup device connections",
-                onTap: () {
-                  // Navigation.push(context, MaterialPageRoute(builder: (context) => const ConnectionPrinter2()));
-                },
-              ),
-              _buildDivider(),
-              _buildNavigationTile(
-                icon: Icons.access_time_outlined,
-                title: "Setting Timing",
-                subtitle: "Configure business hours & delays",
-                onTap: () {},
-              ),
             ],
           ),
         ],

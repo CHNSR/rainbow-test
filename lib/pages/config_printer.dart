@@ -30,7 +30,11 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
 
   bool _isConnected = false;
   bool _isLoading = false;
-  String _status = 'Ready';
+  String _status = 'ยังไม่ได้ตรวจสอบสถานะ';
+  final _plugin = FlutterPrinter01();
+  Map<String, dynamic>? _textTemplate;
+  Map<String, dynamic>? _hardwareTemplate;
+  Map<String, dynamic>? _graphicsTemplate;
 
   void onTestPrint() async {
     setState(() => _isLoading = true);
@@ -58,10 +62,11 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
       final ok = await myprinter.connection.getConnectionStatus();
       setState(() {
         _isConnected = ok;
-        _status = ok ? '🟢 Status: Connected' : '🔴 Status: Disconnected';
+        _status = ok ? 'Printer พร้อมใช้งาน' : 'ไม่สามารถติดต่อ Printer ได้';
       });
     } catch (e) {
       setState(() {
+        _isConnected = false;
         _status = 'Error: $e';
       });
     } finally {
@@ -109,6 +114,10 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
         // isAutoCut: _isAutoCut,
         // isBeep: _isBeep,
         // printPrice: _printPrice,
+        //
+        // textTemplate: _textTemplate,
+        // hardwareTemplate: _hardwareTemplate,
+        // graphicsTemplate: _graphicsTemplate,
       );
 
       if (widget.index != null) {
@@ -152,6 +161,9 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
       // _isAutoCut = c.isAutoCut;
       // _isBeep = c.isBeep;
       // _printPrice = c.printPrice;
+      // _textTemplate = c.textTemplate;
+      // _hardwareTemplate = c.hardwareTemplate;
+      // _graphicsTemplate = c.graphicsTemplate;
     }
   }
 
@@ -161,7 +173,7 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.index != null ? "Edit Printer" : "Config Printer",
+        title: Text(widget.index != null ? "Edit Printer" : "Add Printer",
             style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: cs.inversePrimary,
         centerTitle: true,
@@ -169,8 +181,37 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          StatusCard(isConnected: _isConnected, status: _status),
-          const SizedBox(height: 24),
+          // ---------------- printer status & actions ----------------
+          if (widget.index != null) ...[
+            const SizedBox(height: 12),
+            const SectionHeader(
+                icon: Icons.monitor_heart_outlined, label: 'Testing & Status'),
+            const SizedBox(height: 12),
+            StatusCard(isConnected: _isConnected, status: _status),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: ActionButton(
+                    label: 'Check Status',
+                    icon: Icons.sync_outlined,
+                    onTap: _isLoading ? null : _checkStatus,
+                    outlined: true,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ActionButton(
+                    label: 'Test Print',
+                    icon: Icons.print_outlined,
+                    onTap: _isLoading ? null : () => onTestPrint(),
+                    outlined: true,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
           const SectionHeader(
               icon: Icons.info_outline, label: 'Printer Details'),
           const SizedBox(height: 12),
@@ -250,31 +291,7 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
               onTap: _isLoading ? null : _scanUsb,
             ),
           ],
-          const SizedBox(height: 24),
-          const SectionHeader(
-              icon: Icons.monitor_heart_outlined, label: 'Testing & Status'),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: ActionButton(
-                  label: 'Check Status',
-                  icon: Icons.sync_outlined,
-                  onTap: _isLoading ? null : _checkStatus,
-                  outlined: true,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ActionButton(
-                  label: 'Test Print',
-                  icon: Icons.print_outlined,
-                  onTap: _isLoading ? null : () => onTestPrint(),
-                  outlined: true,
-                ),
-              ),
-            ],
-          ),
+
           const SizedBox(height: 24),
           const SectionHeader(icon: Icons.settings, label: 'Configuration'),
           const SizedBox(height: 12),
@@ -316,6 +333,98 @@ class _PrinterConfigPageState extends State<PrinterConfigPage> {
                     filled: true,
                     fillColor: cs.surfaceContainerLow,
                   ),
+                ),
+              ),
+            ],
+          ),
+          //Dropdown for Auto Cut, Beep, Print Price can be added here similarly
+          const SizedBox(height: 24),
+          const SectionHeader(
+              icon: Icons.pages_sharp, label: 'Template Settings'),
+          const SizedBox(height: 12),
+
+          Column(
+            children: [
+              Card(
+                elevation: 0,
+                color: cs.surfaceContainerLow,
+                child: ListTile(
+                  leading: const Icon(Icons.text_fields_outlined,
+                      color: Color(0xFF5C6BC0)),
+                  title: const Text('Text',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(_textTemplate != null
+                      ? '✅ บันทึกชั่วคราวแล้ว'
+                      : 'พิมพ์ข้อความ / Print Text'),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => TextScreen(plugin: _plugin)),
+                    );
+                    if (result != null && mounted) {
+                      setState(
+                          () => _textTemplate = result as Map<String, dynamic>);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              Card(
+                elevation: 0,
+                color: cs.surfaceContainerLow,
+                child: ListTile(
+                  leading: const Icon(Icons.hardware_outlined,
+                      color: Color(0xFFF57C00)),
+                  title: const Text('Hardware',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(_hardwareTemplate != null
+                      ? '✅ บันทึกชั่วคราวแล้ว'
+                      : 'Raw Bytes, ESC/POS Commands'),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => HardwareScreen(
+                          plugin: _plugin,
+                          printerIndex: widget.index,
+                          config: widget.config,
+                        ),
+                      ),
+                    );
+                    if (result != null && mounted) {
+                      setState(() =>
+                          _hardwareTemplate = result as Map<String, dynamic>);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              Card(
+                elevation: 0,
+                color: cs.surfaceContainerLow,
+                child: ListTile(
+                  leading: const Icon(Icons.image_outlined,
+                      color: Color(0xFF388E3C)),
+                  title: const Text('Graphics',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(_graphicsTemplate != null
+                      ? '✅ บันทึกชั่วคราวแล้ว'
+                      : 'Widget, รูปภาพ, QR Code, Barcode'),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => GraphicsScreen(plugin: _plugin)),
+                    );
+                    if (result != null && mounted) {
+                      setState(() =>
+                          _graphicsTemplate = result as Map<String, dynamic>);
+                    }
+                  },
                 ),
               ),
             ],

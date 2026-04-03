@@ -12,9 +12,8 @@ export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
 export 'package:flutter_application_1/pages/config_printer.dart';
 export 'package:flutter_application_1/pages/printer_list.dart';
-export 'package:flutter_application_1/pages/connection_printer2.dart';
-export 'package:flutter_application_1/pages/scan_network_screen.dart';
-export 'package:flutter_application_1/pages/printer_setting/printer_setting.dart';
+
+export 'package:flutter_application_1/pages/printer_setting/scan_network_screen.dart';
 export 'package:flutter_application_1/pages/printer_setting/text_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/graphic_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/hardware_page.dart';

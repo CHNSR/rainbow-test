@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_printer_01/flutter_printer_01.dart';
 import 'package:flutter_printer_01/src/modules/printer_text.dart';
@@ -256,11 +257,40 @@ class _TextScreenState extends State<TextScreen> {
           // ── Print Button ─────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: ActionButton(
-              label: 'Print Text',
-              icon: Icons.print_outlined,
-              onTap: _printText,
-              loading: _isLoading,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ActionButton(
+                    label: 'Test Print',
+                    icon: Icons.print_outlined,
+                    outlined: true,
+                    onTap: _printText,
+                    loading: _isLoading,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ActionButton(
+                    label: 'Save Template',
+                    icon: Icons.save,
+                    onTap: () {
+                      final templateData = {
+                        'useCustomSize': _useCustomSize,
+                        'selectedSize': _selectedSize.name,
+                        'customWidth': _customWidth,
+                        'customHeight': _customHeight,
+                        'alignment': _alignment.name,
+                        'bold': _bold,
+                        'upsideDown': _upsideDown,
+                        'feedPaper':
+                            int.tryParse(_feedPaperController.text) ?? 3,
+                      };
+                      log('📤 Sending Text Template: $templateData');
+                      Navigator.pop(context, templateData);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_printer_01/flutter_printer_01.dart';
@@ -34,84 +35,15 @@ class _HardwareScreenState extends State<HardwareScreen> {
   @override
   void initState() {
     super.initState();
-    // ⚠️ ถ้า Model มี Field แล้ว ให้ดึงค่าเริ่มต้นมาเซ็ตตรงนี้ครับ
-    // if (widget.config != null) {
-    //   _cutpaper = widget.config!.isAutoCut;
-    //   _beepCount = widget.config!.beepCount;
-    //   _beepController.text = _beepCount.toString();
-    // }
   }
 
   void _saveHardwareConfig() {
-    if (widget.printerIndex == null || widget.config == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                '❌ ไม่พบ Index ปริ้นเตอร์ที่จะบันทึก (ต้องส่งมาจากหน้าก่อนหน้า)')),
-      );
-      return;
-    }
-
-    // ⚠️ ต้องไปเพิ่ม field isAutoCut, beepCount ในโมเดล PrinterConfig ก่อน
-    /*
-    final updatedConfig = PrinterConfig(
-      name: widget.config!.name,
-      ip: widget.config!.ip,
-      port: widget.config!.port,
-      paperSize: widget.config!.paperSize,
-      category: widget.config!.category,
-      // isAutoCut: _cutpaper,
-      // beepCount: _beepCount,
-    );
-
-    // 📥 ส่ง Event เข้า Bloc เพื่อบันทึกลง Database (Hive)
-    context.read<PrinterBloc>().add(EditPrinter(widget.printerIndex!, updatedConfig));
-    */
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content:
-              Text('✅ (จำลอง) บันทึกการตั้งค่า Hardware เข้า BLoC สำเร็จ')),
-    );
-  }
-
-  Future<void> _checkPrinterStatus() async {
-    setState(() => _isLoading = true);
-    try {
-      final status = await widget.plugin.hardware.getPrinterStatus();
-      setState(() {
-        _printerStatus = status;
-        _success = status.isSuccess;
-        _status = status.isSuccess
-            ? 'สถานะ: ${status.state.name}\n${status.toString()}'
-            : 'ดึงสถานะไม่สำเร็จ';
-      });
-    } catch (e) {
-      setState(() {
-        _success = false;
-        _status = 'Error: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _cutPaper() async {
-    setState(() => _isLoading = true);
-    try {
-      final ok = await widget.plugin.hardware.cutPaper();
-      setState(() {
-        _success = ok;
-        _status = ok ? '✅ ตัดกระดาษสำเร็จ' : '❌ ตัดกระดาษล้มเหลว';
-      });
-    } catch (e) {
-      setState(() {
-        _success = false;
-        _status = 'Error: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    final templateData = {
+      'cutpaper': _cutpaper,
+      'beepCount': _beepCount,
+    };
+    log('📤 Sending Hardware Template: $templateData');
+    Navigator.pop(context, templateData);
   }
 
   Future<void> _sendCustomBytes() async {
@@ -134,27 +66,6 @@ class _HardwareScreenState extends State<HardwareScreen> {
         _success = ok;
         _status =
             ok ? '✅ Raw Bytes [${parts.join(', ')}] ส่งสำเร็จ' : '❌ ส่งล้มเหลว';
-      });
-    } catch (e) {
-      setState(() {
-        _success = false;
-        _status = 'Error: $e';
-      });
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _beep({int times = 2, int duration = 2}) async {
-    setState(() => _isLoading = true);
-    try {
-      final ok = await widget.plugin.hardware.beep(
-        times: times,
-        duration: duration,
-      );
-      setState(() {
-        _success = ok;
-        _status = ok ? '✅ Beep ส่งสำเร็จ' : '❌ ส่งล้มเหลว';
       });
     } catch (e) {
       setState(() {
@@ -191,45 +102,6 @@ class _HardwareScreenState extends State<HardwareScreen> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 40),
         children: [
-          // ── Printer Status ──────────────────────────────────────────────────
-          _buildSection(
-            title: 'Printer Status',
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: ActionButton(
-                  label: 'Test Print Receipt',
-                  icon: Icons.refresh,
-                  onTap: (!_isLoading) ? _checkPrinterStatus : null,
-                  loading: _isLoading,
-                  outlined: true,
-                ),
-              ),
-              if (_printerStatus != null) ...[
-                const Divider(height: 1),
-                _StatusInfoTile(
-                  icon: Icons.power_settings_new,
-                  label: 'State',
-                  value: _printerStatus!.state.name.toUpperCase(),
-                  isSuccess: _printerStatus!.isOnline,
-                ),
-                _StatusInfoTile(
-                  icon: Icons.circle,
-                  label: 'Send',
-                  value: _printerStatus!.isOnline ? "Yes" : "No",
-                  isSuccess: _printerStatus!.isOnline,
-                ),
-                _StatusInfoTile(
-                  icon: Icons.feed_outlined,
-                  label: 'Paper Feed Button',
-                  value: _printerStatus!.isPaperFeedButtonPressed
-                      ? "Pushed"
-                      : "Idle",
-                ),
-              ],
-            ],
-          ),
-
           // ── Actions ──────────────────────────────────────────────────
           _buildSection(
             title: 'Hardware Actions',
@@ -326,13 +198,6 @@ class _HardwareScreenState extends State<HardwareScreen> {
               ),
             ],
           ),
-
-          if (_status.isNotEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              child: StatusCard(isConnected: _success, status: _status),
-            ),
-          ],
         ],
       ),
     );
