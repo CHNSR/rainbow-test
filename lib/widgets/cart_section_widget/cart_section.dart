@@ -49,18 +49,18 @@ class _CartSectionState extends State<CartSection> {
                     ),
                   ),
                 ),
-                SizedBox(width: screenWidth * 0.005),
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Image.asset(
-                    //'assets/logo/vector.png',
-                    'assets/logo/cart.png',
-                    width:
-                        isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
-                    height:
-                        isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
-                  ),
-                ),
+                // SizedBox(width: screenWidth * 0.005),
+                // Align(
+                //   alignment: Alignment.bottomLeft,
+                //   child: Image.asset(
+                //     //'assets/logo/vector.png',
+                //     'assets/logo/cart.png',
+                //     width:
+                //         isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
+                //     height:
+                //         isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
+                //   ),
+                // ),
               ],
             ),
 

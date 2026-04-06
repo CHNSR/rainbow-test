@@ -60,25 +60,21 @@ class _ConfigPrinter2State extends State<ConfigPrinter2> {
 
   void onTestOperation() async {
     setState(() => _isLoading = true);
-    try {
-      // เชื่อมต่อ -> สั่งตัดกระดาษ -> ตัดการเชื่อมต่อ
-      await smilePrinterService.connectNetwork(
-        ipController.text,
-        int.tryParse(portController.text) ?? 9100,
-      );
-      await smilePrinterService.cutPaper();
-      await smilePrinterService.disconnect();
+    final result = await smilePrinterService.testOperationNetwork(
+      ip: ipController.text,
+      port: int.tryParse(portController.text) ?? 9100,
+    );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ ส่งคำสั่ง Operation สำเร็จ")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Operation Error: $e")),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    setState(() => _isLoading = false);
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result.success ? "✅ ${result.message}" : "❌ ${result.message}",
+        ),
+      ),
+    );
   }
 
   Future<void> _checkStatus() async {
