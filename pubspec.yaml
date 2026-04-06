@@ -21,8 +21,10 @@ dependencies:
   barcode: ^2.2.9
   barcode_widget: ^2.0.4
   hive_ce: ^2.19.3
-  flutter_printer_01:
-    path: C:\Github\plug-in_printer\flutter_printer_01
+  # flutter_printer_01:
+  #   path: C:\Github\plug-in_printer\flutter_printer_01
+  driver_printer:
+    path: C:\Users\chano\Desktop\plugindriverprinter\plugindriverprinter
   hive_ce_flutter: ^2.3.4
 
 dev_dependencies:
