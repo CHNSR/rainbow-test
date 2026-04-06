@@ -15,14 +15,14 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   google_fonts: ^8.0.2
   equatable: ^2.0.8
-  flutter_thermal_printer: ^2.0.1
   intl: ^0.20.2
   dotted_line: ^3.2.3
   barcode: ^2.2.9
   barcode_widget: ^2.0.4
   hive_ce: ^2.19.3
-  flutter_printer_01:
-    path: C:\Github\plug-in_printer\flutter_printer_01
+  flutter_svg: ^2.0.10
+  driver_printer:
+    path: C:\Users\chano\Desktop\plugindriverprinter\plugindriverprinter
   hive_ce_flutter: ^2.3.4
 
 dev_dependencies:

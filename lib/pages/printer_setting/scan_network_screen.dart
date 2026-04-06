@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_printer_01/flutter_printer_01.dart';
 
 /// หน้าทดสอบ Network Scanner โดยเฉพาะ
 class ScanNetworkScreen extends StatefulWidget {
-  final FlutterPrinter01 plugin;
-  const ScanNetworkScreen({super.key, required this.plugin});
+  const ScanNetworkScreen({super.key});
 
   @override
   State<ScanNetworkScreen> createState() => _ScanNetworkScreenState();
@@ -47,11 +45,13 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
     setState(() {
       _isScanning = true;
       _foundPrinters.clear();
-      _status = 'กำลังสแกน${ports.length > 1 ? " ${ports.length} พอร์ต" : " พอร์ต ${ports.first}"} กว่า 254 IPs...';
+      _status =
+          'กำลังสแกน${ports.length > 1 ? " ${ports.length} พอร์ต" : " พอร์ต ${ports.first}"} กว่า 254 IPs...';
     });
 
     try {
-      final result = await widget.plugin.connection.scanNetworkPrinters(ports: ports);
+      // TODO: ใส่ฟังก์ชัน Scan Network ของปลั๊กอินใหม่ที่นี่ (คืนค่ากลับมาเป็น List ของ IP)
+      final List<String> result = [];
       if (!mounted) return;
       setState(() {
         _foundPrinters.addAll(result);
@@ -160,7 +160,8 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
                 labelText: 'พอร์ตที่จะสแกน (ใส่หลายพอร์ตคั่นด้วย ,)',
                 hintText: '9100, 4000, 9101',
                 prefixIcon: const Icon(Icons.settings_ethernet),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
                 fillColor: cs.surfaceContainerLow,
               ),
@@ -184,7 +185,8 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
                     : const Icon(Icons.search),
                 label: Text(
                   _isScanning ? 'กำลังสแกนวง LAN...' : 'เริ่มสแกน',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -236,7 +238,11 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
                         final ip = _foundPrinters[index];
                         return _PrinterListTile(
                           ip: ip,
-                          port: int.tryParse(_portController.text.split(',').first.trim()) ?? 9100,
+                          port: int.tryParse(_portController.text
+                                  .split(',')
+                                  .first
+                                  .trim()) ??
+                              9100,
                           onTap: () => _onPrinterSelected(ip),
                         );
                       },
@@ -293,8 +299,8 @@ class _PrinterListTile extends StatelessWidget {
                     ),
                     Text(
                       'Port $port  •  แตะเพื่อเชื่อมต่อ',
-                      style: TextStyle(
-                          fontSize: 12, color: cs.onSurfaceVariant),
+                      style:
+                          TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),

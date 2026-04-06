@@ -246,26 +246,26 @@ class ReceiptWidget {
               child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                children: [
-                  SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: FutureBuilder<Widget>(
-                      future: Future.value(
-                          PrinterService().createQrCode("https://soisiam.com")),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) return snapshot.data!;
-                        return const SizedBox(width: 10, height: 10);
-                      },
-                    ),
-                  ),
-                  Text(
-                    "feedback us!",
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
-                  ),
-                ],
-              ),
+              // Column(
+              //   children: [
+              //     SizedBox(
+              //       width: 30,
+              //       height: 30,
+              //       child: FutureBuilder<Widget>(
+              //         future: Future.value(
+              //             PrinterService().createQrCode("https://soisiam.com")),
+              //         builder: (context, snapshot) {
+              //           if (snapshot.hasData) return snapshot.data!;
+              //           return const SizedBox(width: 10, height: 10);
+              //         },
+              //       ),
+              //     ),
+              //     Text(
+              //       "feedback us!",
+              //       style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
+              //     ),
+              //   ],
+              // ),
               Column(
                 children: [
                   Text("Thank you for your visit!",
@@ -529,26 +529,26 @@ class ReceiptWidget {
               child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                children: [
-                  SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: FutureBuilder<Widget>(
-                      future: Future.value(
-                          PrinterService().createQrCode("https://soisiam.com")),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) return snapshot.data!;
-                        return const SizedBox(width: 10, height: 10);
-                      },
-                    ),
-                  ),
-                  Text(
-                    "feedback us!",
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
-                  ),
-                ],
-              ),
+              // Column(
+              //   children: [
+              //     SizedBox(
+              //       width: 30,
+              //       height: 30,
+              //       child: FutureBuilder<Widget>(
+              //         future: Future.value(
+              //             PrinterService().createQrCode("https://soisiam.com")),
+              //         builder: (context, snapshot) {
+              //           if (snapshot.hasData) return snapshot.data!;
+              //           return const SizedBox(width: 10, height: 10);
+              //         },
+              //       ),
+              //     ),
+              //     Text(
+              //       "feedback us!",
+              //       style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
+              //     ),
+              //   ],
+              // ),
               Column(
                 children: [
                   Text("Thank you for your visit!",
@@ -566,6 +566,77 @@ class ReceiptWidget {
       ),
     );
   }
+
+  // ------------------------------ widget: test print reciept (byte)------------------------------
+  static Widget testPrintReceiptByteWidget({required double width}) {
+    return Container(
+      color: Colors.white,
+      width: width,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Center(
+            child: Text(
+              "TEST PRINTER (TEXT/BYTE)",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _divider(amountLine: 1),
+          const SizedBox(height: 16),
+          const Text("Connection: SUCCESS",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text("Method: Native Text / ESC-POS"),
+          Text(
+              "Time: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())}"),
+          const SizedBox(height: 16),
+          _divider(amountLine: 1),
+          const SizedBox(height: 16),
+          const Center(child: Text("Ready to print orders!")),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  // ------------------------------ widget: test print reciept (grafic)------------------------------
+  static Widget testPrintReceiptGraphicWidget({required double width}) {
+    return Container(
+      color: Colors.white,
+      width: width,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Image.asset(
+              'assets/logo/smile_logo.png',
+              width: 100,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Center(
+            child: Text(
+              "TEST PRINTER (GRAPHIC)",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _divider(amountLine: 1, dashLength: 2, dashGap: 2),
+          const SizedBox(height: 16),
+          const Text("Connection: SUCCESS",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text("Method: Widget Capture / Image"),
+          Text(
+              "Time: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())}"),
+          const SizedBox(height: 16),
+          _divider(amountLine: 1, dashLength: 2, dashGap: 2),
+        ],
+      ),
+    );
+  }
+
   // ------------------------------ component: divider ------------------------------
 
   static Widget _divider({

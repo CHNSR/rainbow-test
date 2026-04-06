@@ -18,6 +18,7 @@ export 'package:flutter_application_1/pages/printer_setting/text_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/graphic_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/hardware_page.dart';
 export 'package:flutter_application_1/pages/printer_setting/history_printing.dart';
+export 'package:flutter_application_1/pages/printer_config_page2.dart';
 
 // ==============================================================================
 // 🔷 MODEL EXPORTS

@@ -4,7 +4,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/service/myprinter/myprinter.dart';
+import 'package:flutter_application_1/service/smile_printer/smile_printer.dart';
 import 'package:flutter_application_1/widgets/order_page/receipt_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -699,45 +699,43 @@ class OrderPageWidget {
             ),
           ),
 
-          Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Center(
+          //     child: Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Column(
+          //       children: [
+          //         SizedBox(
+          //           width: 30,
+          //           height: 30,
+          //           child: FutureBuilder<Widget>(
+          //             future: Future.value(
+          //                  //PrinterService().createQrCode("https://soisiam.com")
+          //                 //Myprinter().createQrCode("https://soisiam.com")),
+          //             builder: (context, snapshot) {
+          //               if (snapshot.hasData) return snapshot.data!;
+          //               return const SizedBox(width: 10, height: 10);
+          //             },
+          //           ),
+          //         ),
+          //         Text(
+          //           "feedback us!",
+          //           style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
+          //         ),
+          //       ],
+          //     ),
+          Column(
             children: [
-              Column(
-                children: [
-                  SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: FutureBuilder<Widget>(
-                      future: Future.value(
-                          // PrinterService().createQrCode("https://soisiam.com")
-                          Myprinter().createQrCode("https://soisiam.com")),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) return snapshot.data!;
-                        return const SizedBox(width: 10, height: 10);
-                      },
-                    ),
-                  ),
-                  Text(
-                    "feedback us!",
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 5),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text("Thank you for your visit!",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w400, fontSize: 10)),
-                  Text("Please come back and see us.",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w400, fontSize: 10)),
-                ],
-              ),
+              Text("Thank you for your visit!",
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 10)),
+              Text("Please come back and see us.",
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 10)),
             ],
-          )),
-          const SizedBox(height: 5),
+          ),
         ],
+        //         )),
+        //         const SizedBox(height: 5),
+        //       ],
       ),
     );
   }
@@ -781,7 +779,7 @@ class OrderPageWidget {
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     // final printerService = PrinterService();
-    final myprinter = Myprinter();
+    final myprinter = SmilePrinterService.instance;
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 
@@ -907,7 +905,7 @@ class OrderPageWidget {
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     // final printerService = PrinterService();
-    final myprinter = Myprinter();
+    final myprinter = SmilePrinterService.instance;
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 

@@ -23,7 +23,7 @@ class _PrinterListPageState extends State<PrinterListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const PrinterConfigPage(),
+              builder: (_) => const ConfigPrinter2(),
             ),
           );
         },
@@ -109,11 +109,11 @@ class _PrinterListPageState extends State<PrinterListPage> {
                         children: [
                           TextButton.icon(
                             onPressed: () {
-                              PrinterService().testPrintNetwork(
-                                ip: printer.ip,
-                                port: printer.port,
-                                paperSize: printer.paperSize,
-                              );
+                              // PrinterService().testPrintNetwork(
+                              //   ip: printer.ip,
+                              //   port: printer.port,
+                              //   paperSize: printer.paperSize,
+                              // );
                             },
                             icon: const Icon(Icons.print),
                             label: const Text("Test"),
@@ -123,7 +123,7 @@ class _PrinterListPageState extends State<PrinterListPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => PrinterConfigPage(
+                                  builder: (_) => ConfigPrinter2(
                                     index: index,
                                     config: printer,
                                   ),

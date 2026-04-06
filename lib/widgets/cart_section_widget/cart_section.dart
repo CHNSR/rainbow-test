@@ -53,7 +53,8 @@ class _CartSectionState extends State<CartSection> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Image.asset(
-                    'assets/logo/vector.png',
+                    //'assets/logo/vector.png',
+                    'assets/logo/cart.png',
                     width:
                         isLandscape ? screenWidth * 0.015 : screenWidth * 0.02,
                     height:
