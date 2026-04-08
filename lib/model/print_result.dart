@@ -28,6 +28,12 @@ class PrinterConfig extends Equatable {
   final Map<String, dynamic>? hardwareTemplate;
   @HiveField(7)
   final Map<String, dynamic>? graphicsTemplate;
+  @HiveField(8)
+  final bool? isAutoCut;
+  @HiveField(9)
+  final bool? isBeep;
+  @HiveField(10)
+  final bool? printPrice;
 
   const PrinterConfig({
     required this.name,
@@ -38,6 +44,9 @@ class PrinterConfig extends Equatable {
     this.textTemplate,
     this.hardwareTemplate,
     this.graphicsTemplate,
+    this.isAutoCut,
+    this.isBeep,
+    this.printPrice,
   });
 
   @override
@@ -49,7 +58,10 @@ class PrinterConfig extends Equatable {
         category,
         textTemplate,
         hardwareTemplate,
-        graphicsTemplate
+        graphicsTemplate,
+        isAutoCut,
+        isBeep,
+        printPrice,
       ];
 }
 

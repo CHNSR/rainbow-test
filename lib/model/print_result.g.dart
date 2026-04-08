@@ -25,13 +25,16 @@ class PrinterConfigAdapter extends TypeAdapter<PrinterConfig> {
       textTemplate: (fields[5] as Map?)?.cast<String, dynamic>(),
       hardwareTemplate: (fields[6] as Map?)?.cast<String, dynamic>(),
       graphicsTemplate: (fields[7] as Map?)?.cast<String, dynamic>(),
+      isAutoCut: fields[8] as bool?,
+      isBeep: fields[9] as bool?,
+      printPrice: fields[10] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PrinterConfig obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -47,7 +50,13 @@ class PrinterConfigAdapter extends TypeAdapter<PrinterConfig> {
       ..writeByte(6)
       ..write(obj.hardwareTemplate)
       ..writeByte(7)
-      ..write(obj.graphicsTemplate);
+      ..write(obj.graphicsTemplate)
+      ..writeByte(8)
+      ..write(obj.isAutoCut)
+      ..writeByte(9)
+      ..write(obj.isBeep)
+      ..writeByte(10)
+      ..write(obj.printPrice);
   }
 
   @override

@@ -38,16 +38,13 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SettingPage());
 
       case AppRoutes.configPrinter:
-        return MaterialPageRoute(builder: (_) => const PrinterConfigPage());
+        return MaterialPageRoute(builder: (_) => const ConfigPrinter3());
 
       case AppRoutes.printerList:
         return MaterialPageRoute(builder: (_) => const PrinterListPage());
 
       case AppRoutes.historyPrinting:
         return MaterialPageRoute(builder: (_) => const HistoryPrinting());
-
-      case AppRoutes.printerConfigPage:
-        return MaterialPageRoute(builder: (_) => const PrinterConfigPage());
 
       default:
         return MaterialPageRoute(

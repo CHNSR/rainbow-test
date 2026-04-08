@@ -23,7 +23,7 @@ class _PrinterListPageState extends State<PrinterListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const PrinterConfigPage(),
+              builder: (_) => const ConfigPrinter3(),
             ),
           );
         },
@@ -123,7 +123,7 @@ class _PrinterListPageState extends State<PrinterListPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => PrinterConfigPage(
+                                  builder: (_) => ConfigPrinter3(
                                     index: index,
                                     config: printer,
                                   ),

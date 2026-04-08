@@ -174,6 +174,9 @@ class SmilePrinterService {
   /// ตรวจสอบการเชื่อมต่อ Printer ผ่าน IP และ Port (Ping)
   Future<bool> checkConnection(String ip, int port) async {
     try {
+      // ข้ามการ Ping เช็ค Socket หากเป็นชื่อ USB Device
+      if (!ip.contains('.')) return true;
+
       final socket =
           await Socket.connect(ip, port, timeout: const Duration(seconds: 2));
       socket.destroy();

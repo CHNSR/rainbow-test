@@ -141,6 +141,8 @@ class _OrderPagesState extends State<OrderPages> {
 
     // Dispatch LoadMenuEvent
     context.read<MenuBloc>().add(LoadMenuEvent());
+    // 👇 สั่งให้ PrinterBloc ดึงข้อมูลจาก Hive มาเก็บไว้ใน State (สมมติว่า Event ชื่อ LoadPrinters)
+    context.read<PrinterBloc>().add(LoadPrinters());
   }
 
   @override
