@@ -62,111 +62,8 @@ class SmilePrinterService {
   }
 
   // ==========================================
-  // 2. 📝 หมวดควบคุมข้อความ (Text Formatting)
+  // 2. 📝 Helper Method: สำหรับสร้าง Config ส่งให้ Printer
   // ==========================================
-<<<<<<<< Updated upstream:lib/service/smile_pos/smile_printer_service.dart
-  Future<void> printText(String text,
-      {bool isBold = false, String size = 'h1'}) async {
-    try {
-      // แปลงขนาด String เป็น int ตามความเหมาะสม (สามารถปรับตัวเลขได้เองครับ)
-      int textSize = 14; // Default
-      if (size == 'h1')
-        textSize = 24;
-      else if (size == 'h2')
-        textSize = 20;
-      else if (size == 'h3') textSize = 18;
-
-      final PrinterConfig data = PrinterConfig(
-        type: "text",
-        gateway: "posx",
-        value: PrinterValue(
-          data: PrinterData(
-            sendText: SendText(
-              dataReceipt: [
-                DataReceipt(
-                  text: "$text\n",
-                  isBold: isBold,
-                  textSize: textSize,
-                )
-              ],
-            ),
-          ),
-        ),
-      );
-      final String jsonData = jsonEncode(data.toJson());
-      await _smilePrinter.printData(jsonData as PrinterConfig);
-    } catch (e) {
-      print("❌ Print Text Error: $e");
-    }
-  }
-
-  Future<void> feedPaper(int lines) async {
-    try {
-      String feed = List.filled(lines, '\n').join();
-      final PrinterConfig data = PrinterConfig(
-        type: "text",
-        gateway: "posx",
-        value: PrinterValue(
-          data: PrinterData(
-            sendText: SendText(
-              dataReceipt: [DataReceipt(text: feed)],
-            ),
-          ),
-        ),
-      );
-      final String jsonData = jsonEncode(data.toJson());
-      await _smilePrinter.printData(jsonData as PrinterConfig);
-    } catch (e) {
-      print("❌ Feed Paper Error: $e");
-    }
-  }
-
-  // ==========================================
-  // 3. 🖼️ หมวดกราฟิก (Graphics)
-  // ==========================================
-  Future<void> printImage(Uint8List bytes) async {
-    try {
-      final base64Image = base64Encode(bytes); // แปลง Uint8List เป็น String
-      final PrinterConfig data = PrinterConfig(
-        type: "image",
-        gateway: "posx",
-        value: PrinterValue(
-          data: PrinterData(sendImage: base64Image),
-        ),
-      );
-      final String jsonData = jsonEncode(data.toJson());
-      await _smilePrinter.fullPrint(jsonData as PrinterConfig);
-    } catch (e) {
-      print("❌ Print Image Error: $e");
-    }
-  }
-
-  // ==========================================
-  // 4. ✂️ หมวดควบคุมฮาร์ดแวร์ (Hardware Actions)
-  // ==========================================
-  Future<void> cutPaper() async {
-    try {
-      final PrinterConfig data = PrinterConfig(
-        type: "hardware",
-        gateway: "posx",
-        value: PrinterValue(
-          cutPaper: 1, // ค่า 1 ใช้เพื่อสั่งตัดกระดาษ
-          data: PrinterData(),
-        ),
-      );
-      final String jsonData = jsonEncode(data.toJson());
-      await _smilePrinter.printOperation(jsonData as PrinterConfig);
-    } catch (e) {
-      print("❌ Cut Paper Error: $e");
-    }
-  }
-
-  // ==========================================
-  // 5. 🛠️ God Mode (Raw Data)
-  // ==========================================
-  Future<void> sendRawBytes(List<int> bytes) async {
-    // await _plugin.sendRawBytes(bytes);
-========
   PrinterConfig _buildConfig({
     app.PrinterConfig? config,
     String? fallbackIp,
@@ -218,11 +115,10 @@ class SmilePrinterService {
         data: data,
       ),
     );
->>>>>>>> Stashed changes:lib/service/printer/smile_printer.dart
   }
 
   // ==========================================
-  // 6. 🖨️ หมวดการพิมพ์ใบเสร็จและแปลงจาก Myprinter (Migrated)
+  // 3. 🖨️ หมวดการพิมพ์ใบเสร็จและฟังก์ชันหลัก
   // ==========================================
 
   /// ตรวจสอบการเชื่อมต่อ Printer ผ่าน IP และ Port (Ping)
@@ -240,10 +136,6 @@ class SmilePrinterService {
     }
   }
 
-  // ==========================================
-  // 6. 🖨️(High-Level Functions)
-  // ==========================================
-
   /// สั่งพิมพ์ใบเสร็จทดสอบ (จากหน้า Config)
   Future<app.PrintResult> testPrintNetwork({
     required String ip,
@@ -258,16 +150,27 @@ class SmilePrinterService {
       bool isOnline = await checkConnection(ip, port);
       if (!isOnline) throw 'ไม่สามารถเชื่อมต่อ $ip:$port';
 
-      await connectNetwork(ip, port);
+      // สร้างรูปแบบใบเสร็จ (DataReceipt List)
+      final List<DataReceipt> receiptLines = [
+        DataReceipt(
+            text: "TEST PRINTER",
+            isBold: true,
+            textSize: 24,
+            alignment: 'center'),
+        DataReceipt(
+            text: "--------------------------------",
+            alignment: 'left',
+            textSize: 16),
+        DataReceipt(
+            text: "Connection: SUCCESS", alignment: 'left', textSize: 16),
+        DataReceipt(text: "IP: $ip", alignment: 'left', textSize: 16),
+        DataReceipt(text: "Port: $port", alignment: 'left', textSize: 16),
+        DataReceipt(
+            text: "Time: ${DateTime.now()}", alignment: 'left', textSize: 16),
+        DataReceipt(
+            text: "\n\n", alignment: 'left', textSize: 16), // Feed paper
+      ];
 
-<<<<<<<< Updated upstream:lib/service/smile_pos/smile_printer_service.dart
-      await printText('TEST PRINTER', isBold: true, size: 'h1');
-      await printText('--------------------------------');
-      await printText("Connection: SUCCESS");
-      await printText("IP: $ip");
-      await printText("Port: $port");
-      await printText("Time: ${DateTime.now()}");
-========
       // รวมแพ็กเกจข้อมูล
       final configPayload = _buildConfig(
         fallbackIp: ip,
@@ -275,18 +178,15 @@ class SmilePrinterService {
           sendText: SendText(dataReceipt: receiptLines),
         ),
       );
->>>>>>>> Stashed changes:lib/service/printer/smile_printer.dart
 
-      await feedPaper(3);
-      await cutPaper();
+      // ส่งคำสั่งทีเดียวจบแบบ Lifecycle ของ Plugin
+      await _smilePrinter.connect(configPayload);
+      await _smilePrinter.printData(configPayload);
+      await _smilePrinter.disconnectPrinter(configPayload);
 
       return app.PrintResult(success: true, message: "Print success");
     } catch (e) {
       return app.PrintResult(success: false, message: e.toString());
-<<<<<<<< Updated upstream:lib/service/smile_pos/smile_printer_service.dart
-    } finally {
-      await disconnect();
-========
     }
   }
 
@@ -317,7 +217,6 @@ class SmilePrinterService {
       return app.PrintResult(success: true, message: "Operation success");
     } catch (e) {
       return app.PrintResult(success: false, message: e.toString());
->>>>>>>> Stashed changes:lib/service/printer/smile_printer.dart
     }
   }
 
@@ -330,29 +229,35 @@ class SmilePrinterService {
       bool isOnline = await checkConnection(config.ip, config.port);
       if (!isOnline) throw 'ไม่สามารถเชื่อมต่อ ${config.ip}:${config.port}';
 
-      await connectNetwork(config.ip, config.port);
+      final List<DataReceipt> receiptLines = [];
 
-      await printText("Soi Siam Restaurant", isBold: true, size: 'h2');
-      await printText("Tel : 66-5842111");
-      await printText(
-          "Date : ${DateTime.now().toLocal().toString().substring(0, 16)}");
-      await printText("--------------------------------");
+      receiptLines.add(DataReceipt(
+          text: "Soi Siam Restaurant",
+          isBold: true,
+          textSize: 20,
+          alignment: 'center'));
+      receiptLines.add(DataReceipt(
+          text: "Tel : 66-5842111", alignment: 'center', textSize: 16));
+      receiptLines.add(DataReceipt(
+          text:
+              "Date : ${DateTime.now().toLocal().toString().substring(0, 16)}",
+          alignment: 'left',
+          textSize: 16));
+      receiptLines.add(DataReceipt(
+          text: "--------------------------------",
+          alignment: 'left',
+          textSize: 16));
 
       double total = 0;
       for (final order in orders) {
-        // จัดเรียงข้อความให้พอดีบรรทัด (สามารถดึงค่าจาก Template ได้ในอนาคต)
-        await printText(
-            "${order.quantity}x ${order.foodName}  ${order.foodPrice.toStringAsFixed(2)}");
+        receiptLines.add(DataReceipt(
+            text:
+                "${order.quantity}x ${order.foodName}  \$${order.foodPrice.toStringAsFixed(2)}",
+            alignment: 'left',
+            textSize: 16));
         total += order.totalPrice;
       }
 
-<<<<<<<< Updated upstream:lib/service/smile_pos/smile_printer_service.dart
-      await printText("--------------------------------");
-      await printText("TOTAL: \$${total.toStringAsFixed(2)}", isBold: true);
-
-      await feedPaper(3);
-      await cutPaper();
-========
       receiptLines.add(DataReceipt(
           text: "--------------------------------",
           alignment: 'left',
@@ -395,11 +300,8 @@ class SmilePrinterService {
         await escService.printData(configPayload);
         await escService.disconnectPrinter();
       }
->>>>>>>> Stashed changes:lib/service/printer/smile_printer.dart
     } catch (e) {
       print("❌ Error printing receipt: $e");
-    } finally {
-      await disconnect();
     }
   }
 
@@ -433,22 +335,11 @@ class SmilePrinterService {
     required GlobalKey repaintKey,
   }) async {
     try {
-<<<<<<<< Updated upstream:lib/service/smile_pos/smile_printer_service.dart
-      bool isOnline = await checkConnection(config.ip, config.port);
-      if (!isOnline) throw 'ไม่สามารถเชื่อมต่อ ${config.ip}:${config.port}';
-
-      await connectNetwork(config.ip, config.port);
-========
->>>>>>>> Stashed changes:lib/service/printer/smile_printer.dart
       await Future.delayed(const Duration(milliseconds: 120));
 
       final captured = await capture(repaintKey);
+      final base64Image = base64Encode(captured);
 
-<<<<<<<< Updated upstream:lib/service/smile_pos/smile_printer_service.dart
-      await printImage(captured);
-      await feedPaper(3);
-      await cutPaper();
-========
       final configPayload = _buildConfig(
         config: config,
         data: PrinterData(
@@ -475,16 +366,11 @@ class SmilePrinterService {
         await escService.printData(configPayload);
         await escService.disconnectPrinter();
       }
->>>>>>>> Stashed changes:lib/service/printer/smile_printer.dart
 
       return true;
     } catch (e) {
       print("❌ Print error: $e");
       return false;
-    } finally {
-      try {
-        await disconnect();
-      } catch (_) {}
     }
   }
 

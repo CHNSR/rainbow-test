@@ -15,7 +15,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   google_fonts: ^8.0.2
   equatable: ^2.0.8
-  flutter_thermal_printer: ^2.0.1
+  
   intl: ^0.20.2
   dotted_line: ^3.2.3
   barcode: ^2.2.9

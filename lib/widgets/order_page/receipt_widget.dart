@@ -251,13 +251,10 @@ class ReceiptWidget {
                   SizedBox(
                     width: 30,
                     height: 30,
-                    child: FutureBuilder<Widget>(
-                      future: Future.value(
-                          PrinterService().createQrCode("https://soisiam.com")),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) return snapshot.data!;
-                        return const SizedBox(width: 10, height: 10);
-                      },
+                    child: BarcodeWidget(
+                      barcode: Barcode.qrCode(),
+                      data: "https://soisiam.com",
+                      drawText: false,
                     ),
                   ),
                   Text(
@@ -534,13 +531,10 @@ class ReceiptWidget {
                   SizedBox(
                     width: 30,
                     height: 30,
-                    child: FutureBuilder<Widget>(
-                      future: Future.value(
-                          PrinterService().createQrCode("https://soisiam.com")),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) return snapshot.data!;
-                        return const SizedBox(width: 10, height: 10);
-                      },
+                    child: BarcodeWidget(
+                      barcode: Barcode.qrCode(),
+                      data: "https://soisiam.com",
+                      drawText: false,
                     ),
                   ),
                   Text(

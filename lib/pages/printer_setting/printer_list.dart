@@ -109,11 +109,11 @@ class _PrinterListPageState extends State<PrinterListPage> {
                         children: [
                           TextButton.icon(
                             onPressed: () {
-                              PrinterService().testPrintNetwork(
-                                ip: printer.ip,
-                                port: printer.port,
-                                paperSize: printer.paperSize,
-                              );
+                              // PrinterService().testPrintNetwork(
+                              //   ip: printer.ip,
+                              //   port: printer.port,
+                              //   paperSize: printer.paperSize,
+                              // );
                             },
                             icon: const Icon(Icons.print),
                             label: const Text("Test"),
