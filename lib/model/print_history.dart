@@ -34,6 +34,9 @@ class PrintHistoryItem {
   @HiveField(5)
   final List<Map<String, dynamic>> items;
 
+  @HiveField(6)
+  List<Map<String, dynamic>> printer;
+
   PrintHistoryItem({
     required this.id,
     required this.timestamp,
@@ -41,5 +44,6 @@ class PrintHistoryItem {
     required this.status,
     required this.orderType,
     required this.items,
+    required this.printer,
   });
 }

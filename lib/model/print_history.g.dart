@@ -25,13 +25,16 @@ class PrintHistoryItemAdapter extends TypeAdapter<PrintHistoryItem> {
       items: (fields[5] as List)
           .map((e) => (e as Map).cast<String, dynamic>())
           .toList(),
+      printer: (fields[6] as List)
+          .map((e) => (e as Map).cast<String, dynamic>())
+          .toList(),
     );
   }
 
   @override
   void write(BinaryWriter writer, PrintHistoryItem obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -43,7 +46,9 @@ class PrintHistoryItemAdapter extends TypeAdapter<PrintHistoryItem> {
       ..writeByte(4)
       ..write(obj.orderType)
       ..writeByte(5)
-      ..write(obj.items);
+      ..write(obj.items)
+      ..writeByte(6)
+      ..write(obj.printer);
   }
 
   @override

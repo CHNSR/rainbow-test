@@ -148,9 +148,11 @@ class _HistoryPrintingState extends State<HistoryPrinting> {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  "🖨️ ${receipt.printer}",
+                                  "🖨️ ${receipt.printer.length} Printer(s)",
                                   style: TextStyle(
-                                      fontSize: 12, color: Colors.grey[700]),
+                                      fontSize: 12,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w500),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -171,10 +173,119 @@ class _HistoryPrintingState extends State<HistoryPrinting> {
                     children: [
                       const Divider(),
                       ...receipt.items.map((item) => ListTile(
+                            visualDensity: VisualDensity.compact,
                             title: Text("${item.quantity}x ${item.foodName}"),
                             trailing: Text(
                                 "\$${(item.foodPrice * item.quantity).toStringAsFixed(2)}"),
                           )),
+                      if (receipt.printer.isNotEmpty) ...[
+                        const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "🖨️ Printed via:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ...receipt.printer.map((p) {
+                                final category =
+                                    p['category']?.toString() ?? 'Unknown';
+                                final name =
+                                    p['name']?.toString() ?? 'Unknown Printer';
+                                final ip = p['ip']?.toString() ?? '-';
+                                final port = p['port']?.toString() ?? '-';
+                                final printStatus = p['status']?.toString() ??
+                                    'success'; // ดึงสถานะการพิมพ์ของเครื่องนี้
+
+                                final isKitchen =
+                                    category.toLowerCase() == 'kitchen';
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 8.0),
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border:
+                                        Border.all(color: Colors.grey.shade200),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: isKitchen
+                                              ? Colors.orange.shade100
+                                              : Colors.blue.shade100,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          isKitchen
+                                              ? Icons.soup_kitchen
+                                              : Icons.point_of_sale,
+                                          size: 20,
+                                          color: isKitchen
+                                              ? Colors.orange.shade700
+                                              : Colors.blue.shade700,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              name,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              "IP: $ip : $port",
+                                              style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: printStatus == 'success'
+                                              ? Colors.green.shade100
+                                              : Colors.red.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          printStatus.toUpperCase(),
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: printStatus == 'success'
+                                                  ? Colors.green.shade700
+                                                  : Colors.red.shade700),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 8),
                     ],
                   ),

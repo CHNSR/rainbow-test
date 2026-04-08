@@ -178,15 +178,19 @@ class _OrderPagesState extends State<OrderPages> {
           final cashierPrinter =
               printers.where((p) => p.category == "cashier").toList();
 
-          print("🍳 Kitchen printers: ${kitchenPrinter.length}");
-          print("💰 Cashier printers: ${cashierPrinter.length}");
+          print("🍳 [OrderPages] Kitchen printers: ${kitchenPrinter.length}");
+          print("💰 [OrderPages] Cashier printers: ${cashierPrinter.length}");
+
+          List<Map<String, dynamic>> allPrintResults = [];
+          bool hasFailed = false;
 
           // -----------------------------
           // 🔥 1. พิมพ์ Kitchen ก่อน
           // -----------------------------
 
           if (kitchenPrinter.isNotEmpty) {
-            final status = await OrderPageWidget().showReceiptAndPrintMulti(
+            final kitchenResults =
+                await OrderPageWidget().showReceiptAndPrintMulti(
               context: context,
               orders: state.orders,
               configs: kitchenPrinter,
@@ -194,13 +198,17 @@ class _OrderPagesState extends State<OrderPages> {
               category: "kitchen",
             );
 
-            if (status == null) return;
+            if (kitchenResults == null) return; // กดยกเลิก
+            if (!context.mounted) return;
 
-            if (status == false) {
+            allPrintResults.addAll(kitchenResults);
+
+            if (kitchenResults.any((p) => p['status'] == 'failed')) {
+              hasFailed = true;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("❌ พิมพ์ครัวล้มเหลว")),
               );
-              return;
+              // ❌ ไม่ต้องใส่ return; ตรงนี้แล้ว เพื่อให้มันไปพิมพ์ Cashier ต่อ และนำประวัติพังๆ ไปเซฟลง History ด้วย
             }
           }
 
@@ -208,7 +216,8 @@ class _OrderPagesState extends State<OrderPages> {
           // 💰 2. พิมพ์ Cashier
           // -----------------------------
           if (cashierPrinter.isNotEmpty) {
-            final status = await OrderPageWidget().showReceiptAndPrintMulti(
+            final cashierResults =
+                await OrderPageWidget().showReceiptAndPrintMulti(
               context: context,
               orders: state.orders,
               configs: cashierPrinter,
@@ -216,24 +225,37 @@ class _OrderPagesState extends State<OrderPages> {
               category: "cashier",
             );
 
-            if (status == null) return;
+            if (cashierResults == null) return;
+            if (!context.mounted) return;
 
-            if (status == false) {
+            allPrintResults.addAll(cashierResults);
+
+            if (cashierResults.any((p) => p['status'] == 'failed')) {
+              hasFailed = true;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("❌ พิมพ์ใบเสร็จล้มเหลว")),
               );
-              return;
             }
           }
 
           // -----------------------------
           // ✅ success ทั้งหมด
           // -----------------------------
-          context.read<OrderfullBloc>().add(ClearCartEvent());
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("🧾 พิมพ์ครบทุกใบแล้ว")),
-          );
+          if (!context.mounted) return;
+
+          // เรียก SaveReceipt แทน ClearCart (เพราะ SaveReceipt จะบันทึกข้อมูลและเคลียร์ตะกร้าให้)
+          context.read<OrderfullBloc>().add(SaveReceiptEvent(
+                printStatus: hasFailed ? 'failed' : 'success',
+                usedPrinters:
+                    allPrintResults, // ส่งข้อมูลที่แพ็คสถานะแยกรายเครื่องไปให้ Bloc
+              ));
+
+          if (!hasFailed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("🧾 พิมพ์ครบทุกใบแล้ว")),
+            );
+          }
         }
       },
       child: Scaffold(

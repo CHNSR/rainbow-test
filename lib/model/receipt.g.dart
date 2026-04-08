@@ -23,7 +23,11 @@ class ReceiptAdapter extends TypeAdapter<Receipt> {
       orderType: fields[3] as String,
       items: (fields[4] as List).cast<ReceiptItem>(),
       status: fields[5] == null ? 'Success' : fields[5] as String,
-      printer: fields[6] == null ? 'Unknown' : fields[6] as String,
+      printer: fields[6] == null
+          ? []
+          : (fields[6] as List)
+              .map((e) => (e as Map).cast<String, dynamic>())
+              .toList(),
     );
   }
 

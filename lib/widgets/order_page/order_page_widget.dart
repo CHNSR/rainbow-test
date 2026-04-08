@@ -907,13 +907,21 @@ class OrderPageWidget {
                               ),
                             );
 
-                            final success =
-                                await smilePrinter.addPrintJob(() async {
-                              return await smilePrinter.printWidgetReceipt(
-                                  config: config, repaintKey: repaintKey);
-                            });
+                            bool? success;
+                            try {
+                              success = await smilePrinter.addPrintJob(
+                                  () async {
+                                return await smilePrinter.printWidgetReceipt(
+                                    config: config, repaintKey: repaintKey);
+                              }).timeout(const Duration(
+                                  seconds:
+                                      3)); // ⏱️ ตั้งเวลาสูงสุดให้รอแค่ 5 วินาที
+                            } catch (e) {
+                              debugPrint("❌ Print Error Caught in UI: $e");
+                              success = false;
+                            }
 
-                            if (success == false && context.mounted) {
+                            if (success != true && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                     content: Text(
@@ -921,7 +929,9 @@ class OrderPageWidget {
                                     backgroundColor: Colors.red),
                               );
                             }
-                            Navigator.pop(context, success);
+
+                            if (!context.mounted) return;
+                            Navigator.pop(context, success ?? false);
                           },
                         ),
                       ),
@@ -936,7 +946,7 @@ class OrderPageWidget {
     );
   }
 
-  Future<bool?> showReceiptAndPrintMulti({
+  Future<List<Map<String, dynamic>>?> showReceiptAndPrintMulti({
     required BuildContext context,
     required List<OrderItem> orders,
     required List<PrinterConfig> configs,
@@ -948,7 +958,7 @@ class OrderPageWidget {
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 
-    return await showDialog<bool>(
+    return await showDialog<List<Map<String, dynamic>>>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
@@ -1062,7 +1072,7 @@ class OrderPageWidget {
                             elevation: 0,
                           ),
                           onPressed: () async {
-                            bool allSuccess = true;
+                            List<Map<String, dynamic>> printResults = [];
                             final messenger = ScaffoldMessenger.of(context);
 
                             messenger.showSnackBar(
@@ -1074,14 +1084,31 @@ class OrderPageWidget {
 
                             // ส่งคำสั่งทีละเครื่อง (Plugin ดูแล Timeout เอง)
                             for (final config in configs) {
-                              final success =
-                                  await smilePrinter.addPrintJob(() async {
-                                return await smilePrinter.printWidgetReceipt(
-                                    config: config, repaintKey: repaintKey);
+                              bool? success;
+                              try {
+                                success = await smilePrinter.addPrintJob(
+                                    () async {
+                                  return await smilePrinter.printWidgetReceipt(
+                                      config: config, repaintKey: repaintKey);
+                                }).timeout(const Duration(
+                                    seconds:
+                                        5)); // ⏱️ ตั้งเวลาสูงสุดให้รอแค่ 5 วินาทีต่อเครื่อง
+                              } catch (e) {
+                                debugPrint("❌ Print Error Caught in UI: $e");
+                                success = false;
+                              }
+
+                              // 📦 แนบสถานะของแต่ละเครื่องเก็บเอาไว้ด้วย
+                              printResults.add({
+                                'category': config.category,
+                                'name': config.name,
+                                'ip': config.ip,
+                                'port': config.port,
+                                'status':
+                                    success == true ? 'success' : 'failed',
                               });
 
-                              if (success == false) {
-                                allSuccess = false;
+                              if (success != true) {
                                 if (context.mounted) {
                                   messenger.showSnackBar(
                                     SnackBar(
@@ -1093,7 +1120,8 @@ class OrderPageWidget {
                               }
                             }
 
-                            Navigator.pop(context, allSuccess);
+                            if (!context.mounted) return;
+                            Navigator.pop(context, printResults);
                           },
                         ),
                       ),

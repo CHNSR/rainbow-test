@@ -3,14 +3,17 @@
 // Check in to version control
 
 import 'package:hive_ce/hive_ce.dart';
+import 'package:flutter_application_1/model/order_item.dart';
 import 'package:flutter_application_1/model/print_history.dart';
 import 'package:flutter_application_1/model/print_result.dart';
 import 'package:flutter_application_1/model/receipt.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
-    registerAdapter(PrinterConfigAdapter());
+    registerAdapter(OrderItemAdapter());
     registerAdapter(PrintHistoryItemAdapter());
+    registerAdapter(PrintStatusAdapter());
+    registerAdapter(PrinterConfigAdapter());
     registerAdapter(ReceiptAdapter());
     registerAdapter(ReceiptItemAdapter());
   }
@@ -18,8 +21,10 @@ extension HiveRegistrar on HiveInterface {
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
-    registerAdapter(PrinterConfigAdapter());
+    registerAdapter(OrderItemAdapter());
     registerAdapter(PrintHistoryItemAdapter());
+    registerAdapter(PrintStatusAdapter());
+    registerAdapter(PrinterConfigAdapter());
     registerAdapter(ReceiptAdapter());
     registerAdapter(ReceiptItemAdapter());
   }

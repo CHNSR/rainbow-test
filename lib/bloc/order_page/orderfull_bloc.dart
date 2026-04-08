@@ -126,6 +126,20 @@ class OrderfullBloc extends Bloc<OrderfullEvent, OrderfullState> {
 
       final prevState = state;
 
+      // เตรียมข้อมูลออเดอร์แล้วส่ง State กลับไปให้ UI จัดการสั่งพิมพ์ก่อน
+      emit(OrderfullSuccess(
+        cartItems: prevState.cartItems,
+        orders: newOrders,
+        orderType: prevState.orderType,
+      ));
+    });
+
+    // Event ใหม่สำหรับการบันทึกลง Hive และเคลียร์ตะกร้า (เรียกใช้หลังพิมพ์เสร็จ)
+    on<SaveReceiptEvent>((event, emit) async {
+      if (state.cartItems.isEmpty) return;
+
+      final prevState = state;
+
       // 1. คำนวณยอดรวมสุทธิ
       final totalAmount = prevState.cartItems.fold<double>(
         0.0,
@@ -133,7 +147,7 @@ class OrderfullBloc extends Bloc<OrderfullEvent, OrderfullState> {
             sum + ((item.food.foodPrice as num).toDouble() * item.quantity),
       );
 
-      // 2. แปลงรายการสั่งซื้อเป็น ReceiptItem สำหรับบันทึกลง Database
+      // 2. แปลงรายการสั่งซื้อเป็น ReceiptItem
       final receiptItems = prevState.cartItems
           .map((item) => ReceiptItem(
                 foodName: item.food.foodName,
@@ -142,29 +156,23 @@ class OrderfullBloc extends Bloc<OrderfullEvent, OrderfullState> {
               ))
           .toList();
 
-      // 3. สร้าง Object ใบเสร็จเพื่อจัดเก็บ
+      // 3. สร้าง Object ใบเสร็จเพื่อจัดเก็บ (บันทึกสถานะการพิมพ์ และ IP เครื่องพิมพ์)
       final receipt = Receipt(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         date: DateTime.now(),
         totalAmount: totalAmount,
         orderType: prevState.orderType ?? 'Unknown',
         items: receiptItems,
-        status: event.status,
-        printer: event.printer,
+        status: event.printStatus, // เก็บสถานะการพิมพ์ที่ส่งมาจากหน้า UI
+        printer: event.usedPrinters, // บันทึกข้อมูล Printer แบบ List<Map>
       );
 
-      // 4. บันทึกลง Hive Database
+      // 4. บันทึกลง Hive Database หลังการพิมพ์เสร็จสิ้น
       await HiveService.addReceipt(receipt);
 
-      emit(OrderfullSuccess(
-        cartItems: prevState.cartItems,
-        orders: newOrders,
-        orderType: prevState.orderType,
-      ));
-
       emit(OrderfullLoaded(
-        cartItems: prevState.cartItems, // เคลียร์ cart
-        orders: newOrders,
+        cartItems: [], // เคลียร์ตะกร้าสินค้า
+        orders: prevState.orders,
         orderType: prevState.orderType,
       ));
     });

@@ -23,8 +23,8 @@ class Receipt extends Equatable {
   @HiveField(5, defaultValue: 'Success')
   final String status;
 
-  @HiveField(6, defaultValue: 'Unknown')
-  final String printer;
+  @HiveField(6, defaultValue: [])
+  final List<Map<String, dynamic>> printer;
 
   const Receipt({
     required this.id,

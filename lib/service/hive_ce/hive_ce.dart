@@ -24,7 +24,14 @@ class HiveService {
     // 3. Open Boxes
     await Hive.openBox<dynamic>(settingsBox);
     await Hive.openBox<PrinterConfig>(printerBox);
-    await Hive.openBox<Receipt>(receiptBox);
+
+    try {
+      await Hive.openBox<Receipt>(receiptBox);
+    } catch (e) {
+      // หากเปิด Box ไม่ได้เนื่องจากโครงสร้างข้อมูลเก่าไม่ตรงกับ Model ใหม่ ให้ลบ Box ทิ้งแล้วเปิดใหม่
+      await Hive.deleteBoxFromDisk(receiptBox);
+      await Hive.openBox<Receipt>(receiptBox);
+    }
 
     // Set default settings if not exists
     final box = Hive.box<dynamic>(settingsBox);

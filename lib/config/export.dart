@@ -10,10 +10,8 @@ export 'package:flutter_application_1/pages/home_page.dart';
 export 'package:flutter_application_1/pages/order_pages.dart';
 export 'package:flutter_application_1/pages/select_order_type.dart';
 export 'package:flutter_application_1/pages/setting_page.dart';
-
 export 'package:flutter_application_1/pages/printer_setting/printer_list.dart';
 export 'package:flutter_application_1/pages/printer_setting/history_printing.dart';
-export 'package:flutter_application_1/pages/printer_config_page2.dart';
 export 'package:flutter_application_1/pages/config_printer3.dart';
 
 // ==============================================================================

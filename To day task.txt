@@ -443,3 +443,22 @@ app
 	-error bug click cancel but save data to hive in confirm bottons
 		- change save database logic in orderConfirm to ordersuccess bloc 
 	-error delete state in bloc (find printer form stateyo)
+
+8/4/2569
+- Connect printer to app
+	- redesign design Connect page | pass
+	- create service file | pass
+	- create receipt widget in widget | pass
+ 	- reconnect plugin another page | pass
+	- create service file | pass
+	- move test receipt to widget(byte,graphic) | pass
+	  page scan network can use func? no
+--------------------------------------------------------------------------
+- on saved func | pass
+	- printer test | press
+	- redesign preview receipt | pass
+	- fix bug save to database after click confirm | pass
+	- fix hive to store each receipt | pass
+	- make status printing each printer | pass 
+	- Header detail | pass
+	- bug return false showRecieptAndPrintMulti I think it can't be null (maybe logic error ) |pass but maybe bug with plug in timeout
