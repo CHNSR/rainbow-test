@@ -462,3 +462,12 @@ app
 	- make status printing each printer | pass 
 	- Header detail | pass
 	- bug return false showRecieptAndPrintMulti I think it can't be null (maybe logic error ) |pass but maybe bug with plug in timeout
+
+--------------------------------------------------------------------------
+9/4/2569
+	- check bug timeout| pass
+	- redesign scale receipt table | pass
+	- resize text | pass
+	- scan printer | pass
+	- lean code | in progress
+		- 
