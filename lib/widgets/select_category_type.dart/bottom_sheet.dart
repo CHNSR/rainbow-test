@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/utils/landscape.dart';
+import 'package:flutter_application_1/core/utils/landscape.dart';
 
 class BottomSheetCustom extends StatelessWidget {
   const BottomSheetCustom({super.key});

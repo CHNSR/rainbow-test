@@ -72,7 +72,7 @@ class SmilePrinterService {
     // ค่าตั้งต้น (Fallback Defaults)
     String gateway = 'posx';
     String model = 'generic';
-    int timeout = 10000;
+    int timeout = 5000;
     int maxChar = 32;
     bool isThermal = true;
     String? ip = fallbackIp;
@@ -85,7 +85,7 @@ class SmilePrinterService {
       final extra = config.hardwareTemplate ?? {};
       gateway = extra['gateway'] ?? 'posx';
       model = extra['model'] ?? 'generic';
-      timeout = int.tryParse(extra['timeout']?.toString() ?? '10000') ?? 10000;
+      timeout = int.tryParse(extra['timeout']?.toString() ?? '5000') ?? 5000;
 
       final defaultMaxChar = config.paperSize == "80" ? 48 : 32;
       maxChar = int.tryParse(
@@ -335,6 +335,10 @@ class SmilePrinterService {
     required GlobalKey repaintKey,
   }) async {
     try {
+      // ⚡ เช็คการเชื่อมต่อด่วนก่อน (Fail-fast ใน 2 วินาที) ถ้าไม่ติดให้เด้ง Error ทันที
+      bool isOnline = await checkConnection(config.ip, config.port);
+      if (!isOnline) throw 'ไม่สามารถเชื่อมต่อ ${config.ip}:${config.port}';
+
       await Future.delayed(const Duration(milliseconds: 120));
 
       final captured = await capture(repaintKey);

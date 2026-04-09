@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:driver_printer/driver_printer.dart';
 import 'package:driver_printer/driver_printer_entities.dart' as dp;
 import 'package:driver_printer/command_printer.dart';
+import 'package:flutter_application_1/pages/printer_setting/scan_network.dart';
+import 'package:flutter_application_1/model/printer_enums.dart';
 
 class ConfigPrinter3 extends StatefulWidget {
   final int? index;
@@ -44,7 +46,7 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
   final ipController = TextEditingController();
   final usbNameController = TextEditingController();
   final portController = TextEditingController(text: '9100');
-  final timeoutController = TextEditingController(text: '10000');
+  final timeoutController = TextEditingController(text: '5000');
   final maxCharacterController = TextEditingController(text: '48');
 
   bool useIp = true;
@@ -55,27 +57,6 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
   bool isPrint = true;
   bool opCashDrawer = true;
   bool opBuzzer = false;
-
-  final List<String> gateways = const [
-    'posx',
-    'epson',
-    'star',
-    'esc_command',
-    'vpos',
-    'bixolon',
-    'custom',
-    'element'
-  ];
-  final List<String> models = const [
-    'generic',
-    'TM-M30',
-    'TM-U220',
-    'TM-T20',
-    'TM-T82',
-    'TSP-100III',
-    'TSP-100IV',
-    'SP-742'
-  ];
 
   final _driverPrinter = DriverPrinter();
 
@@ -104,7 +85,7 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
       isThermal = extra['isThermal'] ?? true;
       useIp = extra['useIp'] ?? true;
       useNative = extra['useNative'] ?? true;
-      timeoutController.text = extra['timeout'] ?? '10000';
+      timeoutController.text = extra['timeout'] ?? '5000';
       maxCharacterController.text =
           extra['maxChar'] ?? (paperSize == "80" ? "48" : "32");
 
@@ -256,238 +237,380 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final bool isPad = screenWidth > 600;
+
+    // 📏 Fixed & Predictable Sizing (ลบสูตรคูณ % หน้าจอที่ทำให้ UI เพี้ยน)
+    final double textSize = isPad ? 16.0 : 14.0;
+    final double H1Size = isPad ? 22.0 : 18.0;
+    final double H2Size = isPad ? 18.0 : 16.0;
+    final double spacing = isPad ? 20.0 : 16.0;
+
+    // 🛠️ Helper สำหรับสร้างกล่องครอบแต่ละ Section ให้ดูคลีนและจัด Group
+    Widget buildCard(List<Widget> children) {
+      return Container(
+        padding: EdgeInsets.all(spacing),
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: cs.outlineVariant.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: cs.shadow.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
+        ),
+      );
+    }
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest, // พื้นหลังให้สว่างสุด
       appBar: AppBar(
         title: Text(
             widget.index != null
                 ? "Edit Printer (Advanced)"
                 : "Add Printer (Advanced)",
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: H1Size)),
         backgroundColor: cs.inversePrimary,
         centerTitle: true,
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          // คุมความกว้างไม่ให้ยืดเต็มจอเกินไปใน Tablet/Web
+          padding: EdgeInsets.symmetric(
+              horizontal: isPad ? screenWidth * 0.03 : 20, vertical: 24),
           children: [
             // ---------------- 1. Printer Details (แอป) ----------------
-            const SectionHeader(
-                icon: Icons.info_outline, label: 'Printer Details'),
+            SectionHeader(
+                sizetext: H2Size,
+                icon: Icons.info_outline,
+                label: 'Printer Details'),
             const SizedBox(height: 12),
-            PrinterTextField(
-              controller: nameController,
-              label: 'Name of printer',
-              icon: Icons.print,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: paperSize,
-                    items: const [
-                      DropdownMenuItem(value: "58", child: Text("58 mm")),
-                      DropdownMenuItem(value: "80", child: Text("80 mm")),
-                    ],
-                    onChanged: (val) {
-                      setState(() {
-                        paperSize = val!;
-                        maxCharacterController.text =
-                            (val == "80") ? "48" : "32";
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: "Paper Size",
-                      prefixIcon: const Icon(Icons.receipt_long),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      filled: true,
-                      fillColor: cs.surfaceContainerLow,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: printerCategory,
-                    items: const [
-                      DropdownMenuItem(
-                          value: "kitchen", child: Text("Kitchen")),
-                      DropdownMenuItem(
-                          value: "cashier", child: Text("Cashier")),
-                    ],
-                    onChanged: (value) =>
-                        setState(() => printerCategory = value!),
-                    decoration: InputDecoration(
-                      labelText: "Category",
-                      prefixIcon: const Icon(Icons.category),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      filled: true,
-                      fillColor: cs.surfaceContainerLow,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            // ---------------- 2. Connection Settings (Plugin) ----------------
-            const SectionHeader(
-                icon: Icons.electrical_services_outlined,
-                label: 'Connection & Engine'),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: gatewayController.text,
-                    items: gateways
-                        .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                        .toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Gateway',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12))),
-                    onChanged: (v) =>
-                        setState(() => gatewayController.text = v ?? 'posx'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: models.contains(modelController.text)
-                        ? modelController.text
-                        : 'generic',
-                    items: models
-                        .map((m) => DropdownMenuItem(value: m, child: Text(m)))
-                        .toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Model',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12))),
-                    onChanged: (v) =>
-                        setState(() => modelController.text = v ?? 'generic'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: true, label: Text('Network (IP)')),
-                ButtonSegment(value: false, label: Text('USB Device')),
-              ],
-              selected: {useIp},
-              onSelectionChanged: (s) => setState(() => useIp = s.first),
-            ),
-            const SizedBox(height: 12),
-            if (useIp)
+            buildCard([
               PrinterTextField(
-                  controller: ipController,
-                  label: 'IP Address',
-                  icon: Icons.router_outlined)
-            else
-              PrinterTextField(
-                  controller: usbNameController,
-                  label: 'USB Device Name',
-                  icon: Icons.usb),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                    child: PrinterTextField(
-                        controller: portController,
-                        label: 'Port',
-                        icon: Icons.numbers)),
-                const SizedBox(width: 12),
-                Expanded(
-                    child: PrinterTextField(
-                        controller: timeoutController,
-                        label: 'Timeout (ms)',
-                        icon: Icons.timer)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            SwitchListTile.adaptive(
-              title: const Text("Use Native Engine"),
-              subtitle: const Text("Off = ใช้ Dart ESC/POS Command"),
-              value: useNative,
-              onChanged: (v) => setState(() => useNative = v),
-            ),
-
-            const SizedBox(height: 24),
-
-            // ---------------- 3. Basic Settings ----------------
-            const SectionHeader(
-                icon: Icons.settings, label: 'Printer Settings'),
-            const SizedBox(height: 12),
-            Card(
-              elevation: 0,
-              color: cs.surfaceContainerLow,
-              child: Column(
+                controller: nameController,
+                label: 'Name of printer',
+                icon: Icons.print,
+                textSize: textSize,
+              ),
+              SizedBox(height: spacing),
+              Row(
                 children: [
-                  SwitchListTile.adaptive(
-                    title: const Text("Auto Cut Paper",
-                        style: TextStyle(fontWeight: FontWeight.w500)),
-                    value: _isAutoCut,
-                    onChanged: (val) => setState(() => _isAutoCut = val),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: paperSize,
+                      style: TextStyle(fontSize: textSize, color: cs.onSurface),
+                      items: const [
+                        DropdownMenuItem(value: "58", child: Text("58 mm")),
+                        DropdownMenuItem(value: "80", child: Text("80 mm")),
+                      ],
+                      onChanged: (val) {
+                        setState(() {
+                          paperSize = val!;
+                          maxCharacterController.text =
+                              (val == "80") ? "48" : "32";
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Paper Size",
+                        labelStyle: TextStyle(fontSize: textSize),
+                        prefixIcon:
+                            Icon(Icons.receipt_long, size: textSize + 6),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        filled: true,
+                        fillColor: cs.surfaceContainerLow,
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: textSize * 0.9, horizontal: 16),
+                      ),
+                    ),
                   ),
-                  const Divider(height: 1),
-                  SwitchListTile.adaptive(
-                    title: const Text("Beep Sound",
-                        style: TextStyle(fontWeight: FontWeight.w500)),
-                    value: _isBeep,
-                    onChanged: (val) => setState(() => _isBeep = val),
-                  ),
-                  const Divider(height: 1),
-                  SwitchListTile.adaptive(
-                    title: const Text("Print Price (Cashier)",
-                        style: TextStyle(fontWeight: FontWeight.w500)),
-                    value: _printPrice,
-                    onChanged: (val) => setState(() => _printPrice = val),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: printerCategory,
+                      style: TextStyle(fontSize: textSize, color: cs.onSurface),
+                      items: const [
+                        DropdownMenuItem(
+                            value: "kitchen", child: Text("Kitchen")),
+                        DropdownMenuItem(
+                            value: "cashier", child: Text("Cashier")),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => printerCategory = value!),
+                      decoration: InputDecoration(
+                        labelText: "Category",
+                        labelStyle: TextStyle(fontSize: textSize),
+                        prefixIcon: Icon(Icons.category, size: textSize + 6),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        filled: true,
+                        fillColor: cs.surfaceContainerLow,
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: textSize * 0.9, horizontal: 16),
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // ---------------- 4. Action & Testing ----------------
-            const SectionHeader(
-                icon: Icons.monitor_heart_outlined, label: 'Action & Testing'),
-            const SizedBox(height: 12),
-            SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: true, label: Text('Print Receipt')),
-                ButtonSegment(value: false, label: Text('Operation Only')),
-              ],
-              selected: {isPrint},
-              onSelectionChanged: (s) => setState(() => isPrint = s.first),
-            ),
-            if (!isPrint) ...[
-              const SizedBox(height: 12),
-              SwitchListTile.adaptive(
-                  title: const Text('Open Cash Drawer'),
-                  value: opCashDrawer,
-                  onChanged: (v) => setState(() => opCashDrawer = v)),
-              SwitchListTile.adaptive(
-                  title: const Text('Buzzer'),
-                  value: opBuzzer,
-                  onChanged: (v) => setState(() => opBuzzer = v)),
-            ],
-            const SizedBox(height: 12),
-            ActionButton(
-              label: _isLoading ? 'Sending...' : 'Send Test Command',
-              icon: Icons.send,
-              outlined: true,
-              onTap: _isLoading ? null : _onSendTest,
-            ),
+            ]),
 
             const SizedBox(height: 32),
+
+            // ---------------- 2. Connection Settings (Plugin) ----------------
+            SectionHeader(
+                sizetext: H2Size,
+                icon: Icons.electrical_services_outlined,
+                label: 'Connection & Engine'),
+            const SizedBox(height: 12),
+            buildCard([
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: gatewayController.text,
+                      style: TextStyle(fontSize: textSize, color: cs.onSurface),
+                      items: PrinterGateway.values
+                          .map((g) => DropdownMenuItem(
+                                value: g.value,
+                                child: Text(g.value),
+                              ))
+                          .toList(),
+                      decoration: InputDecoration(
+                          labelText: 'Gateway',
+                          labelStyle: TextStyle(fontSize: textSize),
+                          prefixIcon:
+                              Icon(Icons.settings_ethernet, size: textSize + 6),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: cs.surfaceContainerLow,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: textSize * 0.9, horizontal: 16)),
+                      onChanged: (v) =>
+                          setState(() => gatewayController.text = v ?? 'posx'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: PrinterModel.values
+                              .any((e) => e.value == modelController.text)
+                          ? modelController.text
+                          : PrinterModel.generic.value,
+                      style: TextStyle(fontSize: textSize, color: cs.onSurface),
+                      items: PrinterModel.values
+                          .map((m) => DropdownMenuItem(
+                                value: m.value,
+                                child: Text(m.value),
+                              ))
+                          .toList(),
+                      decoration: InputDecoration(
+                          labelText: 'Model',
+                          labelStyle: TextStyle(fontSize: textSize),
+                          prefixIcon:
+                              Icon(Icons.developer_board, size: textSize + 6),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          filled: true,
+                          fillColor: cs.surfaceContainerLow,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: textSize * 0.9, horizontal: 16)),
+                      onChanged: (v) =>
+                          setState(() => modelController.text = v ?? 'generic'),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: spacing),
+              SegmentedButton<bool>(
+                style: SegmentedButton.styleFrom(
+                    textStyle: TextStyle(fontSize: textSize),
+                    padding: EdgeInsets.symmetric(vertical: textSize * 0.7),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12))),
+                segments: const [
+                  ButtonSegment(value: true, label: Text('Network (IP)')),
+                  ButtonSegment(value: false, label: Text('USB Device')),
+                ],
+                selected: {useIp},
+                onSelectionChanged: (s) => setState(() => useIp = s.first),
+              ),
+              SizedBox(height: spacing),
+              if (useIp)
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: PrinterTextField(
+                            controller: ipController,
+                            label: 'IP Address',
+                            textSize: textSize,
+                            icon: Icons.router_outlined),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        ),
+                        onPressed: () async {
+                          final selectedIp = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ScanNetworkScreen()),
+                          );
+                          if (selectedIp != null &&
+                              selectedIp is String &&
+                              mounted) {
+                            setState(() => ipController.text = selectedIp);
+                          }
+                        },
+                        icon: Icon(Icons.wifi_find, size: textSize + 4),
+                        label: Text('Scan',
+                            style: TextStyle(
+                                fontSize: textSize,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                PrinterTextField(
+                    controller: usbNameController,
+                    label: 'USB Device Name',
+                    textSize: textSize,
+                    icon: Icons.usb),
+              SizedBox(height: spacing),
+              Row(
+                children: [
+                  Expanded(
+                      child: PrinterTextField(
+                          controller: portController,
+                          label: 'Port',
+                          textSize: textSize,
+                          icon: Icons.numbers)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                      child: PrinterTextField(
+                          controller: timeoutController,
+                          label: 'Timeout (ms)',
+                          textSize: textSize,
+                          icon: Icons.timer)),
+                ],
+              ),
+              SizedBox(height: spacing),
+              const Divider(height: 1),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: Text("Use Native Engine",
+                    style: TextStyle(
+                        fontSize: textSize, fontWeight: FontWeight.w500)),
+                subtitle: Text("Off = ใช้ Dart ESC/POS Command",
+                    style: TextStyle(fontSize: textSize * 0.85)),
+                value: useNative,
+                onChanged: (v) => setState(() => useNative = v),
+              ),
+            ]),
+
+            const SizedBox(height: 32),
+
+            // ---------------- 3. Basic Settings ----------------
+            SectionHeader(
+                icon: Icons.settings,
+                label: 'Printer Settings',
+                sizetext: H2Size),
+            const SizedBox(height: 12),
+            buildCard([
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: Text("Auto Cut Paper",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: textSize)),
+                value: _isAutoCut,
+                onChanged: (val) => setState(() => _isAutoCut = val),
+              ),
+              const Divider(height: 1),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: Text("Beep Sound",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: textSize)),
+                value: _isBeep,
+                onChanged: (val) => setState(() => _isBeep = val),
+              ),
+              const Divider(height: 1),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: Text("Print Price (Cashier)",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: textSize)),
+                value: _printPrice,
+                onChanged: (val) => setState(() => _printPrice = val),
+              ),
+            ]),
+
+            const SizedBox(height: 32),
+
+            // ---------------- 4. Action & Testing ----------------
+            SectionHeader(
+                icon: Icons.monitor_heart_outlined,
+                label: 'Action & Testing',
+                sizetext: H2Size),
+            const SizedBox(height: 12),
+            buildCard([
+              SegmentedButton<bool>(
+                style: SegmentedButton.styleFrom(
+                    textStyle: TextStyle(fontSize: textSize),
+                    padding: EdgeInsets.symmetric(vertical: textSize * 0.7),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12))),
+                segments: const [
+                  ButtonSegment(value: true, label: Text('Print Receipt')),
+                  ButtonSegment(value: false, label: Text('Operation Only')),
+                ],
+                selected: {isPrint},
+                onSelectionChanged: (s) => setState(() => isPrint = s.first),
+              ),
+              if (!isPrint) ...[
+                SizedBox(height: spacing),
+                SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text('Open Cash Drawer',
+                        style: TextStyle(
+                            fontSize: textSize, fontWeight: FontWeight.w500)),
+                    value: opCashDrawer,
+                    onChanged: (v) => setState(() => opCashDrawer = v)),
+                const Divider(height: 1),
+                SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text('Buzzer',
+                        style: TextStyle(
+                            fontSize: textSize, fontWeight: FontWeight.w500)),
+                    value: opBuzzer,
+                    onChanged: (v) => setState(() => opBuzzer = v)),
+              ],
+              SizedBox(height: spacing),
+              ActionButton(
+                label: _isLoading ? 'Sending...' : 'Send Test Command',
+                icon: Icons.send,
+                outlined: true,
+                onTap: _isLoading ? null : _onSendTest,
+                textSize: textSize,
+              ),
+            ]),
+
+            const SizedBox(height: 48),
 
             // ---------------- Save Buttons ----------------
             Row(
@@ -501,6 +624,7 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                     onTap: () {
                       context.read<PrinterBloc>().add(ClearPrinterConfig());
                     },
+                    textSize: textSize,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -509,10 +633,12 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                     label: 'Save Config',
                     icon: Icons.save,
                     onTap: _onSave,
+                    textSize: textSize,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ),

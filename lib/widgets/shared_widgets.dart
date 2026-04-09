@@ -50,19 +50,24 @@ class StatusCard extends StatelessWidget {
 class SectionHeader extends StatelessWidget {
   final IconData icon;
   final String label;
-  const SectionHeader({super.key, required this.icon, required this.label});
+  final double sizetext;
+  const SectionHeader(
+      {super.key,
+      required this.icon,
+      required this.label,
+      required this.sizetext});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(icon, size: 18, color: cs.primary),
+        Icon(icon, size: sizetext + 2, color: cs.primary),
         const SizedBox(width: 8),
         Text(label,
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
+                fontSize: sizetext,
                 color: cs.primary,
                 letterSpacing: 0.5)),
         const SizedBox(width: 8),
@@ -79,6 +84,7 @@ class ActionButton extends StatelessWidget {
   final bool loading;
   final bool outlined;
   final bool danger;
+  final double? textSize;
 
   const ActionButton({
     super.key,
@@ -88,6 +94,7 @@ class ActionButton extends StatelessWidget {
     this.loading = false,
     this.outlined = false,
     this.danger = false,
+    this.textSize,
   });
 
   @override
@@ -101,19 +108,22 @@ class ActionButton extends StatelessWidget {
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2.5))
-            : Icon(icon, size: 20),
+            : Icon(icon, size: (textSize ?? 15) + 4),
         const SizedBox(width: 10),
-        Text(label,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+    Text(label,
+        style: TextStyle(fontSize: textSize ?? 15, fontWeight: FontWeight.w600)),
       ],
     );
 
     final shape =
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
+    
+    // 📏 คำนวณความสูงปุ่มให้ขยายตามตัวหนังสือ (Default 50)
+    final double buttonHeight = (textSize != null) ? textSize! + 35 : 50;
 
     if (outlined) {
       return SizedBox(
-        height: 50,
+        height: buttonHeight,
         child: OutlinedButton(
           onPressed: onTap,
           style: OutlinedButton.styleFrom(shape: shape),
@@ -122,7 +132,7 @@ class ActionButton extends StatelessWidget {
       );
     }
     return SizedBox(
-      height: 50,
+      height: buttonHeight,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
@@ -142,6 +152,7 @@ class PrinterTextField extends StatelessWidget {
   final IconData icon;
   final bool enabled;
   final TextInputType? keyboardType;
+  final double? textSize;
 
   const PrinterTextField({
     super.key,
@@ -150,6 +161,7 @@ class PrinterTextField extends StatelessWidget {
     required this.icon,
     this.enabled = true,
     this.keyboardType,
+    this.textSize,
   });
 
   @override
@@ -159,14 +171,16 @@ class PrinterTextField extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       keyboardType: keyboardType,
+      style: TextStyle(fontSize: textSize),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        labelStyle: TextStyle(fontSize: textSize),
+        prefixIcon: Icon(icon, size: (textSize != null) ? textSize! + 6 : 24),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: cs.surfaceContainerLow,
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        contentPadding: EdgeInsets.symmetric(
+            vertical: (textSize != null) ? textSize! * 0.9 : 14, horizontal: 16),
       ),
     );
   }

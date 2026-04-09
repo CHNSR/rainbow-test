@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/utils/deviceType.dart';
+import 'package:flutter_application_1/core/utils/deviceType.dart';
 
 class OrderPages extends StatefulWidget {
   const OrderPages({super.key});

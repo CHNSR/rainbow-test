@@ -909,13 +909,11 @@ class OrderPageWidget {
 
                             bool? success;
                             try {
-                              success = await smilePrinter.addPrintJob(
-                                  () async {
+                              success =
+                                  await smilePrinter.addPrintJob(() async {
                                 return await smilePrinter.printWidgetReceipt(
                                     config: config, repaintKey: repaintKey);
-                              }).timeout(const Duration(
-                                  seconds:
-                                      3)); // ⏱️ ตั้งเวลาสูงสุดให้รอแค่ 5 วินาที
+                              });
                             } catch (e) {
                               debugPrint("❌ Print Error Caught in UI: $e");
                               success = false;
@@ -1086,13 +1084,11 @@ class OrderPageWidget {
                             for (final config in configs) {
                               bool? success;
                               try {
-                                success = await smilePrinter.addPrintJob(
-                                    () async {
+                                success =
+                                    await smilePrinter.addPrintJob(() async {
                                   return await smilePrinter.printWidgetReceipt(
                                       config: config, repaintKey: repaintKey);
-                                }).timeout(const Duration(
-                                    seconds:
-                                        5)); // ⏱️ ตั้งเวลาสูงสุดให้รอแค่ 5 วินาทีต่อเครื่อง
+                                });
                               } catch (e) {
                                 debugPrint("❌ Print Error Caught in UI: $e");
                                 success = false;
