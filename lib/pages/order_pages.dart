@@ -183,6 +183,8 @@ class _OrderPagesState extends State<OrderPages> {
 
           List<Map<String, dynamic>> allPrintResults = [];
           bool hasFailed = false;
+          bool hasPrintedKitchen =
+              false; // 👈 เพิ่มตัวเช็คว่าพิมพ์ครัวผ่านแล้วหรือยัง
 
           // -----------------------------
           // 🔥 1. พิมพ์ Kitchen ก่อน
@@ -196,6 +198,7 @@ class _OrderPagesState extends State<OrderPages> {
               configs: kitchenPrinter,
               receptWidth: 384,
               category: "kitchen",
+              isCancellable: true, // ใบแรกยังอนุญาตให้ยกเลิกได้
             );
 
             if (kitchenResults == null) return; // กดยกเลิก
@@ -203,6 +206,7 @@ class _OrderPagesState extends State<OrderPages> {
 
             allPrintResults.addAll(kitchenResults);
 
+            hasPrintedKitchen = true; // 👈 บันทึกว่าพิมพ์ครัวเสร็จแล้ว
             if (kitchenResults.any((p) => p['status'] == 'failed')) {
               hasFailed = true;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -223,6 +227,8 @@ class _OrderPagesState extends State<OrderPages> {
               configs: cashierPrinter,
               receptWidth: 384,
               category: "cashier",
+              isCancellable:
+                  !hasPrintedKitchen, // 👈 ถ้าพิมพ์ครัวไปแล้ว จะห้ามยกเลิกใบนี้เด็ดขาด
             );
 
             if (cashierResults == null) return;

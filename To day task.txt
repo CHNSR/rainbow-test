@@ -470,4 +470,15 @@ app
 	- resize text | pass
 	- scan printer | pass
 	- lean code | in progress
-		- 
+	- cancel order | pass
+	- bug fix click cancel between print kitchen and cashier | pass
+	- scan network page overflow and must to scroll | pass
+	- close time bar in mobile app | pass
+	- find list of each printer | to do
+	- bug save data with out Ip| todo
+	- make pin for setting | option
+	- make func follow order preferences | option
+		- open & close func togo | option
+		- open & close func tostay | option
+		- open & close first page func | option
+	- USB test printer

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.initHive();
-
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(
     MultiBlocProvider(
       providers: [

@@ -4,7 +4,6 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
-
 import 'package:flutter_application_1/widgets/order_page/receipt_widget.dart';
 import 'package:flutter_application_1/service/printer/smile_printer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -779,6 +778,7 @@ class OrderPageWidget {
     required PrinterConfig config,
     required double receptWidth,
     required String category,
+    bool isCancellable = true, // 👈 เพิ่มพารามิเตอร์
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final smilePrinter = SmilePrinterService.instance;
@@ -789,157 +789,198 @@ class OrderPageWidget {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.grey.shade100,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            height: screenSize.height * 0.8,
-            width:
-                isLandscape ? screenSize.width * 0.28 : screenSize.width * 0.85,
-            child: Column(
-              children: [
-                /// 🏷️ Header (Fixed)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                        Border(bottom: BorderSide(color: Colors.grey.shade300)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Receipt Preview",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF4F4F4F)),
+        bool isPrinting = false;
+        return StatefulBuilder(builder: (context, setState) {
+          return PopScope(
+            canPop: !(isPrinting ||
+                !isCancellable), // 👈 ล็อคปุ่ม Back ของเครื่องด้วย
+            child: Dialog(
+              backgroundColor: Colors.grey.shade100,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              clipBehavior: Clip.antiAlias,
+              child: SizedBox(
+                height: screenSize.height * 0.8,
+                width: isLandscape
+                    ? screenSize.width * 0.28
+                    : screenSize.width * 0.85,
+                child: Column(
+                  children: [
+                    /// 🏷️ Header (Fixed)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                            bottom: BorderSide(color: Colors.grey.shade300)),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
-                        onPressed: () => Navigator.pop(context, null),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Receipt Preview",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4F4F4F)),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close,
+                                color: (isPrinting || !isCancellable)
+                                    ? Colors.grey.shade300
+                                    : Colors.grey),
+                            onPressed: (isPrinting || !isCancellable)
+                                ? null
+                                : () => Navigator.pop(context, null),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
 
-                /// 🧾 Receipt
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 4),
+                    /// 🧾 Receipt
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: RepaintBoundary(
-                          key: repaintKey,
-                          child: category == "kitchen"
-                              ? ReceiptWidget.kitchenRecieptWidget(
-                                  orders: orders, width: receptWidth)
-                              : ReceiptWidget.customerRecieptWidget(
-                                  orders: orders, width: receptWidth),
+                            child: RepaintBoundary(
+                              key: repaintKey,
+                              child: category == "kitchen"
+                                  ? ReceiptWidget.kitchenRecieptWidget(
+                                      orders: orders, width: receptWidth)
+                                  : ReceiptWidget.customerRecieptWidget(
+                                      orders: orders, width: receptWidth),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                /// 🔘 Footer Buttons
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                        Border(top: BorderSide(color: Colors.grey.shade300)),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context, null),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Colors.red.shade300),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: Text("Cancel",
-                              style: TextStyle(
-                                  color: Colors.red.shade600,
-                                  fontWeight: FontWeight.bold)),
-                        ),
+                    /// 🔘 Footer Buttons
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                            top: BorderSide(color: Colors.grey.shade300)),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.print, size: 20),
-                          label: const Text("Print",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            elevation: 0,
-                          ),
-                          onPressed: () async {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text("⏳ Checking printer connection..."),
-                                duration: Duration(milliseconds: 1500),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: (isPrinting || !isCancellable)
+                                  ? null
+                                  : () => Navigator.pop(context, null),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                side: BorderSide(
+                                    color: (isPrinting || !isCancellable)
+                                        ? Colors.grey.shade300
+                                        : Colors.red.shade300),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
                               ),
-                            );
+                              child: Text("Cancel",
+                                  style: TextStyle(
+                                      color: (isPrinting || !isCancellable)
+                                          ? Colors.grey
+                                          : Colors.red.shade600,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: isPrinting
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
+                                  : const Icon(Icons.print, size: 20),
+                              label: Text(isPrinting ? "Printing..." : "Print",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                elevation: 0,
+                              ),
+                              onPressed: isPrinting
+                                  ? null
+                                  : () async {
+                                      setState(() => isPrinting = true);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "⏳ Checking printer connection..."),
+                                          duration:
+                                              Duration(milliseconds: 1500),
+                                        ),
+                                      );
 
-                            bool? success;
-                            try {
-                              success =
-                                  await smilePrinter.addPrintJob(() async {
-                                return await smilePrinter.printWidgetReceipt(
-                                    config: config, repaintKey: repaintKey);
-                              });
-                            } catch (e) {
-                              debugPrint("❌ Print Error Caught in UI: $e");
-                              success = false;
-                            }
+                                      bool? success;
+                                      try {
+                                        success = await smilePrinter
+                                            .addPrintJob(() async {
+                                          return await smilePrinter
+                                              .printWidgetReceipt(
+                                                  config: config,
+                                                  repaintKey: repaintKey);
+                                        });
+                                      } catch (e) {
+                                        debugPrint(
+                                            "❌ Print Error Caught in UI: $e");
+                                        success = false;
+                                      }
 
-                            if (success != true && context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                        "❌ ปริ้นเตอร์ไม่ตอบสนอง (${config.ip})"),
-                                    backgroundColor: Colors.red),
-                              );
-                            }
+                                      if (success != true && context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  "❌ ปริ้นเตอร์ไม่ตอบสนอง (${config.ip})"),
+                                              backgroundColor: Colors.red),
+                                        );
+                                        // ปลดล็อคปุ่มให้กด Cancel หรือลองใหม่ได้กรณีล้มเหลว
+                                        setState(() => isPrinting = false);
+                                        return;
+                                      }
 
-                            if (!context.mounted) return;
-                            Navigator.pop(context, success ?? false);
-                          },
-                        ),
+                                      if (!context.mounted) return;
+                                      Navigator.pop(context, success ?? false);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }
@@ -950,6 +991,7 @@ class OrderPageWidget {
     required List<PrinterConfig> configs,
     required double receptWidth,
     required String category,
+    bool isCancellable = true, // 👈 เพิ่มพารามิเตอร์
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final smilePrinter = SmilePrinterService.instance;
@@ -960,174 +1002,242 @@ class OrderPageWidget {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.grey.shade100,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            height: screenSize.height * 0.8,
-            width:
-                isLandscape ? screenSize.width * 0.28 : screenSize.width * 0.85,
-            child: Column(
-              children: [
-                /// 🏷️ Header (Fixed)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                        Border(bottom: BorderSide(color: Colors.grey.shade300)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Preview (${configs.length} Printers)",
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF4F4F4F)),
+        bool isPrinting = false;
+        return StatefulBuilder(builder: (context, setState) {
+          return PopScope(
+            canPop: !(isPrinting ||
+                !isCancellable), // 👈 ล็อคปุ่ม Back ของเครื่องด้วย
+            child: Dialog(
+              backgroundColor: Colors.grey.shade100,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              clipBehavior: Clip.antiAlias,
+              child: SizedBox(
+                height: screenSize.height * 0.8,
+                width: isLandscape
+                    ? screenSize.width * 0.28
+                    : screenSize.width * 0.65,
+                child: Column(
+                  children: [
+                    /// 🏷️ Header (Fixed)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                            bottom: BorderSide(color: Colors.grey.shade300)),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
-                        onPressed: () => Navigator.pop(context, null),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                ),
-
-                /// 🧾 Receipt
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Preview (${configs.length} Printers)",
+                            style: TextStyle(
+                                fontSize: isLandscape
+                                    ? screenSize.width * 0.009
+                                    : screenSize.width * 0.02,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4F4F4F)),
+                          ),
+                          GestureDetector(
+                            onTap: (isPrinting || !isCancellable)
+                                ? null
+                                : () {
+                                    // 🧹 เคลียร์ Cart และ ปิดหน้าต่างลง
+                                    context
+                                        .read<OrderfullBloc>()
+                                        .add(ClearCartEvent());
+                                    Navigator.pop(context, null);
+                                  },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Cancel Order",
+                                  style: TextStyle(
+                                      fontSize: isLandscape
+                                          ? screenSize.width * 0.009
+                                          : screenSize.width * 0.02,
+                                      fontWeight: FontWeight.bold,
+                                      color: (isPrinting || !isCancellable)
+                                          ? Colors.grey
+                                          : const Color.fromARGB(
+                                              255, 224, 47, 47)),
+                                ),
+                                SizedBox(width: screenSize.width * 0.005),
+                                Icon(Icons.close,
+                                    color: (isPrinting || !isCancellable)
+                                        ? Colors.grey
+                                        : const Color.fromARGB(
+                                            255, 224, 47, 47),
+                                    size: isLandscape
+                                        ? screenSize.width * 0.01
+                                        : screenSize.width * 0.025),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: RepaintBoundary(
-                          key: repaintKey,
-                          child: category == "kitchen"
-                              ? ReceiptWidget.kitchenRecieptWidget(
-                                  orders: orders, width: receptWidth)
-                              : ReceiptWidget.customerRecieptWidget(
-                                  orders: orders, width: receptWidth),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    /// 🧾 Receipt
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: RepaintBoundary(
+                              key: repaintKey,
+                              child: category == "kitchen"
+                                  ? ReceiptWidget.kitchenRecieptWidget(
+                                      orders: orders, width: receptWidth)
+                                  : ReceiptWidget.customerRecieptWidget(
+                                      orders: orders, width: receptWidth),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                /// 🔘 Footer Buttons
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border:
-                        Border(top: BorderSide(color: Colors.grey.shade300)),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context, null),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: BorderSide(color: Colors.red.shade300),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: Text("Cancel",
-                              style: TextStyle(
-                                  color: Colors.red.shade600,
-                                  fontWeight: FontWeight.bold)),
-                        ),
+                    /// 🔘 Footer Buttons
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                            top: BorderSide(color: Colors.grey.shade300)),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.print, size: 20),
-                          label: const Text("Print All",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.shade600,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            elevation: 0,
-                          ),
-                          onPressed: () async {
-                            List<Map<String, dynamic>> printResults = [];
-                            final messenger = ScaffoldMessenger.of(context);
-
-                            messenger.showSnackBar(
-                              const SnackBar(
-                                content: Text("⏳ Sending to printers..."),
-                                duration: Duration(milliseconds: 1500),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: (isPrinting || !isCancellable)
+                                  ? null
+                                  : () => Navigator.pop(context, null),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                side: BorderSide(
+                                    color: (isPrinting || !isCancellable)
+                                        ? Colors.grey.shade300
+                                        : Colors.blue.shade100),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
                               ),
-                            );
+                              child: Text("Edit Order",
+                                  style: TextStyle(
+                                      color: (isPrinting || !isCancellable)
+                                          ? Colors.grey
+                                          : Colors.blueAccent,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: isPrinting
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2, color: Colors.white))
+                                  : const Icon(Icons.print, size: 20),
+                              label: Text(
+                                  isPrinting ? "Printing..." : "Print All",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                elevation: 0,
+                              ),
+                              onPressed: isPrinting
+                                  ? null
+                                  : () async {
+                                      setState(() => isPrinting = true);
+                                      List<Map<String, dynamic>> printResults =
+                                          [];
+                                      final messenger =
+                                          ScaffoldMessenger.of(context);
 
-                            // ส่งคำสั่งทีละเครื่อง (Plugin ดูแล Timeout เอง)
-                            for (final config in configs) {
-                              bool? success;
-                              try {
-                                success =
-                                    await smilePrinter.addPrintJob(() async {
-                                  return await smilePrinter.printWidgetReceipt(
-                                      config: config, repaintKey: repaintKey);
-                                });
-                              } catch (e) {
-                                debugPrint("❌ Print Error Caught in UI: $e");
-                                success = false;
-                              }
+                                      messenger.showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text("⏳ Sending to printers..."),
+                                          duration:
+                                              Duration(milliseconds: 1500),
+                                        ),
+                                      );
 
-                              // 📦 แนบสถานะของแต่ละเครื่องเก็บเอาไว้ด้วย
-                              printResults.add({
-                                'category': config.category,
-                                'name': config.name,
-                                'ip': config.ip,
-                                'port': config.port,
-                                'status':
-                                    success == true ? 'success' : 'failed',
-                              });
+                                      // ส่งคำสั่งทีละเครื่อง (Plugin ดูแล Timeout เอง)
+                                      for (final config in configs) {
+                                        bool? success;
+                                        try {
+                                          success = await smilePrinter
+                                              .addPrintJob(() async {
+                                            return await smilePrinter
+                                                .printWidgetReceipt(
+                                                    config: config,
+                                                    repaintKey: repaintKey);
+                                          });
+                                        } catch (e) {
+                                          debugPrint(
+                                              "❌ Print Error Caught in UI: $e");
+                                          success = false;
+                                        }
 
-                              if (success != true) {
-                                if (context.mounted) {
-                                  messenger.showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            "❌ ล้มเหลวที่ปริ้นเตอร์ ${config.name} (${config.ip})"),
-                                        backgroundColor: Colors.red),
-                                  );
-                                }
-                              }
-                            }
+                                        // 📦 แนบสถานะของแต่ละเครื่องเก็บเอาไว้ด้วย
+                                        printResults.add({
+                                          'category': config.category,
+                                          'name': config.name,
+                                          'ip': config.ip,
+                                          'port': config.port,
+                                          'status': success == true
+                                              ? 'success'
+                                              : 'failed',
+                                        });
 
-                            if (!context.mounted) return;
-                            Navigator.pop(context, printResults);
-                          },
-                        ),
+                                        if (success != true) {
+                                          if (context.mounted) {
+                                            messenger.showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      "❌ ล้มเหลวที่ปริ้นเตอร์ ${config.name} (${config.ip})"),
+                                                  backgroundColor: Colors.red),
+                                            );
+                                          }
+                                        }
+                                      }
+
+                                      if (!context.mounted) return;
+                                      Navigator.pop(context, printResults);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }

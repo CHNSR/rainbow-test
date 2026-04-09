@@ -105,151 +105,152 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
         backgroundColor: cs.inversePrimary,
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- Status Card ---
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: _isScanning
-                    ? cs.primaryContainer.withOpacity(0.6)
-                    : _foundPrinters.isNotEmpty
-                        ? Colors.green.shade50
-                        : cs.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // --- Status Card ---
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 400),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
                   color: _isScanning
-                      ? cs.primary
+                      ? cs.primaryContainer.withOpacity(0.6)
                       : _foundPrinters.isNotEmpty
-                          ? Colors.green.shade300
-                          : cs.outlineVariant,
-                  width: 1.5,
+                          ? Colors.green.shade50
+                          : cs.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: _isScanning
+                        ? cs.primary
+                        : _foundPrinters.isNotEmpty
+                            ? Colors.green.shade300
+                            : cs.outlineVariant,
+                    width: 1.5,
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  _isScanning
-                      ? ScaleTransition(
-                          scale: _pulseAnimation,
-                          child: Icon(Icons.radar,
-                              color: cs.primary, size: isPad ? 48 : 36),
-                        )
-                      : Icon(
-                          _foundPrinters.isNotEmpty
-                              ? Icons.print
-                              : Icons.print_disabled_outlined,
-                          color: _foundPrinters.isNotEmpty
-                              ? Colors.green.shade600
-                              : cs.onSurfaceVariant,
-                          size: isPad ? 48 : 36,
-                        ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      _status,
-                      style: TextStyle(
-                        fontSize:
-                            isPad ? 18 : 15, // ขยายข้อความและทำ Responsive
-                        fontWeight: FontWeight.w600,
-                        color: _isScanning
-                            ? cs.primary
-                            : _foundPrinters.isNotEmpty
-                                ? Colors.green.shade800
+                child: Row(
+                  children: [
+                    _isScanning
+                        ? ScaleTransition(
+                            scale: _pulseAnimation,
+                            child: Icon(Icons.radar,
+                                color: cs.primary, size: isPad ? 48 : 36),
+                          )
+                        : Icon(
+                            _foundPrinters.isNotEmpty
+                                ? Icons.print
+                                : Icons.print_disabled_outlined,
+                            color: _foundPrinters.isNotEmpty
+                                ? Colors.green.shade600
                                 : cs.onSurfaceVariant,
+                            size: isPad ? 48 : 36,
+                          ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        _status,
+                        style: TextStyle(
+                          fontSize:
+                              isPad ? 18 : 15, // ขยายข้อความและทำ Responsive
+                          fontWeight: FontWeight.w600,
+                          color: _isScanning
+                              ? cs.primary
+                              : _foundPrinters.isNotEmpty
+                                  ? Colors.green.shade800
+                                  : cs.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // --- Subnet Input ---
-            TextField(
-              controller: _subnetController,
-              enabled: !_isScanning,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Subnet (เช่น 192.168.1)',
-                hintText: '192.168.1',
-                prefixIcon: const Icon(Icons.network_wifi),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                filled: true,
-                fillColor: cs.surfaceContainerLow,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // --- Port Input ---
-            TextField(
-              controller: _portController,
-              enabled: !_isScanning,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'พอร์ตที่จะสแกน (ใส่หลายพอร์ตคั่นด้วย ,)',
-                hintText: '9100, 4000, 9101',
-                prefixIcon: const Icon(Icons.settings_ethernet),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                filled: true,
-                fillColor: cs.surfaceContainerLow,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // --- Scan Button ---
-            SizedBox(
-              height: isPad ? 64 : 52, // ขยายปุ่มให้สูงขึ้นในจอใหญ่
-              child: FilledButton.icon(
-                onPressed: _isScanning ? null : _startScan,
-                icon: _isScanning
-                    ? SizedBox(
-                        width: isPad ? 26 : 20,
-                        height: isPad ? 26 : 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Icon(Icons.search, size: isPad ? 28 : 24),
-                label: Text(
-                  _isScanning ? 'กำลังสแกนวง LAN...' : 'เริ่มสแกน',
-                  style: TextStyle(
-                      fontSize: isPad ? 20 : 16, fontWeight: FontWeight.bold),
+                  ],
                 ),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
+              ),
+              const SizedBox(height: 24),
+
+              // --- Subnet Input ---
+              TextField(
+                controller: _subnetController,
+                enabled: !_isScanning,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Subnet (เช่น 192.168.1)',
+                  hintText: '192.168.1',
+                  prefixIcon: const Icon(Icons.network_wifi),
+                  border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: cs.surfaceContainerLow,
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 24),
+              // --- Port Input ---
+              TextField(
+                controller: _portController,
+                enabled: !_isScanning,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'พอร์ตที่จะสแกน (ใส่หลายพอร์ตคั่นด้วย ,)',
+                  hintText: '9100, 4000, 9101',
+                  prefixIcon: const Icon(Icons.settings_ethernet),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: cs.surfaceContainerLow,
+                ),
+              ),
+              const SizedBox(height: 16),
 
-            // --- Results Header ---
-            if (_foundPrinters.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'ผลลัพธ์ (${_foundPrinters.length} เครื่อง)',
-                  style: TextStyle(
-                    fontSize: isPad ? 18 : 15,
-                    fontWeight: FontWeight.bold,
-                    color: cs.onSurfaceVariant,
-                    letterSpacing: 0.5,
+              // --- Scan Button ---
+              SizedBox(
+                height: isPad ? 64 : 52, // ขยายปุ่มให้สูงขึ้นในจอใหญ่
+                child: FilledButton.icon(
+                  onPressed: _isScanning ? null : _startScan,
+                  icon: _isScanning
+                      ? SizedBox(
+                          width: isPad ? 26 : 20,
+                          height: isPad ? 26 : 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Icon(Icons.search, size: isPad ? 28 : 24),
+                  label: Text(
+                    _isScanning ? 'กำลังสแกนวง LAN...' : 'เริ่มสแกน',
+                    style: TextStyle(
+                        fontSize: isPad ? 20 : 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
-            ],
 
-            // --- Results List ---
-            Expanded(
-              child: _foundPrinters.isEmpty
+              const SizedBox(height: 24),
+
+              // --- Results Header ---
+              if (_foundPrinters.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    'ผลลัพธ์ (${_foundPrinters.length} เครื่อง)',
+                    style: TextStyle(
+                      fontSize: isPad ? 18 : 15,
+                      fontWeight: FontWeight.bold,
+                      color: cs.onSurfaceVariant,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
+
+              // --- Results List ---
+              _foundPrinters.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -267,6 +268,9 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
                       ),
                     )
                   : ListView.separated(
+                      shrinkWrap: true, // 👈 ให้หดตัวเท่าข้อมูลที่มี
+                      physics:
+                          const NeverScrollableScrollPhysics(), // 👈 ให้ใช้การ Scroll ของ SingleChildScrollView
                       itemCount: _foundPrinters.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
@@ -282,8 +286,8 @@ class _ScanNetworkScreenState extends State<ScanNetworkScreen>
                         );
                       },
                     ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
