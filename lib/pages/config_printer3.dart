@@ -6,8 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:driver_printer/driver_printer.dart';
 import 'package:driver_printer/driver_printer_entities.dart' as dp;
 import 'package:driver_printer/command_printer.dart';
-import 'package:flutter_application_1/pages/printer_setting/scan_network.dart';
 import 'package:flutter_application_1/model/printer_enums.dart';
+import 'package:flutter_application_1/pages/setting/printer_setting_pages/scan_usb_screen.dart';
 
 class ConfigPrinter3 extends StatefulWidget {
   final int? index;
@@ -300,6 +300,9 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                 label: 'Name of printer',
                 icon: Icons.print,
                 textSize: textSize,
+                validator: (val) => (val == null || val.trim().isEmpty)
+                    ? 'กรุณากรอกชื่อเครื่องพิมพ์'
+                    : null,
               ),
               SizedBox(height: spacing),
               Row(
@@ -452,10 +455,17 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                     children: [
                       Expanded(
                         child: PrinterTextField(
-                            controller: ipController,
-                            label: 'IP Address',
-                            textSize: textSize,
-                            icon: Icons.router_outlined),
+                          controller: ipController,
+                          label: 'IP Address',
+                          textSize: textSize,
+                          icon: Icons.router_outlined,
+                          validator: (val) {
+                            if (useIp && (val == null || val.trim().isEmpty)) {
+                              return 'กรุณากรอก IP Address';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                       const SizedBox(width: 12),
                       FilledButton.icon(
@@ -486,27 +496,72 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                   ),
                 )
               else
-                PrinterTextField(
-                    controller: usbNameController,
-                    label: 'USB Device Name',
-                    textSize: textSize,
-                    icon: Icons.usb),
+                Row(
+                  children: [
+                    Expanded(
+                      child: PrinterTextField(
+                        controller: usbNameController,
+                        label: 'USB Device Name',
+                        textSize: textSize,
+                        icon: Icons.usb,
+                        validator: (val) {
+                          if (!useIp && (val == null || val.trim().isEmpty)) {
+                            return 'กรุณากรอกชื่อ USB Device';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                      onPressed: () async {
+                        final selectedUsb = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const ScanUsbScreen()),
+                        );
+                        if (selectedUsb != null &&
+                            selectedUsb is String &&
+                            mounted) {
+                          setState(() => usbNameController.text = selectedUsb);
+                        }
+                      },
+                      icon: Icon(Icons.usb, size: textSize + 4),
+                      label: Text('Find Device',
+                          style: TextStyle(
+                              fontSize: textSize, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
               SizedBox(height: spacing),
               Row(
                 children: [
                   Expanded(
                       child: PrinterTextField(
-                          controller: portController,
-                          label: 'Port',
-                          textSize: textSize,
-                          icon: Icons.numbers)),
+                    controller: portController,
+                    label: 'Port',
+                    textSize: textSize,
+                    icon: Icons.numbers,
+                    validator: (val) => (val == null || val.trim().isEmpty)
+                        ? 'กรุณากรอกพอร์ต'
+                        : null,
+                  )),
                   const SizedBox(width: 12),
                   Expanded(
                       child: PrinterTextField(
-                          controller: timeoutController,
-                          label: 'Timeout (ms)',
-                          textSize: textSize,
-                          icon: Icons.timer)),
+                    controller: timeoutController,
+                    label: 'Timeout (ms)',
+                    textSize: textSize,
+                    icon: Icons.timer,
+                    validator: (val) => (val == null || val.trim().isEmpty)
+                        ? 'กรุณากรอก Timeout'
+                        : null,
+                  )),
                 ],
               ),
               SizedBox(height: spacing),

@@ -16,6 +16,8 @@ void main() async {
         BlocProvider(create: (context) => MenuBloc()),
         BlocProvider(create: (context) => PrinterBloc()),
         BlocProvider(create: (context) => OrderfullBloc()),
+        BlocProvider(
+            create: (context) => SettingBloc()..add(LoadSettingEvent())),
       ],
       child: const MainApp(),
     ),

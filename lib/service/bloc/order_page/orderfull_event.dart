@@ -29,7 +29,8 @@ class ConfirmOrderEvent extends OrderfullEvent {
 
 class SaveReceiptEvent extends OrderfullEvent {
   final String printStatus;
-  final List<Map<String, dynamic>> usedPrinters; // รับค่า Printer ที่ผ่านการแพ็คแล้ว
+  final List<Map<String, dynamic>>
+      usedPrinters; // รับค่า Printer ที่ผ่านการแพ็คแล้ว
 
   SaveReceiptEvent({required this.printStatus, required this.usedPrinters});
 }

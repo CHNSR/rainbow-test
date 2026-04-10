@@ -199,6 +199,7 @@ class _OrderPagesState extends State<OrderPages> {
               receptWidth: 384,
               category: "kitchen",
               isCancellable: true, // ใบแรกยังอนุญาตให้ยกเลิกได้
+              orderType: state.orderType ?? "Unknown",
             );
 
             if (kitchenResults == null) return; // กดยกเลิก
@@ -229,6 +230,7 @@ class _OrderPagesState extends State<OrderPages> {
               category: "cashier",
               isCancellable:
                   !hasPrintedKitchen, // 👈 ถ้าพิมพ์ครัวไปแล้ว จะห้ามยกเลิกใบนี้เด็ดขาด
+              orderType: state.orderType ?? "Unknown",
             );
 
             if (cashierResults == null) return;

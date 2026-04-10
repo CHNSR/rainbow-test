@@ -80,42 +80,57 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
 
   //select catagory
   Widget _selectCatagory(double screenWidth, double screenHeight) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        //button
-        _categoryButton(
-          title: 'To Stay',
-          imagePath: 'assets/picture/ani_to_stay.gif',
-          buttonColor: Color(0xFF496EE2),
-          screenWidth: screenWidth,
-          screenHeight: screenHeight,
-          onTap: () {
-            context.read<OrderfullBloc>().add(SetOrderTypeEvent("stay"));
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => OrderPages()),
-            );
-          },
-        ),
-        SizedBox(width: screenWidth * 0.025),
-        _categoryButton(
-          title: 'Togo Walk-in',
-          imagePath: 'assets/picture/togo_walk_in.gif',
-          buttonColor: Color(0xFFFAA21C),
-          screenWidth: screenWidth,
-          screenHeight: screenHeight,
-          onTap: () {
-            context.read<OrderfullBloc>().add(SetOrderTypeEvent("togo"));
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => OrderPages()),
-            );
-          },
-        ),
+    return BlocBuilder<SettingBloc, SettingState>(
+      builder: (context, state) {
+        bool showStay = true;
+        bool showTogo = true;
 
-        //button
-      ],
+        if (state is SettingLoaded) {
+          showStay = state.isStay;
+          showTogo = state.isTogo;
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (showStay)
+              _categoryButton(
+                title: 'To Stay',
+                imagePath: 'assets/picture/ani_to_stay.gif',
+                buttonColor: Color(0xFF496EE2),
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                imageAlignment: Alignment(0, -1.8),
+                onTap: () {
+                  context.read<OrderfullBloc>().add(SetOrderTypeEvent("stay"));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => OrderPages()),
+                  );
+                },
+              ),
+
+            // เว้นระยะห่างเฉพาะตอนที่โชว์ทั้ง 2 ปุ่มพร้อมกัน
+            if (showStay && showTogo) SizedBox(width: screenWidth * 0.025),
+
+            if (showTogo)
+              _categoryButton(
+                title: 'Togo Walk-in',
+                imagePath: 'assets/picture/togo_walk_in.gif',
+                buttonColor: Color(0xFFFAA21C),
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+                onTap: () {
+                  context.read<OrderfullBloc>().add(SetOrderTypeEvent("togo"));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => OrderPages()),
+                  );
+                },
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -127,6 +142,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
     required VoidCallback onTap,
     required double screenWidth,
     required double screenHeight,
+    AlignmentGeometry? imageAlignment,
   }) {
     final isLandscape = LandScapeUtils.isLandscape(context);
     final cardWidth = isLandscape
@@ -162,6 +178,7 @@ class _SelectOrderTypeState extends State<SelectOrderType> {
                   imagePath,
                   fit: BoxFit.cover,
                   width: double.infinity,
+                  alignment: imageAlignment ?? Alignment.center,
                 ),
               ),
             ),

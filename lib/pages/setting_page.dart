@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -9,11 +10,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  // Settings toggles
-  bool isTogo = true;
-  bool isToStay = true;
-  bool isShowFoodSet = true;
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -28,68 +24,91 @@ class _SettingPageState extends State<SettingPage> {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           surfaceTintColor: Colors.transparent),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 40),
-        children: [
-          _buildSection(
-            title: "Order Preferences",
+      body: BlocBuilder<SettingBloc, SettingState>(
+        builder: (context, state) {
+          if (state is SettingInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          bool isTogo = true;
+          bool isToStay = true;
+          bool isShowFoodSet = true;
+
+          if (state is SettingLoaded) {
+            isTogo = state.isTogo;
+            isToStay = state.isStay;
+            isShowFoodSet = state.isShowFoodSet;
+          }
+
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 40),
             children: [
-              _buildToggleTile(
-                icon: Icons.shopping_bag_outlined,
-                title: "Togo",
-                subtitle: "Enable take-away orders",
-                value: isTogo,
-                onChanged: (value) => setState(() => isTogo = value),
+              _buildSection(
+                title: "Order Preferences",
+                children: [
+                  _buildToggleTile(
+                    icon: Icons.shopping_bag_outlined,
+                    title: "Togo",
+                    subtitle: "Enable take-away orders",
+                    value: isTogo,
+                    onChanged: (value) =>
+                        context.read<SettingBloc>().add(ToggleTogoEvent(value)),
+                  ),
+                  _buildDivider(),
+                  _buildToggleTile(
+                    icon: Icons.restaurant_outlined,
+                    title: "To Stay",
+                    subtitle: "Enable dine-in orders",
+                    value: isToStay,
+                    onChanged: (value) => context
+                        .read<SettingBloc>()
+                        .add(ToggleTostayEvent(value)),
+                  ),
+                  _buildDivider(),
+                  _buildToggleTile(
+                    icon: Icons.fastfood_outlined,
+                    title: "First Page Show Food Set",
+                    subtitle: "Display food sets by default on home",
+                    value: isShowFoodSet,
+                    onChanged: (value) => context
+                        .read<SettingBloc>()
+                        .add(ToggleShowFoodSetEvent(value)),
+                  ),
+                ],
               ),
-              _buildDivider(),
-              _buildToggleTile(
-                icon: Icons.restaurant_outlined,
-                title: "To Stay",
-                subtitle: "Enable dine-in orders",
-                value: isToStay,
-                onChanged: (value) => setState(() => isToStay = value),
+              _buildSection(
+                title: "Payment & Cart",
+                children: [
+                  _buildPaymentMethodTile(),
+                  _buildDivider(),
+                  _buildShowOrderTile(),
+                  _buildDivider(),
+                  _buildNavigationTile(
+                    icon: Icons.history_outlined,
+                    title: "History Printing",
+                    subtitle: "View past print jobs and receipts",
+                    onTap: () {
+                      AppNavigator.goToHistoryPrinting(context);
+                    },
+                  ),
+                  _buildDivider(),
+                ],
               ),
-              _buildDivider(),
-              _buildToggleTile(
-                icon: Icons.fastfood_outlined,
-                title: "First Page Show Food Set",
-                subtitle: "Display food sets by default on home",
-                value: isShowFoodSet,
-                onChanged: (value) => setState(() => isShowFoodSet = value),
+              _buildSection(
+                title: "Hardware & System",
+                children: [
+                  _buildNavigationTile(
+                    icon: Icons.print_outlined,
+                    title: "Config Printer",
+                    subtitle: "Manage network and USB printers",
+                    onTap: () => AppNavigator.goToPrinterList(context),
+                  ),
+                  _buildDivider(),
+                ],
               ),
             ],
-          ),
-          _buildSection(
-            title: "Payment & Cart",
-            children: [
-              _buildPaymentMethodTile(),
-              _buildDivider(),
-              _buildShowOrderTile(),
-              _buildDivider(),
-              _buildNavigationTile(
-                icon: Icons.history_outlined,
-                title: "History Printing",
-                subtitle: "View past print jobs and receipts",
-                onTap: () {
-                  AppNavigator.goToHistoryPrinting(context);
-                },
-              ),
-              _buildDivider(),
-            ],
-          ),
-          _buildSection(
-            title: "Hardware & System",
-            children: [
-              _buildNavigationTile(
-                icon: Icons.print_outlined,
-                title: "Config Printer",
-                subtitle: "Manage network and USB printers",
-                onTap: () => AppNavigator.goToPrinterList(context),
-              ),
-              _buildDivider(),
-            ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

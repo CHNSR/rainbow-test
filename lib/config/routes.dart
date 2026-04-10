@@ -19,6 +19,7 @@ class AppRoutes {
   static const String printerConfigPage = '/printer-config-page';
   static const String printerListPage = '/printer-list-page';
   static const String printerSettingPage = '/printer-setting-page';
+  static const String storeManagementPage = '/store_management_page';
 }
 
 /// ✅ Route generator - สร้าง routes
@@ -45,6 +46,9 @@ class AppRouter {
 
       case AppRoutes.historyPrinting:
         return MaterialPageRoute(builder: (_) => const HistoryPrinting());
+
+      case AppRoutes.storeManagement:
+        return MaterialPageRoute(builder: (_) => const StoreMainPage());
 
       default:
         return MaterialPageRoute(

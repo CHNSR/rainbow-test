@@ -13,6 +13,7 @@ class HiveService {
   static const String keyRestaurantName = 'restaurantName';
   static const String keyRestaurantPhone = 'restaurantPhone';
   static const String keyTaxRate = 'taxRate';
+  static const String keyAppUsers = 'appUsers';
 
   static Future<void> initHive() async {
     // 1. Initialize Hive
@@ -98,6 +99,26 @@ class HiveService {
 
   static Future<void> setRestaurantPhone(String phone) async {
     await Hive.box<dynamic>(settingsBox).put(keyRestaurantPhone, phone);
+  }
+
+  static String getTaxRate() {
+    return Hive.box<dynamic>(settingsBox).get(keyTaxRate, defaultValue: "0.0");
+  }
+
+  static Future<void> setTaxRate(String rate) async {
+    await Hive.box<dynamic>(settingsBox).put(keyTaxRate, rate);
+  }
+
+  // ==========================================
+  // USERS / ROLES
+  // ==========================================
+  static List<String> getAppUsersRaw() {
+    final box = Hive.box<dynamic>(settingsBox);
+    return box.get(keyAppUsers, defaultValue: <dynamic>[]).cast<String>();
+  }
+
+  static Future<void> saveAppUsersRaw(List<String> users) async {
+    await Hive.box<dynamic>(settingsBox).put(keyAppUsers, users);
   }
 
   // ==========================================

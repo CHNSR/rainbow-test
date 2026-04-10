@@ -110,14 +110,15 @@ class ActionButton extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2.5))
             : Icon(icon, size: (textSize ?? 15) + 4),
         const SizedBox(width: 10),
-    Text(label,
-        style: TextStyle(fontSize: textSize ?? 15, fontWeight: FontWeight.w600)),
+        Text(label,
+            style: TextStyle(
+                fontSize: textSize ?? 15, fontWeight: FontWeight.w600)),
       ],
     );
 
     final shape =
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
-    
+
     // 📏 คำนวณความสูงปุ่มให้ขยายตามตัวหนังสือ (Default 50)
     final double buttonHeight = (textSize != null) ? textSize! + 35 : 50;
 
@@ -153,6 +154,7 @@ class PrinterTextField extends StatelessWidget {
   final bool enabled;
   final TextInputType? keyboardType;
   final double? textSize;
+  final String? Function(String?)? validator;
 
   const PrinterTextField({
     super.key,
@@ -162,16 +164,18 @@ class PrinterTextField extends StatelessWidget {
     this.enabled = true,
     this.keyboardType,
     this.textSize,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return TextField(
+    return TextFormField(
       controller: controller,
       enabled: enabled,
       keyboardType: keyboardType,
       style: TextStyle(fontSize: textSize),
+      validator: validator,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(fontSize: textSize),
@@ -180,7 +184,8 @@ class PrinterTextField extends StatelessWidget {
         filled: true,
         fillColor: cs.surfaceContainerLow,
         contentPadding: EdgeInsets.symmetric(
-            vertical: (textSize != null) ? textSize! * 0.9 : 14, horizontal: 16),
+            vertical: (textSize != null) ? textSize! * 0.9 : 14,
+            horizontal: 16),
       ),
     );
   }

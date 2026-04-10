@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -449,5 +451,59 @@ class SmilePrinterService {
         break;
       } catch (_) {}
     }
+  }
+
+  // ==========================================
+  // 8. 📡 หมวดแสกนหาปริ้นเตอร์ (USB Scanner)
+  // ==========================================
+  static Future<List<app.USBPrinterDevice>> scanUsbPrinters(
+      {required String printerGateway}) async {
+    print("🔍 [SmilePrinterService] Start scanning USB printers...");
+    final List<app.USBPrinterDevice> results = [];
+    try {
+      print("⏳ [SmilePrinterService] Calling discoveryPrinter()...");
+
+      // discoveryPrinter ค้นหา Epson/Star printers
+      // ห่อพารามิเตอร์เสริมไว้ใน "value" เพื่อให้ตรงกับโครงสร้าง PrinterConfig ฝั่ง Native
+      final response = await DriverPrinter().discoveryPrinter(jsonEncode({
+        'gateway': printerGateway,
+        'type': 'usb',
+        'value': {
+          'toUsb': true,
+          'toIp': false,
+        }
+      }));
+
+      // Parse JSON response
+      Map<String, dynamic> decoded;
+      try {
+        decoded = jsonDecode(response);
+      } catch (_) {
+        decoded = {'result': []};
+      }
+
+      // ดึง result array
+      final List<dynamic> printers = decoded['result'] as List? ?? [];
+
+      print("✅ [SmilePrinterService] Found ${printers.length} USB printers.");
+
+      for (final printer in printers) {
+        final model = printer['model'] ?? 'Unknown';
+        final usbName = printer['usbName'] ?? 'Unknown USB Device';
+        final gateway = printer['gateway'] ?? 'unknown';
+
+        print("  👉 Found: $model ($gateway) - $usbName");
+        results.add(app.USBPrinterDevice(
+          name: usbName,
+          model: model,
+          gateway: gateway,
+        ));
+      }
+
+      print("🎉 [SmilePrinterService] Total: ${results.length}");
+    } catch (e) {
+      print("❌ [SmilePrinterService] USB Scan error: $e");
+    }
+    return results;
   }
 }

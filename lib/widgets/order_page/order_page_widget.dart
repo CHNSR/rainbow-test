@@ -779,6 +779,7 @@ class OrderPageWidget {
     required double receptWidth,
     required String category,
     bool isCancellable = true, // 👈 เพิ่มพารามิเตอร์
+    required String orderType,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final smilePrinter = SmilePrinterService.instance;
@@ -857,13 +858,26 @@ class OrderPageWidget {
                                 ),
                               ],
                             ),
-                            child: RepaintBoundary(
-                              key: repaintKey,
-                              child: category == "kitchen"
-                                  ? ReceiptWidget.kitchenRecieptWidget(
-                                      orders: orders, width: receptWidth)
-                                  : ReceiptWidget.customerRecieptWidget(
-                                      orders: orders, width: receptWidth),
+                            // เพิ่ม FittedBox หุ้มไว้เพื่อให้ย่อส่วนพรีวิวให้พอดีจอ
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: RepaintBoundary(
+                                key: repaintKey,
+                                // ฟิกซ์ขนาดไว้เสมอ ไม่ให้อิงความกว้างหน้าจอ (สมมติ 400 สำหรับ 80mm และ 300 สำหรับ 58mm)
+                                child: category == "kitchen"
+                                    ? ReceiptWidget.kitchenRecieptWidget(
+                                        orders: orders,
+                                        width: config.paperSize == "80"
+                                            ? 400
+                                            : 300,
+                                        orderType: orderType)
+                                    : ReceiptWidget.customerRecieptWidget(
+                                        orders: orders,
+                                        width: config.paperSize == "80"
+                                            ? 400
+                                            : 300,
+                                        orderType: orderType),
+                              ),
                             ),
                           ),
                         ),
@@ -992,6 +1006,7 @@ class OrderPageWidget {
     required double receptWidth,
     required String category,
     bool isCancellable = true, // 👈 เพิ่มพารามิเตอร์
+    required String orderType,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final smilePrinter = SmilePrinterService.instance;
@@ -1097,13 +1112,22 @@ class OrderPageWidget {
                                 ),
                               ],
                             ),
-                            child: RepaintBoundary(
-                              key: repaintKey,
-                              child: category == "kitchen"
-                                  ? ReceiptWidget.kitchenRecieptWidget(
-                                      orders: orders, width: receptWidth)
-                                  : ReceiptWidget.customerRecieptWidget(
-                                      orders: orders, width: receptWidth),
+                            // เพิ่ม FittedBox หุ้มไว้เพื่อให้ย่อส่วนพรีวิวให้พอดีจอ
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: RepaintBoundary(
+                                key: repaintKey,
+                                // กรณีหลายเครื่องอาจจะฟิกซ์ค่าคงที่ตัวหลักไว้ เช่น 400 (80mm)
+                                child: category == "kitchen"
+                                    ? ReceiptWidget.kitchenRecieptWidget(
+                                        orders: orders,
+                                        width: 400,
+                                        orderType: orderType)
+                                    : ReceiptWidget.customerRecieptWidget(
+                                        orders: orders,
+                                        width: 400,
+                                        orderType: orderType),
+                              ),
                             ),
                           ),
                         ),

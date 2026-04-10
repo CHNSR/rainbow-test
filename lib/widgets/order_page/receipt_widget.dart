@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 
 class ReceiptWidget {
   static Widget customerRecieptWidget(
-      {required List<OrderItem> orders, required double width}) {
+      {required List<OrderItem> orders,
+      required double width,
+      required String orderType}) {
     double total = orders.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
     return Container(
@@ -88,7 +90,12 @@ class ReceiptWidget {
           ),
 
           // ☎️ Phone
-          const Text("Tel : 66-5842111"),
+          Row(
+            children: [
+              const Text("Tel : 66-5842111"),
+              Text("Order Type: $orderType"),
+            ],
+          ),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,7 +289,9 @@ class ReceiptWidget {
   }
 
   static Widget kitchenRecieptWidget(
-      {required List<OrderItem> orders, required double width}) {
+      {required List<OrderItem> orders,
+      required double width,
+      required String orderType}) {
     double total = orders.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
     return Container(
@@ -368,7 +377,13 @@ class ReceiptWidget {
           ),
 
           // ☎️ Phone
-          const Text("Tel : 66-5842111"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Order Type: $orderType"),
+              const Text("Tel : 66-5842111"),
+            ],
+          ),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -77,3 +77,15 @@ class ScanPrinterDevice {
   @override
   String toString() => '$ip:$port';
 }
+
+class USBPrinterDevice {
+  final String name;
+  final String model;
+  final String gateway;
+
+  USBPrinterDevice({
+    required this.name,
+    required this.model,
+    required this.gateway,
+  });
+}
