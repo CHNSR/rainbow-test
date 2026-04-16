@@ -98,7 +98,7 @@ class SmilePrinterService {
       final useIp = extra['useIp'] ?? true;
 
       ip = useIp ? config.ip : null;
-      usbName = !useIp ? config.ip : null;
+      usbName = !useIp ? (extra['usbName'] ?? config.ip) : null;
       cutPaper = (config.isAutoCut ?? true) ? 1 : 0;
       printerName = config.name.isEmpty ? 'SmilePrinter' : config.name;
     }
@@ -127,7 +127,7 @@ class SmilePrinterService {
   Future<bool> checkConnection(String ip, int port) async {
     try {
       // ข้ามการ Ping เช็ค Socket หากเป็นชื่อ USB Device
-      if (!ip.contains('.')) return true;
+      if (ip.isEmpty || !ip.contains('.')) return true;
 
       final socket =
           await Socket.connect(ip, port, timeout: const Duration(seconds: 2));

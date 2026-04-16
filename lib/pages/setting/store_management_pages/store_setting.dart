@@ -98,6 +98,16 @@ class _StoreSettingState extends State<StoreSetting> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.streetAddress,
+                decoration: const InputDecoration(
+                  labelText: "Address",
+                  prefixIcon: Icon(Icons.location_on_outlined),
+                  border: OutlineInputBorder(),
+                ),
+              ),
             ]),
             const SizedBox(height: 24),
             _buildSectionTitle("Financial & Tax"),

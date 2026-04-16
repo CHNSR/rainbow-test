@@ -48,7 +48,12 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const HistoryPrinting());
 
       case AppRoutes.storeManagement:
-        return MaterialPageRoute(builder: (_) => const StoreMainPage());
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        final role = args['role'] as String? ?? 'Staff';
+        final name = args['name'] as String? ?? 'Guest';
+        return MaterialPageRoute(
+            builder: (_) =>
+                StoreMainPage(loggedInUserRole: role, loggedInUserName: name));
 
       default:
         return MaterialPageRoute(
@@ -88,8 +93,10 @@ class AppNavigator {
   }
 
   /// ไปหน้า store management
-  static void goToStoreManagement(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.storeManagement);
+  static void goToStoreManagement(BuildContext context,
+      {required String role, required String name}) {
+    Navigator.pushNamed(context, AppRoutes.storeManagement,
+        arguments: {'role': role, 'name': name});
   }
 
   static void goToConfigPrinter(BuildContext context) {

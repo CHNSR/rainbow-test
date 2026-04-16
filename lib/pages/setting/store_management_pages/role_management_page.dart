@@ -1,37 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
-
-class AppUser {
-  String id;
-  String name;
-  String role;
-  String pin;
-  bool isActive;
-
-  AppUser(
-      {required this.id,
-      required this.name,
-      required this.role,
-      required this.pin,
-      this.isActive = true});
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'role': role,
-        'pin': pin,
-        'isActive': isActive,
-      };
-
-  factory AppUser.fromJson(Map<String, dynamic> json) => AppUser(
-        id: json['id'],
-        name: json['name'],
-        role: json['role'],
-        pin: json['pin'],
-        isActive: json['isActive'] ?? true,
-      );
-}
+import 'package:flutter_application_1/model/app_user.dart';
+import 'package:flutter_application_1/service/bloc/store_management/store_management_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RoleManagementPage extends StatefulWidget {
   const RoleManagementPage({super.key});
@@ -41,36 +11,21 @@ class RoleManagementPage extends StatefulWidget {
 }
 
 class _RoleManagementPageState extends State<RoleManagementPage> {
-  List<AppUser> users = [];
-
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    // สั่งให้ BLoC โหลดข้อมูล User ทันทีที่เปิดหน้า
+    context.read<StoreManagementBloc>().add(LoadStoreDataEvent());
   }
 
-  void _loadUsers() {
-    final rawUsers = HiveService.getAppUsersRaw();
-    if (rawUsers.isEmpty) {
-      // สร้าง Default Owner account หากยังไม่มีข้อมูลเลย
-      users = [AppUser(id: "1", name: "Owner", role: "Owner", pin: "9999")];
-      _saveUsers();
-    } else {
-      users = rawUsers.map((str) => AppUser.fromJson(jsonDecode(str))).toList();
-    }
-    setState(() {});
-  }
-
-  Future<void> _saveUsers() async {
-    final rawUsers = users.map((u) => jsonEncode(u.toJson())).toList();
-    await HiveService.saveAppUsersRaw(rawUsers);
-  }
-
-  void _showUserDialog({AppUser? user}) {
+  void _showUserDialog({Employee? user}) {
     final isEditing = user != null;
     final nameController = TextEditingController(text: user?.name ?? '');
     final pinController = TextEditingController(text: user?.pin ?? '');
-    String selectedRole = user?.role ?? 'Staff';
+    final wageController =
+        TextEditingController(text: user?.hourlyWage?.toString() ?? '0');
+    String selectedRole =
+        user?.role ?? 'Staff'; // Default to Staff for new users
     bool isActive = user?.isActive ?? true;
 
     showDialog(
@@ -107,6 +62,16 @@ class _RoleManagementPageState extends State<RoleManagementPage> {
                       decoration: const InputDecoration(
                         labelText: "4-Digit PIN Code",
                         prefixIcon: Icon(Icons.password),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: wageController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: "Hourly Wage (THB)",
+                        prefixIcon: Icon(Icons.money),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -167,21 +132,25 @@ class _RoleManagementPageState extends State<RoleManagementPage> {
                     }
 
                     if (isEditing) {
-                      user!.name = nameController.text.trim();
-                      user.pin = pinController.text.trim();
-                      user.role = selectedRole;
-                      user.isActive = isActive;
+                      // สร้าง Object ใหม่เพื่อส่งไปอัปเดตใน BLoC
+                      context.read<StoreManagementBloc>().add(
+                            UpdateEmployeeEvent(
+                              employeeId: user!.id,
+                              name: nameController.text.trim(),
+                              role: selectedRole,
+                              password: pinController.text.trim(),
+                              hourlyWage:
+                                  double.tryParse(wageController.text) ?? 0.0,
+                            ),
+                          );
                     } else {
-                      users.add(AppUser(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        name: nameController.text.trim(),
-                        role: selectedRole,
-                        pin: pinController.text.trim(),
-                      ));
+                      context.read<StoreManagementBloc>().add(AddEmployeeEvent(
+                            name: nameController.text.trim(),
+                            role: selectedRole,
+                            password: pinController.text.trim(),
+                          ));
                     }
 
-                    _saveUsers();
-                    setState(() {});
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -197,6 +166,50 @@ class _RoleManagementPageState extends State<RoleManagementPage> {
           },
         );
       },
+    );
+  }
+
+  void _confirmDelete(Employee user, List<Employee> users) {
+    // ป้องกันการลบ Owner ถ้าเหลือเพียงคนเดียวในระบบ
+    if (user.role.toLowerCase() == 'owner' &&
+        users.where((u) => u.role.toLowerCase() == 'owner').length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Cannot delete the only owner account!"),
+            backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        title: const Text("Delete User",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text("Are you sure you want to delete ${user.name}?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () {
+              context
+                  .read<StoreManagementBloc>()
+                  .add(DeleteEmployeeEvent(user.id));
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("User deleted successfully!")),
+              );
+            },
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -218,89 +231,130 @@ class _RoleManagementPageState extends State<RoleManagementPage> {
         label: const Text("Add User",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          final user = users[index];
-          return Card(
-            color: Colors.white,
-            margin: const EdgeInsets.only(bottom: 12),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 1,
-            child: ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              leading: CircleAvatar(
-                backgroundColor: _getRoleColor(user.role).withOpacity(0.2),
-                radius: 25,
-                child: Icon(
-                  _getRoleIcon(user.role),
-                  color: _getRoleColor(user.role),
-                ),
-              ),
-              title: Text(
-                user.name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  decoration: user.isActive
-                      ? TextDecoration.none
-                      : TextDecoration.lineThrough,
-                  color: user.isActive ? Colors.black : Colors.grey,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: _getRoleColor(user.role).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          user.role,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: _getRoleColor(user.role),
-                          ),
+      body: BlocListener<StoreManagementBloc, StoreManagementState>(
+        listener: (context, state) {
+          if (state is StoreManagementError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text("Error: ${state.message}"),
+                  backgroundColor: Colors.red),
+            );
+          }
+        },
+        child: BlocBuilder<StoreManagementBloc, StoreManagementState>(
+          builder: (context, state) {
+            if (state is StoreManagementLoading ||
+                state is StoreManagementInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state is StoreManagementLoaded) {
+              final users = state.employees;
+              if (users.isEmpty) {
+                return const Center(
+                    child: Text("No users found. Press '+' to add one."));
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  return Card(
+                    color: Colors.white,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            _getRoleColor(user.role).withOpacity(0.2),
+                        radius: 25,
+                        child: Icon(
+                          _getRoleIcon(user.role),
+                          color: _getRoleColor(user.role),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      if (!user.isActive)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.red.shade50,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            "Inactive",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.red.shade700),
-                          ),
+                      title: Text(
+                        user.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          decoration: user.isActive
+                              ? TextDecoration.none
+                              : TextDecoration.lineThrough,
+                          color: user.isActive ? Colors.black : Colors.grey,
                         ),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.edit_outlined, color: Colors.grey),
-                onPressed: () => _showUserDialog(user: user),
-              ),
-            ),
-          );
-        },
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color:
+                                      _getRoleColor(user.role).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  user.role,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: _getRoleColor(user.role),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (!user.isActive)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade50,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    "Inactive",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.red.shade700),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined,
+                                color: Colors.grey),
+                            onPressed: () => _showUserDialog(user: user),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline,
+                                color: Colors.red),
+                            onPressed: () => _confirmDelete(user, users),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return const Center(child: Text("Something went wrong."));
+          },
+        ),
       ),
     );
   }

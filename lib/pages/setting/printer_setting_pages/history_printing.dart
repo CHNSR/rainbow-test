@@ -85,7 +85,8 @@ class _HistoryPrintingState extends State<HistoryPrinting> {
                   child: ExpansionTile(
                     title: Text(
                       "Order #${receipt.id.substring(receipt.id.length - 6)}",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                     subtitle: Padding(
                       padding: const EdgeInsets.only(top: 4.0),
@@ -172,9 +173,27 @@ class _HistoryPrintingState extends State<HistoryPrinting> {
                     ),
                     children: [
                       const Divider(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Order Items:",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[700],
+                                fontSize: 16),
+                          ),
+                        ),
+                      ),
                       ...receipt.items.map((item) => ListTile(
                             visualDensity: VisualDensity.compact,
-                            title: Text("${item.quantity}x ${item.foodName}"),
+                            title: Text("${item.quantity}x ${item.foodName}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                )),
                             trailing: Text(
                                 "\$${(item.foodPrice * item.quantity).toStringAsFixed(2)}"),
                           )),

@@ -5,7 +5,8 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_application_1/widgets/order_page/receipt_widget.dart';
-import 'package:flutter_application_1/service/printer/smile_printer.dart';
+import 'package:flutter_application_1/service/printer/smile_printer_native.dart';
+import 'package:flutter_application_1/service/printer/printer_service_factory.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:barcode/barcode.dart';
@@ -782,7 +783,6 @@ class OrderPageWidget {
     required String orderType,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
-    final smilePrinter = SmilePrinterService.instance;
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 
@@ -955,13 +955,28 @@ class OrderPageWidget {
 
                                       bool? success;
                                       try {
-                                        success = await smilePrinter
-                                            .addPrintJob(() async {
-                                          return await smilePrinter
+                                        // ใช้ Factory เพื่อเลือก Native หรือ CMD โดยอัตโนมัติ
+                                        final useNative =
+                                            config.hardwareTemplate?[
+                                                    'useNative'] ??
+                                                true;
+                                        if (useNative) {
+                                          // Native Service มี addPrintJob
+                                          success = await SmilePrinterService
+                                              .instance
+                                              .addPrintJob(() async {
+                                            return await PrinterServiceFactory
+                                                .printWidgetReceipt(
+                                                    config: config,
+                                                    repaintKey: repaintKey);
+                                          });
+                                        } else {
+                                          // Command Service เรียก โดยตรง
+                                          success = await PrinterServiceFactory
                                               .printWidgetReceipt(
                                                   config: config,
                                                   repaintKey: repaintKey);
-                                        });
+                                        }
                                       } catch (e) {
                                         debugPrint(
                                             "❌ Print Error Caught in UI: $e");
@@ -1009,7 +1024,6 @@ class OrderPageWidget {
     required String orderType,
   }) async {
     final GlobalKey repaintKey = GlobalKey();
-    final smilePrinter = SmilePrinterService.instance;
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
     bool isLandscape = LandScapeUtils.isLandscape(context);
 
@@ -1212,13 +1226,17 @@ class OrderPageWidget {
                                       for (final config in configs) {
                                         bool? success;
                                         try {
-                                          success = await smilePrinter
-                                              .addPrintJob(() async {
-                                            return await smilePrinter
-                                                .printWidgetReceipt(
-                                                    config: config,
-                                                    repaintKey: repaintKey);
-                                          });
+                                          // ใช้ Factory เพื่อเลือก Native หรือ CMD โดยอัตโนมัติ
+                                          success = await PrinterServiceFactory
+                                              .addPrintJob(
+                                                  config: config,
+                                                  job: () async {
+                                                    return await PrinterServiceFactory
+                                                        .printWidgetReceipt(
+                                                            config: config,
+                                                            repaintKey:
+                                                                repaintKey);
+                                                  });
                                         } catch (e) {
                                           debugPrint(
                                               "❌ Print Error Caught in UI: $e");

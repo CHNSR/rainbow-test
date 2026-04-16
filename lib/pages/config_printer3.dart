@@ -92,7 +92,7 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
       if (useIp) {
         ipController.text = c.ip;
       } else {
-        usbNameController.text = c.ip; // ถ้าเป็น USB จะเก็บชื่อลงใน ip แทน
+        usbNameController.text = extra['usbName'] ?? c.ip;
       }
     }
   }
@@ -106,6 +106,7 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
       'model': modelController.text,
       'isThermal': isThermal,
       'useIp': useIp,
+      'usbName': useIp ? '' : usbNameController.text,
       'useNative': useNative,
       'timeout': timeoutController.text,
       'maxChar': maxCharacterController.text,
@@ -113,8 +114,8 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
 
     final config = PrinterConfig(
       name: nameController.text,
-      ip: useIp ? ipController.text : usbNameController.text,
-      port: int.tryParse(portController.text) ?? 9100,
+      ip: useIp ? ipController.text : '',
+      port: useIp ? (int.tryParse(portController.text) ?? 9100) : 0,
       paperSize: paperSize,
       category: printerCategory,
       isAutoCut: _isAutoCut,
@@ -375,23 +376,63 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                 label: 'Connection & Engine'),
             const SizedBox(height: 12),
             buildCard([
+              SegmentedButton<bool>(
+                style: SegmentedButton.styleFrom(
+                    textStyle: TextStyle(
+                        fontSize: textSize, fontWeight: FontWeight.bold),
+                    padding: EdgeInsets.symmetric(vertical: textSize * 0.8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12))),
+                segments: [
+                  ButtonSegment(
+                    value: true,
+                    label: const Text('🔧 Native Service'),
+                    icon: Icon(Icons.memory, size: textSize + 2),
+                  ),
+                  ButtonSegment(
+                    value: false,
+                    label: const Text('📟 Command Service'),
+                    icon: Icon(Icons.terminal, size: textSize + 2),
+                  ),
+                ],
+                selected: {useNative},
+                onSelectionChanged: (s) => setState(() {
+                  useNative = s.first;
+                  // Native Service ปกติใช้ posx, Command ใช้ epson/star
+                  if (useNative) {
+                    gatewayController.text = 'posx';
+                  } else {
+                    gatewayController.text = 'epson';
+                  }
+                }),
+              ),
+              SizedBox(height: spacing),
               Row(
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: gatewayController.text,
                       style: TextStyle(fontSize: textSize, color: cs.onSurface),
-                      items: PrinterGateway.values
+                      items: (useNative
+                              ? ['posx'] // Native Service รองรับ posx หลัก
+                              : [
+                                  'epson',
+                                  'star',
+                                  'custom'
+                                ]) // Command Service รองรับหลายแบบ
                           .map((g) => DropdownMenuItem(
-                                value: g.value,
-                                child: Text(g.value),
+                                value: g,
+                                child: Text(g),
                               ))
                           .toList(),
                       decoration: InputDecoration(
-                          labelText: 'Gateway',
+                          labelText: useNative
+                              ? 'Gateway (Native)'
+                              : 'Printer Type (Command)',
                           labelStyle: TextStyle(fontSize: textSize),
-                          prefixIcon:
-                              Icon(Icons.settings_ethernet, size: textSize + 6),
+                          prefixIcon: Icon(
+                              useNative ? Icons.settings_ethernet : Icons.print,
+                              size: textSize + 6),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12)),
                           filled: true,
@@ -541,17 +582,19 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
               SizedBox(height: spacing),
               Row(
                 children: [
-                  Expanded(
-                      child: PrinterTextField(
-                    controller: portController,
-                    label: 'Port',
-                    textSize: textSize,
-                    icon: Icons.numbers,
-                    validator: (val) => (val == null || val.trim().isEmpty)
-                        ? 'กรุณากรอกพอร์ต'
-                        : null,
-                  )),
-                  const SizedBox(width: 12),
+                  if (useIp) ...[
+                    Expanded(
+                        child: PrinterTextField(
+                      controller: portController,
+                      label: 'Port',
+                      textSize: textSize,
+                      icon: Icons.numbers,
+                      validator: (val) => (val == null || val.trim().isEmpty)
+                          ? 'กรุณากรอกพอร์ต'
+                          : null,
+                    )),
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(
                       child: PrinterTextField(
                     controller: timeoutController,
@@ -566,27 +609,6 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
               ),
               SizedBox(height: spacing),
               const Divider(height: 1),
-              SwitchListTile.adaptive(
-                contentPadding: EdgeInsets.zero,
-                title: Text("Use Native Engine",
-                    style: TextStyle(
-                        fontSize: textSize, fontWeight: FontWeight.w500)),
-                subtitle: Text("Off = ใช้ Dart ESC/POS Command",
-                    style: TextStyle(fontSize: textSize * 0.85)),
-                value: useNative,
-                onChanged: (v) => setState(() => useNative = v),
-              ),
-            ]),
-
-            const SizedBox(height: 32),
-
-            // ---------------- 3. Basic Settings ----------------
-            SectionHeader(
-                icon: Icons.settings,
-                label: 'Printer Settings',
-                sizetext: H2Size),
-            const SizedBox(height: 12),
-            buildCard([
               SwitchListTile.adaptive(
                 contentPadding: EdgeInsets.zero,
                 title: Text("Auto Cut Paper",

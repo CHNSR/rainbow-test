@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/core/utils/deviceType.dart';
 
 class OrderPages extends StatefulWidget {
   const OrderPages({super.key});
@@ -410,11 +409,8 @@ class _OrderPagesState extends State<OrderPages> {
 
                     /// 🔹 RIGHT SIDE (CART)
                     SizedBox(
-                      width: DeviceType.isDesktop(context)
-                          ? screenWidth * 0.20
-                          : DeviceType.isTablet(context)
-                              ? screenWidth * 0.25
-                              : screenWidth * 0.35,
+                      width:
+                          isLandscape ? screenWidth * 0.22 : screenWidth * 0.25,
                       child: Padding(
                           padding: EdgeInsets.only(
                               left: screenWidth * 0.01,

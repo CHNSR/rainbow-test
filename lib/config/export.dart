@@ -44,6 +44,7 @@ export 'package:flutter_application_1/service/bloc/menu/menu_state.dart';
 export 'package:flutter_application_1/service/bloc/printer/printer_bloc.dart';
 export 'package:flutter_application_1/service/bloc/order_page/orderfull_bloc.dart';
 export 'package:flutter_application_1/service/bloc/setting/setting_bloc.dart';
+export 'package:flutter_application_1/service/bloc/store_management/store_management_bloc.dart';
 
 // ==============================================================================
 // 🔷 SERVICE EXPORTS

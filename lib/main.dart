@@ -18,6 +18,9 @@ void main() async {
         BlocProvider(create: (context) => OrderfullBloc()),
         BlocProvider(
             create: (context) => SettingBloc()..add(LoadSettingEvent())),
+        BlocProvider(
+            create: (context) =>
+                StoreManagementBloc()..add(LoadStoreDataEvent())),
       ],
       child: const MainApp(),
     ),

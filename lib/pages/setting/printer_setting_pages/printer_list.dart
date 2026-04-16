@@ -98,8 +98,13 @@ class _PrinterListPageState extends State<PrinterListPage> {
                       const SizedBox(height: 8),
 
                       /// 🔹 Info
-                      Text("IP: ${printer.ip}"),
-                      Text("Port: ${printer.port}"),
+                      if (printer.hardwareTemplate?['useIp'] == false)
+                        Text(
+                            "USB: ${printer.hardwareTemplate?['usbName'] ?? printer.ip}")
+                      else ...[
+                        Text("IP: ${printer.ip}"),
+                        Text("Port: ${printer.port}"),
+                      ],
 
                       const SizedBox(height: 12),
 

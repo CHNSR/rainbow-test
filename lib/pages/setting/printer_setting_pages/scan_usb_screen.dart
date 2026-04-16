@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
-import 'package:flutter_application_1/service/printer/smile_printer.dart';
+import 'package:flutter_application_1/service/printer/smile_printer_native.dart';
 
 class ScanUsbScreen extends StatefulWidget {
   const ScanUsbScreen({super.key});

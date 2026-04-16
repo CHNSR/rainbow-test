@@ -119,16 +119,22 @@ class ChangeLangWidget extends StatelessWidget {
               onPressed: () {
                 final enteredPin = pinController.text.trim();
                 bool isMatch = false;
+                String userRole = 'Staff'; // Default role
+                String userName = 'Guest'; // Default name
 
                 final rawUsers = HiveService.getAppUsersRaw();
                 if (rawUsers.isEmpty && enteredPin == "9999") {
                   isMatch =
                       true; // Fallback รหัสผ่านชั่วคราว (กรณีแอพยังไม่มีข้อมูล)
+                  userRole = 'Owner';
+                  userName = 'Owner';
                 } else {
                   for (var str in rawUsers) {
                     final map = jsonDecode(str);
                     if (map['pin'] == enteredPin && map['isActive'] == true) {
                       isMatch = true;
+                      userRole = map['role'] as String? ?? 'Staff';
+                      userName = map['name'] as String? ?? 'Staff';
                       break;
                     }
                   }
@@ -136,8 +142,8 @@ class ChangeLangWidget extends StatelessWidget {
 
                 if (isMatch) {
                   Navigator.pop(context);
-                  AppNavigator.goToStoreManagement(
-                      context); // นำทางไปหน้า StoreMainPage
+                  AppNavigator.goToStoreManagement(context,
+                      role: userRole, name: userName);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("❌ Incorrect PIN!"),

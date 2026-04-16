@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/setting/store_management_pages/menu_management.dart';
-import 'package:flutter_application_1/pages/setting/store_management_pages/report.dart';
-import 'package:flutter_application_1/pages/setting/store_management_pages/role_management_page.dart';
-import 'package:flutter_application_1/pages/setting/store_management_pages/store_setting.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../config/export.dart';
 
 class StoreMainPage extends StatefulWidget {
-  const StoreMainPage({super.key});
+  final String loggedInUserRole;
+  final String loggedInUserName;
+
+  const StoreMainPage(
+      {super.key,
+      required this.loggedInUserRole,
+      required this.loggedInUserName});
 
   @override
   State<StoreMainPage> createState() => _StoreMainPageState();
@@ -69,8 +73,10 @@ class _StoreMainPageState extends State<StoreMainPage> {
             children: [
               _buildNavigationTile(
                 icon: Icons.people_outline,
-                title: "Role Management",
+                title: "Employee Management",
                 subtitle: "Manage staff accounts and PINs",
+                enabled: widget.loggedInUserRole.toLowerCase() ==
+                    'owner', // เฉพาะ owner
                 onTap: () {
                   Navigator.push(
                     context,
@@ -84,6 +90,8 @@ class _StoreMainPageState extends State<StoreMainPage> {
                 icon: Icons.store_mall_directory_outlined,
                 title: "Store Settings",
                 subtitle: "Receipt info, Tax, and General info",
+                enabled: widget.loggedInUserRole.toLowerCase() ==
+                    'owner', // เฉพาะ owner
                 onTap: () {
                   Navigator.push(
                     context,
@@ -164,6 +172,18 @@ class _StoreMainPageState extends State<StoreMainPage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
+                    Text("Name: ${widget.loggedInUserName}",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                        )),
+                    const SizedBox(height: 4),
+                    Text("Role: ${widget.loggedInUserRole}",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                        )),
                   ],
                 ),
               ),
@@ -179,7 +199,15 @@ class _StoreMainPageState extends State<StoreMainPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStatItem("Staff", "4", Icons.badge),
+                BlocBuilder<StoreManagementBloc, StoreManagementState>(
+                  builder: (context, state) {
+                    String staffCount = "0";
+                    if (state is StoreManagementLoaded) {
+                      staffCount = state.employees.length.toString();
+                    }
+                    return _buildStatItem("Staff", staffCount, Icons.badge);
+                  },
+                ),
                 Container(width: 1, height: 30, color: Colors.white30),
                 _buildStatItem("Menus", "128", Icons.restaurant),
                 Container(width: 1, height: 30, color: Colors.white30),
@@ -249,10 +277,12 @@ class _StoreMainPageState extends State<StoreMainPage> {
     required IconData icon,
     required String title,
     required String subtitle,
-    required VoidCallback onTap,
+    required VoidCallback? onTap, // เปลี่ยนเป็น VoidCallback?
+    bool enabled = true, // เพิ่ม enabled parameter
   }) {
     return ListTile(
       leading: Container(
+        // Wrap with Opacity for disabled effect
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: const Color(0xFF496EE2).withOpacity(0.1),
@@ -261,12 +291,24 @@ class _StoreMainPageState extends State<StoreMainPage> {
         child: Icon(icon, color: const Color(0xFF496EE2)),
       ),
       title: Text(title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: enabled
+                ? Colors.black
+                : Colors.grey.shade500, // สีเทาเมื่อ disabled
+          )),
       subtitle: Text(subtitle,
-          style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 13,
+            color: enabled
+                ? Colors.grey.shade600
+                : Colors.grey.shade400, // สีเทาอ่อนลง
+          )),
+      trailing: Icon(Icons.chevron_right,
+          color: enabled ? Colors.grey : Colors.grey.shade300), // สีเทาอ่อนลง
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      onTap: onTap,
+      onTap: enabled ? onTap : null, // ถ้า disabled ก็เป็น null ทำให้กดไม่ได้
     );
   }
 
