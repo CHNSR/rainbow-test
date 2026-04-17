@@ -11,11 +11,13 @@ final class StoreManagementInitial extends StoreManagementState {}
 
 final class StoreManagementLoaded extends StoreManagementState {
   final List<Employee> employees;
+  final Employee?
+      currentUser; // 👈 เก็บสถานะผู้ใช้งานที่ล็อกอินอยู่ปัจจุบัน (ถ้า null = customer)
 
-  const StoreManagementLoaded(this.employees);
+  const StoreManagementLoaded(this.employees, {this.currentUser});
 
   @override
-  List<Object> get props => [employees];
+  List<Object> get props => [employees, currentUser ?? ''];
 }
 
 final class StoreManagementError extends StoreManagementState {

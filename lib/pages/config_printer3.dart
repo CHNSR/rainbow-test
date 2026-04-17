@@ -7,6 +7,7 @@ import 'package:driver_printer/driver_printer.dart';
 import 'package:driver_printer/driver_printer_entities.dart' as dp;
 import 'package:driver_printer/command_printer.dart';
 import 'package:flutter_application_1/model/printer_enums.dart';
+import 'package:flutter_application_1/model/printer_model_enum.dart';
 import 'package:flutter_application_1/pages/setting/printer_setting_pages/scan_usb_screen.dart';
 
 class ConfigPrinter3 extends StatefulWidget {
@@ -41,7 +42,7 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
   // ==========================================
   // 2. ฟิลด์ข้อมูลเชิงลึกจาก Plugin
   // ==========================================
-  final gatewayController = TextEditingController(text: 'posx');
+  final gatewayController = TextEditingController(text: 'epson');
   final modelController = TextEditingController(text: 'generic');
   final ipController = TextEditingController();
   final usbNameController = TextEditingController();
@@ -53,6 +54,12 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
   bool isThermal = true;
   bool useNative = true;
 
+  // ==========================================
+  // 3. Gateway & Model Selection State
+  // ==========================================
+  late PrinterGateway selectedGateway;
+  List<String> availableModels = [];
+
   // ฟิลด์สำหรับการทดสอบ (Test Action)
   bool isPrint = true;
   bool opCashDrawer = true;
@@ -63,7 +70,19 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
   @override
   void initState() {
     super.initState();
+    // Initialize default gateway
+    selectedGateway = PrinterGateway.epson;
+    availableModels = gatewayModelMap[PrinterGateway.epson] ?? ['generic'];
     _loadConfig();
+  }
+
+  void _updateAvailableModels(PrinterGateway gateway) {
+    selectedGateway = gateway;
+    availableModels = gatewayModelMap[gateway] ?? ['generic'];
+    // ถ้า model เลือกไป ไม่อยู่ใน list ให้รีเซ็ตเป็น default
+    if (!availableModels.contains(modelController.text)) {
+      modelController.text = availableModels.first;
+    }
   }
 
   void _loadConfig() {
@@ -80,11 +99,34 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
 
       // โหลดการตั้งค่าขั้นสูงของปลั๊กอินที่แพ็คเก็บไว้ใน hardwareTemplate
       final extra = c.hardwareTemplate ?? {};
-      gatewayController.text = extra['gateway'] ?? 'posx';
+      useNative = extra['useNative'] ?? true;
+
+      // Set gateway ตามประเภท Service
+      String gatewayStr;
+      if (useNative) {
+        // Native gateway: epson, star, custom, zywell, vpos
+        gatewayStr = extra['gateway'] ?? 'epson';
+      } else {
+        // Command gateway: esc_command
+        gatewayStr = extra['gateway'] ?? 'esc_command';
+      }
+
+      // เลือก PrinterGateway enum จาก string value
+      try {
+        final gateway = PrinterGateway.values.firstWhere(
+          (e) => e.value == gatewayStr,
+          orElse: () => PrinterGateway.epson,
+        );
+        gatewayController.text = gatewayStr;
+        _updateAvailableModels(gateway);
+      } catch (e) {
+        print("Error parsing gateway: $e");
+        _updateAvailableModels(PrinterGateway.epson);
+      }
+
       modelController.text = extra['model'] ?? 'generic';
       isThermal = extra['isThermal'] ?? true;
       useIp = extra['useIp'] ?? true;
-      useNative = extra['useNative'] ?? true;
       timeoutController.text = extra['timeout'] ?? '5000';
       maxCharacterController.text =
           extra['maxChar'] ?? (paperSize == "80" ? "48" : "32");
@@ -94,6 +136,9 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
       } else {
         usbNameController.text = extra['usbName'] ?? c.ip;
       }
+    } else {
+      // Default values
+      _updateAvailableModels(PrinterGateway.epson);
     }
   }
 
@@ -396,33 +441,47 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                   ),
                 ],
                 selected: {useNative},
-                onSelectionChanged: (s) => setState(() {
-                  useNative = s.first;
-                  // Native Service ปกติใช้ posx, Command ใช้ epson/star
-                  if (useNative) {
-                    gatewayController.text = 'posx';
-                  } else {
-                    gatewayController.text = 'epson';
+                onSelectionChanged: (s) {
+                  final newUseNative = s.first;
+                  if (useNative != newUseNative) {
+                    setState(() {
+                      useNative = newUseNative;
+                      // Native Service ปกติใช้ epson, Command ใช้ esc_command
+                      if (useNative) {
+                        _updateAvailableModels(PrinterGateway.epson);
+                        gatewayController.text = PrinterGateway.epson.value;
+                      } else {
+                        _updateAvailableModels(PrinterGateway.escCommand);
+                        gatewayController.text =
+                            PrinterGateway.escCommand.value;
+                      }
+                    });
                   }
-                }),
+                },
               ),
               SizedBox(height: spacing),
               Row(
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       value: gatewayController.text,
                       style: TextStyle(fontSize: textSize, color: cs.onSurface),
                       items: (useNative
-                              ? ['posx'] // Native Service รองรับ posx หลัก
-                              : [
-                                  'epson',
-                                  'star',
-                                  'custom'
-                                ]) // Command Service รองรับหลายแบบ
+                              ? PrinterGateway.values
+                                  .where((g) => g != PrinterGateway.escCommand)
+                                  .map((g) => g.value)
+                                  .toList()
+                              : [PrinterGateway.escCommand.value])
                           .map((g) => DropdownMenuItem(
                                 value: g,
-                                child: Text(g),
+                                child: Text(
+                                  g.toUpperCase(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ))
                           .toList(),
                       decoration: InputDecoration(
@@ -439,22 +498,38 @@ class _ConfigPrinter3State extends State<ConfigPrinter3> {
                           fillColor: cs.surfaceContainerLow,
                           contentPadding: EdgeInsets.symmetric(
                               vertical: textSize * 0.9, horizontal: 16)),
-                      onChanged: (v) =>
-                          setState(() => gatewayController.text = v ?? 'posx'),
+                      onChanged: (v) {
+                        if (v != null) {
+                          try {
+                            final gateway = PrinterGateway.values
+                                .firstWhere((e) => e.value == v);
+                            setState(() {
+                              _updateAvailableModels(gateway);
+                              gatewayController.text = v;
+                            });
+                          } catch (e) {
+                            print("Error updating gateway: $e");
+                          }
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: PrinterModel.values
-                              .any((e) => e.value == modelController.text)
+                      isExpanded: true,
+                      value: availableModels.contains(modelController.text)
                           ? modelController.text
-                          : PrinterModel.generic.value,
+                          : availableModels.first,
                       style: TextStyle(fontSize: textSize, color: cs.onSurface),
-                      items: PrinterModel.values
+                      items: availableModels
                           .map((m) => DropdownMenuItem(
-                                value: m.value,
-                                child: Text(m.value),
+                                value: m,
+                                child: Text(
+                                  m,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ))
                           .toList(),
                       decoration: InputDecoration(

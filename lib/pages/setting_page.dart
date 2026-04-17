@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/model/app_user.dart';
+import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SettingPage extends StatefulWidget {
@@ -24,89 +28,206 @@ class _SettingPageState extends State<SettingPage> {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           surfaceTintColor: Colors.transparent),
-      body: BlocBuilder<SettingBloc, SettingState>(
-        builder: (context, state) {
-          if (state is SettingInitial) {
-            return const Center(child: CircularProgressIndicator());
+      body: BlocBuilder<StoreManagementBloc, StoreManagementState>(
+        builder: (context, storeState) {
+          bool isLoggedOut = true;
+          String currentUserName = "Guest";
+          String currentUserRole = "Guest";
+
+          // เช็คสถานะการล็อกอินจาก StoreManagementBloc
+          if (storeState is StoreManagementLoaded &&
+              storeState.currentUser != null) {
+            isLoggedOut = false;
+            currentUserName = storeState.currentUser!.name;
+            currentUserRole = storeState.currentUser!.role;
           }
 
-          bool isTogo = true;
-          bool isToStay = true;
-          bool isShowFoodSet = true;
+          return BlocBuilder<SettingBloc, SettingState>(
+            builder: (context, state) {
+              if (state is SettingInitial) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (state is SettingLoaded) {
-            isTogo = state.isTogo;
-            isToStay = state.isStay;
-            isShowFoodSet = state.isShowFoodSet;
-          }
+              bool isTogo = true;
+              bool isToStay = true;
+              bool isShowFoodSet = true;
 
-          return ListView(
-            padding: const EdgeInsets.only(bottom: 40),
-            children: [
-              _buildSection(
-                title: "Order Preferences",
+              if (state is SettingLoaded) {
+                isTogo = state.isTogo;
+                isToStay = state.isStay;
+                isShowFoodSet = state.isShowFoodSet;
+              }
+
+              return ListView(
+                padding: const EdgeInsets.only(bottom: 40),
                 children: [
-                  _buildToggleTile(
-                    icon: Icons.shopping_bag_outlined,
-                    title: "Togo",
-                    subtitle: "Enable take-away orders",
-                    value: isTogo,
-                    onChanged: (value) =>
-                        context.read<SettingBloc>().add(ToggleTogoEvent(value)),
-                  ),
-                  _buildDivider(),
-                  _buildToggleTile(
-                    icon: Icons.restaurant_outlined,
-                    title: "To Stay",
-                    subtitle: "Enable dine-in orders",
-                    value: isToStay,
-                    onChanged: (value) => context
-                        .read<SettingBloc>()
-                        .add(ToggleTostayEvent(value)),
-                  ),
-                  _buildDivider(),
-                  _buildToggleTile(
-                    icon: Icons.fastfood_outlined,
-                    title: "First Page Show Food Set",
-                    subtitle: "Display food sets by default on home",
-                    value: isShowFoodSet,
-                    onChanged: (value) => context
-                        .read<SettingBloc>()
-                        .add(ToggleShowFoodSetEvent(value)),
-                  ),
+                  _buildSection(title: "Account & Login", children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: isLoggedOut
+                                ? Colors.grey.shade200
+                                : cs.primaryContainer,
+                            child: Icon(
+                              isLoggedOut ? Icons.person_outline : Icons.person,
+                              size: 30,
+                              color: isLoggedOut
+                                  ? Colors.grey.shade500
+                                  : cs.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isLoggedOut
+                                      ? "Guest Account"
+                                      : currentUserName,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  isLoggedOut
+                                      ? "Please login to access settings"
+                                      : "Role: $currentUserRole",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isLoggedOut)
+                            ElevatedButton.icon(
+                              onPressed: () => _showPinDialog(context),
+                              icon: const Icon(Icons.login, size: 18),
+                              label: const Text("Login"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: cs.primary,
+                                foregroundColor: cs.onPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            )
+                          else
+                            OutlinedButton.icon(
+                              onPressed: () {
+                                context
+                                    .read<StoreManagementBloc>()
+                                    .add(const SetCurrentUserEvent(null));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("Logged out successfully")),
+                                );
+                              },
+                              icon: const Icon(Icons.logout, size: 18),
+                              label: const Text("Logout"),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red.shade600,
+                                side: BorderSide(color: Colors.red.shade200),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ]),
+
+                  // 🔒 ซ่อนส่วนอื่นๆ ถ้ายังไม่ได้ Login
+                  if (!isLoggedOut) ...[
+                    _buildSection(
+                      title: "Order Preferences",
+                      children: [
+                        _buildToggleTile(
+                          icon: Icons.shopping_bag_outlined,
+                          title: "Togo",
+                          subtitle: "Enable take-away orders",
+                          value: isTogo,
+                          onChanged: (value) => context
+                              .read<SettingBloc>()
+                              .add(ToggleTogoEvent(value)),
+                        ),
+                        _buildDivider(),
+                        _buildToggleTile(
+                          icon: Icons.restaurant_outlined,
+                          title: "To Stay",
+                          subtitle: "Enable dine-in orders",
+                          value: isToStay,
+                          onChanged: (value) => context
+                              .read<SettingBloc>()
+                              .add(ToggleTostayEvent(value)),
+                        ),
+                        _buildDivider(),
+                        _buildToggleTile(
+                          icon: Icons.fastfood_outlined,
+                          title: "First Page Show Food Set",
+                          subtitle: "Display food sets by default on home",
+                          value: isShowFoodSet,
+                          onChanged: (value) => context
+                              .read<SettingBloc>()
+                              .add(ToggleShowFoodSetEvent(value)),
+                        ),
+                      ],
+                    ),
+                    _buildSection(
+                      title: "Payment & Cart",
+                      children: [
+                        _buildPaymentMethodTile(),
+                        _buildDivider(),
+                        _buildShowOrderTile(),
+                        _buildDivider(),
+                        _buildNavigationTile(
+                          icon: Icons.history_outlined,
+                          title: "History Printing",
+                          subtitle: "View past print jobs and receipts",
+                          onTap: () {
+                            AppNavigator.goToHistoryPrinting(context);
+                          },
+                        ),
+                        _buildDivider(),
+                      ],
+                    ),
+                    _buildSection(
+                      title: "Hardware & System",
+                      children: [
+                        _buildNavigationTile(
+                          icon: Icons.print_outlined,
+                          title: "Config Printer",
+                          subtitle: "Manage network and USB printers",
+                          onTap: () => AppNavigator.goToPrinterList(context),
+                        ),
+                        _buildDivider(),
+                      ],
+                    ),
+                    _buildSection(title: "Store Settings", children: [
+                      _buildNavigationTile(
+                        icon: Icons.store_outlined,
+                        title: "Manage Store",
+                        subtitle: "Edit store info, menu, and employees",
+                        onTap: () {
+                          AppNavigator.goToStoreManagement(
+                            context,
+                            role: currentUserRole,
+                            name: currentUserName,
+                          );
+                        },
+                      ),
+                      _buildDivider(),
+                    ])
+                  ],
                 ],
-              ),
-              _buildSection(
-                title: "Payment & Cart",
-                children: [
-                  _buildPaymentMethodTile(),
-                  _buildDivider(),
-                  _buildShowOrderTile(),
-                  _buildDivider(),
-                  _buildNavigationTile(
-                    icon: Icons.history_outlined,
-                    title: "History Printing",
-                    subtitle: "View past print jobs and receipts",
-                    onTap: () {
-                      AppNavigator.goToHistoryPrinting(context);
-                    },
-                  ),
-                  _buildDivider(),
-                ],
-              ),
-              _buildSection(
-                title: "Hardware & System",
-                children: [
-                  _buildNavigationTile(
-                    icon: Icons.print_outlined,
-                    title: "Config Printer",
-                    subtitle: "Manage network and USB printers",
-                    onTap: () => AppNavigator.goToPrinterList(context),
-                  ),
-                  _buildDivider(),
-                ],
-              ),
-            ],
+              );
+            },
           );
         },
       ),
@@ -259,6 +380,99 @@ class _SettingPageState extends State<SettingPage> {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       onTap: onTap,
+    );
+  }
+
+  void _showPinDialog(BuildContext context) {
+    final TextEditingController pinController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          title: const Text("Settings Login",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Please enter your PIN to access settings."),
+              const SizedBox(height: 16),
+              TextField(
+                controller: pinController,
+                keyboardType: TextInputType.number,
+                obscureText: true,
+                maxLength: 4,
+                decoration: const InputDecoration(
+                  labelText: "4-Digit PIN",
+                  prefixIcon: Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF496EE2),
+                  foregroundColor: Colors.white),
+              onPressed: () {
+                final enteredPin = pinController.text.trim();
+                bool isMatch = false;
+                String userRole = 'Staff'; // Default role
+                String userName = 'Guest'; // Default name
+                Employee? matchedEmployee;
+
+                final rawUsers = HiveService.getAppUsersRaw();
+                if (rawUsers.isEmpty && enteredPin == "9999") {
+                  isMatch =
+                      true; // Fallback รหัสผ่านชั่วคราว (กรณีแอพยังไม่มีข้อมูล)
+                  userRole = 'Owner';
+                  userName = 'Owner';
+                  matchedEmployee = Employee(
+                      id: "1",
+                      name: userName,
+                      role: userRole,
+                      pin: enteredPin,
+                      hourlyWage: 0);
+                } else {
+                  for (var str in rawUsers) {
+                    final map = jsonDecode(str);
+                    if (map['pin'] == enteredPin && map['isActive'] == true) {
+                      isMatch = true;
+                      userRole = map['role'] as String? ?? 'Staff';
+                      userName = map['name'] as String? ?? 'Staff';
+                      matchedEmployee = Employee.fromJson(map);
+                      break;
+                    }
+                  }
+                }
+
+                if (isMatch) {
+                  // 🧑‍💼 บันทึกข้อมูลพนักงานที่ Login ลงใน State ของแอป
+                  context
+                      .read<StoreManagementBloc>()
+                      .add(SetCurrentUserEvent(matchedEmployee));
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("✅ Logged in as $userName"),
+                      backgroundColor: Colors.green));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("❌ Incorrect PIN!"),
+                      backgroundColor: Colors.red));
+                }
+              },
+              child: const Text("Enter"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

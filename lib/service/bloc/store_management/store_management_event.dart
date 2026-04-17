@@ -7,6 +7,23 @@ sealed class StoreManagementEvent extends Equatable {
   List<Object> get props => [];
 }
 
+// ================= การตั้งค่าผู้ใช้งานปัจจุบัน (Login/Logout) =================
+class SetCurrentUserEvent extends StoreManagementEvent {
+  final Employee?
+      user; // ส่งค่า null ได้ในกรณีที่ Logout หรือต้องการให้ออกเป็น customer
+  const SetCurrentUserEvent(this.user);
+
+  @override
+  List<Object> get props => [user ?? ''];
+}
+
+class LogOutEvent extends StoreManagementEvent {
+  const LogOutEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
 // ================= โหลดข้อมูล =================
 class LoadStoreDataEvent extends StoreManagementEvent {}
 

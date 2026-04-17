@@ -5,6 +5,7 @@ enum PrinterGateway {
   star('star'),
   escCommand('esc_command'),
   vpos('vpos'),
+  zywell('zywell'),
   bixolon('bixolon'),
   custom('custom'),
   element('element');

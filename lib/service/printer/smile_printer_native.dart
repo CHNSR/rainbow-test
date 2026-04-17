@@ -222,6 +222,29 @@ class SmilePrinterService {
     }
   }
 
+  /// สั่งเปิดลิ้นชักเก็บเงิน (Cash Drawer)
+  Future<void> openCashDrawer(app.PrinterConfig config) async {
+    try {
+      print("📱 [Native] openCashDrawer starting...");
+      bool isOnline = await checkConnection(config.ip, config.port);
+      if (!isOnline) throw 'ไม่สามารถเชื่อมต่อ ${config.ip}:${config.port}';
+
+      final configPayload = _buildConfig(
+        config: config,
+        data: PrinterData(
+          sendOperation: SendOperation(buzzer: 0, cashDrawer: 1),
+        ),
+      );
+
+      await _smilePrinter.connect(configPayload);
+      await _smilePrinter.printOperation(configPayload);
+      await _smilePrinter.disconnectPrinter(configPayload);
+      print("✅ [Native] Cash drawer opened via Plugin");
+    } catch (e) {
+      print("❌ [Native] Open cash drawer failed: $e");
+    }
+  }
+
   /// สั่งพิมพ์ใบเสร็จรับเงิน / ใบเสร็จครัว (แบบ Text)
   Future<void> printReceipt({
     required app.PrinterConfig config,

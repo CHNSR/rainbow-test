@@ -81,17 +81,68 @@ class PrinterServiceFactory {
   }) async {
     try {
       final useNative = config.hardwareTemplate?['useNative'] ?? true;
+      print("📊 [PrinterFactory] addPrintJob - useNative: $useNative");
 
       if (useNative) {
         // Native Service มี addPrintJob
+        print("📱 [PrinterFactory] Using Native Service for queue");
         return await SmilePrinterService.instance.addPrintJob(job);
       } else {
         // Command Service มี addPrintJob เช่นกัน
+        print("📟 [PrinterFactory] Using Command Service for queue");
         return await SmailePrinterCmd.instance.addPrintJob(job);
       }
     } catch (e) {
       print("❌ [PrinterFactory] Add print job error: $e");
       return false;
+    }
+  }
+
+  /// Test Print Network - เลือก service อัตโนมัติตามค่า config
+  static Future<bool> testPrintNetwork({
+    required String ip,
+    required int port,
+    required String paperSize,
+    required bool useNative,
+  }) async {
+    try {
+      print(
+          "🧪 [PrinterFactory] Testing print - IP: $ip, Port: $port, useNative: $useNative");
+
+      if (useNative) {
+        print("📱 [PrinterFactory] Using Native Service for test");
+        final result = await SmilePrinterService.instance.testPrintNetwork(
+          ip: ip,
+          port: port,
+          paperSize: paperSize,
+        );
+        print("✅ [PrinterFactory] Native test result: ${result.success}");
+        return result.success;
+      } else {
+        print("📟 [PrinterFactory] Using Command Service for test");
+        // TODO: implement testPrintNetwork สำหรับ CMD
+        print("⚠️ [PrinterFactory] CMD testPrintNetwork ยังไม่ได้สร้าง");
+        return false;
+      }
+    } catch (e) {
+      print("❌ [PrinterFactory] Test error: $e");
+      return false;
+    }
+  }
+
+  /// Open Cash Drawer - เลือก service อัตโนมัติตามค่า config
+  static Future<void> openCashDrawer(app.PrinterConfig config) async {
+    try {
+      final useNative = config.hardwareTemplate?['useNative'] ?? true;
+      print("💰 [PrinterFactory] openCashDrawer - useNative: $useNative");
+
+      if (useNative) {
+        await SmilePrinterService.instance.openCashDrawer(config);
+      } else {
+        await SmailePrinterCmd.instance.openCashDrawer(config);
+      }
+    } catch (e) {
+      print("❌ [PrinterFactory] Open cash drawer error: $e");
     }
   }
 }

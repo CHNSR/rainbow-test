@@ -11,6 +11,17 @@ part 'store_management_state.dart';
 class StoreManagementBloc
     extends Bloc<StoreManagementEvent, StoreManagementState> {
   StoreManagementBloc() : super(StoreManagementInitial()) {
+    // ================= ตั้งค่าผู้ใช้งานปัจจุบัน =================
+    on<SetCurrentUserEvent>((event, emit) {
+      if (state is StoreManagementLoaded) {
+        final currentState = state as StoreManagementLoaded;
+        emit(StoreManagementLoaded(
+          currentState.employees,
+          currentUser: event.user,
+        ));
+      }
+    });
+
     on<LoadStoreDataEvent>((event, emit) {
       emit(StoreManagementLoading());
       try {

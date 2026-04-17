@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/export.dart';
+import 'package:flutter_application_1/config/export.dart' hide PrintStatus;
 import 'package:flutter_application_1/widgets/order_page/receipt_widget.dart';
 import 'package:flutter_application_1/service/printer/smile_printer_native.dart';
 import 'package:flutter_application_1/service/printer/printer_service_factory.dart';
+import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
+import 'package:flutter_application_1/model/print_history.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:barcode/barcode.dart';
@@ -781,6 +783,7 @@ class OrderPageWidget {
     required String category,
     bool isCancellable = true, // 👈 เพิ่มพารามิเตอร์
     required String orderType,
+    String userid = "customer",
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
@@ -870,13 +873,15 @@ class OrderPageWidget {
                                         width: config.paperSize == "80"
                                             ? 400
                                             : 300,
-                                        orderType: orderType)
+                                        orderType: orderType,
+                                        cashierName: userid)
                                     : ReceiptWidget.customerRecieptWidget(
                                         orders: orders,
                                         width: config.paperSize == "80"
                                             ? 400
                                             : 300,
-                                        orderType: orderType),
+                                        orderType: orderType,
+                                        cashierName: userid),
                               ),
                             ),
                           ),
@@ -1022,6 +1027,8 @@ class OrderPageWidget {
     required String category,
     bool isCancellable = true, // 👈 เพิ่มพารามิเตอร์
     required String orderType,
+    String userid =
+        "customer", // 👈 เปลี่ยน Default เป็น customer ให้เข้าใจง่าย
   }) async {
     final GlobalKey repaintKey = GlobalKey();
     final Size screenSize = LandScapeUtils.getResponsiveScreenSize(context);
@@ -1136,11 +1143,13 @@ class OrderPageWidget {
                                     ? ReceiptWidget.kitchenRecieptWidget(
                                         orders: orders,
                                         width: 400,
-                                        orderType: orderType)
+                                        orderType: orderType,
+                                        cashierName: userid)
                                     : ReceiptWidget.customerRecieptWidget(
                                         orders: orders,
                                         width: 400,
-                                        orderType: orderType),
+                                        orderType: orderType,
+                                        cashierName: userid),
                               ),
                             ),
                           ),
@@ -1245,10 +1254,9 @@ class OrderPageWidget {
 
                                         // 📦 แนบสถานะของแต่ละเครื่องเก็บเอาไว้ด้วย
                                         printResults.add({
-                                          'category': config.category,
-                                          'name': config.name,
-                                          'ip': config.ip,
-                                          'port': config.port,
+                                          'user': userid,
+                                          'printer':
+                                              config, // 👈 โยน Object Config ไปทั้งก้อนเลย
                                           'status': success == true
                                               ? 'success'
                                               : 'failed',
@@ -1267,6 +1275,68 @@ class OrderPageWidget {
                                       }
 
                                       if (!context.mounted) return;
+
+                                      // ==========================================
+                                      // 💾 Save Print History with Printer Config
+                                      // ==========================================
+                                      try {
+                                        // Generate Order ID
+                                        final String orderId =
+                                            'ORD-${DateTime.now().millisecondsSinceEpoch}';
+
+                                        // Calculate total amount from orders
+                                        double totalAmount = 0;
+                                        for (final item in orders) {
+                                          totalAmount +=
+                                              (item.quantity * item.foodPrice);
+                                        }
+
+                                        // Convert orders to Map format
+                                        final List<Map<String, dynamic>>
+                                            itemsList = orders
+                                                .map((item) => {
+                                                      'name': item.foodName,
+                                                      'quantity': item.quantity,
+                                                      'price': item.foodPrice,
+                                                      'total': item.quantity *
+                                                          item.foodPrice,
+                                                    })
+                                                .toList();
+
+                                        // Determine print status (success only if all printed)
+                                        final allSuccess = printResults.every(
+                                            (r) => r['status'] == 'success');
+
+                                        // Save to Hive with printer config data
+                                        await HiveService.savePrintHistory(
+                                          id: orderId,
+                                          totalAmount: totalAmount,
+                                          orderType: orderType,
+                                          items: itemsList,
+                                          printerConfigs: printResults,
+                                          status: allSuccess
+                                              ? PrintStatus.success
+                                              : PrintStatus.fail,
+                                        );
+
+                                        // Open Cash drawer if at least one print succeeded
+                                        if (printResults.any(
+                                            (r) => r['status'] == 'success')) {
+                                          for (final config in configs) {
+                                            // 💰 เตะลิ้นชักเฉพาะเครื่องที่ตั้งค่าเป็น Cashier
+                                            if (config.category == 'cashier') {
+                                              await PrinterServiceFactory
+                                                  .openCashDrawer(config);
+                                            }
+                                          }
+                                        }
+                                        print(
+                                            "✅ [OrderPage] Print history saved successfully");
+                                      } catch (e) {
+                                        print(
+                                            "❌ [OrderPage] Error saving print history: $e");
+                                      }
+
                                       Navigator.pop(context, printResults);
                                     },
                             ),

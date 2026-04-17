@@ -482,3 +482,28 @@ app
 		- open & close func tostay | option
 		- open & close first page func | option
 	- USB test printer
+
+17/4/2569
+- make cmd func printer | pass
+	- male ui for use cmd | pass
+	- add category printer history | pass
+	- add detail to printer card | pass 
+	- make Enum each gateway model | pass
+	- add user role | pass
+	- add login buttons | pass
+	- text bug in config printer page | pass
+
+              + Store Management Bloc | inprogress
+ 	      	- state of user if user login set state user else set guest user to state
+	- add to hive in history reciept user state
+		 
+       + Cash Drawer
+	- open cash drawer | pass
+ 	- learn about operation func | pass
+		- have 2 parameter 
+		  - 1 open cash drawer
+		  - 2 open sound cash drawer
+	
+	- redesign history receipt paage
+	- usb scan func
+	- ui select gateway (scan usb)

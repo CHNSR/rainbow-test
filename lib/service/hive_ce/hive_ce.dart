@@ -1,5 +1,6 @@
 import 'package:flutter_application_1/model/receipt.dart';
 import 'package:flutter_application_1/model/print_result.dart';
+import 'package:flutter_application_1/model/print_history.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:flutter_application_1/hive_registrar.g.dart';
 
@@ -8,6 +9,7 @@ class HiveService {
   static const String settingsBox = 'settingsBox';
   static const String printerBox = 'printerBox';
   static const String receiptBox = 'receiptBox';
+  static const String printHistoryBox = 'printHistoryBox';
 
   // Constants for Setting Keys
   static const String keyRestaurantName = 'restaurantName';
@@ -32,6 +34,14 @@ class HiveService {
       // หากเปิด Box ไม่ได้เนื่องจากโครงสร้างข้อมูลเก่าไม่ตรงกับ Model ใหม่ ให้ลบ Box ทิ้งแล้วเปิดใหม่
       await Hive.deleteBoxFromDisk(receiptBox);
       await Hive.openBox<Receipt>(receiptBox);
+    }
+
+    try {
+      await Hive.openBox<PrintHistoryItem>(printHistoryBox);
+    } catch (e) {
+      // หากเปิด Box ไม่ได้เนื่องจากโครงสร้างข้อมูลเก่าไม่ตรงกับ Model ใหม่ ให้ลบ Box ทิ้งแล้วเปิดใหม่
+      await Hive.deleteBoxFromDisk(printHistoryBox);
+      await Hive.openBox<PrintHistoryItem>(printHistoryBox);
     }
 
     // Set default settings if not exists
@@ -136,5 +146,69 @@ class HiveService {
     // เรียงลำดับจากใบเสร็จใหม่สุดไปเก่าสุด
     receipts.sort((a, b) => b.date.compareTo(a.date));
     return receipts;
+  }
+
+  // ==========================================
+  // PRINT HISTORY (With Printer Config)
+  // ==========================================
+
+  /// 💾 Save print history with printer configuration data
+  /// - id: Receipt ID
+  /// - totalAmount: Total order amount
+  /// - orderType: dine-in / takeaway / delivery
+  /// - items: List of items ordered
+  /// - printerConfigs: List of printer config used for printing
+  /// - status: Print status (success/fail/printing/waiting)
+  static Future<void> savePrintHistory({
+    required String id,
+    required double totalAmount,
+    required String orderType,
+    required List<Map<String, dynamic>> items,
+    required List<Map<String, dynamic>> printerConfigs,
+    PrintStatus status = PrintStatus.success,
+  }) async {
+    try {
+      final historyItem = PrintHistoryItem(
+        id: id,
+        timestamp: DateTime.now(),
+        totalAmount: totalAmount,
+        status: status,
+        orderType: orderType,
+        items: items,
+        printer: printerConfigs,
+      );
+
+      final box = Hive.box<PrintHistoryItem>(printHistoryBox);
+      await box.add(historyItem);
+
+      print("✅ [PrintHistory] Saved history + printer config for order #$id");
+    } catch (e) {
+      print("❌ [PrintHistory] Error saving print history: $e");
+    }
+  }
+
+  /// 📋 Get all print history sorted by latest first
+  static List<PrintHistoryItem> getPrintHistory() {
+    try {
+      final box = Hive.box<PrintHistoryItem>(printHistoryBox);
+      final history = box.values.toList();
+      // Sort by latest first
+      history.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return history;
+    } catch (e) {
+      print("❌ [PrintHistory] Error getting print history: $e");
+      return [];
+    }
+  }
+
+  /// 🗑️ Clear all print history
+  static Future<void> clearPrintHistory() async {
+    try {
+      final box = Hive.box<PrintHistoryItem>(printHistoryBox);
+      await box.clear();
+      print("✅ [PrintHistory] Cleared all print history");
+    } catch (e) {
+      print("❌ [PrintHistory] Error clearing print history: $e");
+    }
   }
 }

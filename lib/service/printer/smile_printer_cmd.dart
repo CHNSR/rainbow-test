@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:driver_printer/command_printer.dart';
+import 'package:driver_printer/driver_printer.dart';
 import 'package:driver_printer/driver_printer_entities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,6 +26,8 @@ class SmailePrinterCmd {
 
   Future<bool> connectNetwork(String ip, int port, String gateway) async {
     try {
+      print(
+          "📟 [CMD] connectNetwork - ip: $ip, port: $port, gateway: $gateway");
       cmdprinterservice = CommandPrinterService(
         connection: TcpPrinter(),
         cmd: EscPosCommand(),
@@ -32,18 +35,21 @@ class SmailePrinterCmd {
       final PrinterConfig data = PrinterConfig(
         type: "network",
         gateway: gateway,
-        value: PrinterValue(ip: ip, data: PrinterData()),
+        value: PrinterValue(ip: ip, port: port, data: PrinterData()),
       );
+      print("📟 [CMD] Attempting to connect...");
       await cmdprinterservice.connect(data);
+      print("✅ [CMD] Network connection successful");
       return true;
     } catch (e) {
-      print("❌ Connection Network failed: $e");
+      print("❌ [CMD] Connection Network failed: $e");
       return false;
     }
   }
 
   Future<bool> connectUsb(String deviceId) async {
     try {
+      print("📟 [CMD] connectUsb - deviceId: $deviceId");
       cmdprinterservice = CommandPrinterService(
         connection: UsbPrinter(),
         cmd: EscPosCommand(),
@@ -51,12 +57,17 @@ class SmailePrinterCmd {
       final data = PrinterConfig(
         type: "usb",
         gateway: "",
-        value: PrinterValue(usbName: deviceId, data: PrinterData()),
+        value: PrinterValue(
+          usbName: deviceId,
+          data: PrinterData(),
+        ),
       );
+      print("📟 [CMD] Attempting USB connection...");
       await cmdprinterservice.connect(data);
+      print("✅ [CMD] USB connection successful");
       return true;
     } catch (e) {
-      print("❌ Connection USB failed: $e");
+      print("❌ [CMD] Connection USB failed: $e");
       return false;
     }
   }
@@ -176,6 +187,23 @@ class SmailePrinterCmd {
     required GlobalKey repaintKey,
   }) async {
     try {
+      // ⚡ Ensure connection first
+      final useIp = config.hardwareTemplate?['useIp'] ?? true;
+      bool connected = false;
+
+      if (useIp) {
+        connected = await connectNetwork(
+            config.ip ?? "10.0.2.2",
+            config.port ?? 9100,
+            config.hardwareTemplate?['gateway'] ?? "esc_command");
+      } else {
+        connected = await connectUsb(config.hardwareTemplate?['usbName'] ?? "");
+      }
+
+      if (!connected) {
+        return false;
+      }
+
       final captured = await convertWidgetToImageBytes(repaintKey);
       final base64Image = base64Encode(captured);
 
@@ -190,13 +218,12 @@ class SmailePrinterCmd {
         ),
       );
 
-      await cmdprinterservice.connect(configPayload);
       await cmdprinterservice.printData(configPayload);
+
       await cmdprinterservice.disconnectPrinter();
 
       return true;
     } catch (e) {
-      print("Print widget receipt failed: $e");
       return false;
     }
   }
@@ -270,11 +297,9 @@ class SmailePrinterCmd {
     int concurrency = 50,
     void Function(int)? onProgress,
   }) async {
-    print("🔍 [SmailePrinterCmd] Starting automatic network scan...");
-
     try {
       // Step 1️⃣: Get device IP
-      print("⏳ Step 1/2: Detecting device IP address...");
+
       final deviceIp = await getDeviceIpAddress();
 
       if (deviceIp == null) {
@@ -282,14 +307,11 @@ class SmailePrinterCmd {
         return [];
       }
 
-      print("✅ Found device IP: $deviceIp");
-
       // Step 2️⃣: Extract subnet
       final subnet = extractSubnet(deviceIp);
-      print("✅ Using subnet: $subnet.x");
 
       // Step 3️⃣: Scan printers in that range
-      print("🔎 Step 2/2: Scanning printers in range $subnet.1-254...");
+
       final results = await scanNetworkPrinters(
         subnet: subnet,
         timeout: timeout,
@@ -360,250 +382,99 @@ class SmailePrinterCmd {
     }
     onComplete();
   }
+
+  // ==========================================
+  // 6. Cash Drawer
+  // ==========================================
+
+  Future<void> openCashDrawer(app.PrinterConfig config) async {
+    try {
+      // 1. ตรวจสอบการเชื่อมต่อ
+      final useIp = config.hardwareTemplate?['useIp'] ?? true;
+
+      if (useIp) {
+        // 🌐 กรณีใช้ IP (Network) สามารถใช้ Socket ส่งคำสั่ง Bytes ตรงๆ ได้เลย (ทำงานไวมาก)
+        final socket = await Socket.connect(config.ip, config.port,
+            timeout: const Duration(seconds: 3));
+        socket.add([
+          27,
+          112,
+          0,
+          25,
+          250
+        ]); // 👈 ชุดคำสั่ง Bytes เตะลิ้นชัก (ESC p 0 25 250)
+        await socket.flush();
+        socket.destroy();
+      } else {
+        // 🔌 กรณีใช้ USB ต้องส่งผ่าน Plugin เพราะ Flutter สั่งยิง Bytes ออกพอร์ต USB ตรงๆ ยาก
+        bool connected =
+            await connectUsb(config.hardwareTemplate?['usbName'] ?? "");
+        if (!connected) {
+          return;
+        }
+
+        final configPayload = _buildConfig(
+          config: config,
+          data: PrinterData(
+            sendOperation: SendOperation(buzzer: 1, cashDrawer: 1),
+          ),
+        );
+        await cmdprinterservice.operation(configPayload);
+        await cmdprinterservice.disconnectPrinter();
+      }
+    } catch (e) {
+      print("❌ [CMD] Open cash drawer failed: $e");
+    }
+  }
+
+  // ==========================================
+  // 7. 🧪 Test Print Network
+  // ==========================================
+
+  // ==========================================
+  // 8. 🔌 USB Scanner
+  // ==========================================
+  static Future<List<app.USBPrinterDevice>> scanUsbPrinters({
+    PrinterGateway printer = PrinterGateway.custom,
+  }) async {
+    print("🔍 [CMD] Start scanning USB printers...");
+    final List<app.USBPrinterDevice> results = [];
+
+    try {
+      final req = DiscoveryPrinter(
+        gateway: 'discovery_printer',
+        printer: printer,
+        toUsb: true,
+      );
+
+      final response =
+          await DriverPrinter().discoveryPrinter(jsonEncode(req.toJson()));
+
+      Map<String, dynamic> decoded;
+      try {
+        decoded = jsonDecode(response as String) as Map<String, dynamic>;
+      } catch (_) {
+        decoded = {'result': []};
+      }
+
+      final printers = decoded['result'] as List? ?? [];
+      print("✅ [CMD] Found ${printers.length} USB printers.");
+
+      for (final printer in printers) {
+        final model = printer['model'] ?? 'Unknown';
+        final usbName = printer['usbName'] ?? 'Unknown USB Device';
+        final gateway = printer['gateway'] ?? 'unknown';
+
+        results.add(app.USBPrinterDevice(
+          name: usbName,
+          model: model,
+          gateway: gateway,
+        ));
+      }
+    } catch (e) {
+      print("❌ [CMD] USB Scan error: $e");
+    }
+
+    return results;
+  }
 }
-
-
-// class SmailePrinterCmd2 {
-//   late final CommandPrinterService cmdprinterservice;
-
-//   final List<Future<bool> Function()> _queue = [];
-//   bool _isProcessing = false;
-
-//   // 1 connection
-//   Future<bool> connectNetwork(String ip, int port, String getway) async {
-//     try {
-//       cmdprinterservice = CommandPrinterService(
-//         connection: TcpPrinter(),
-//         cmd: EscPosCommand(),
-//       );
-//       final PrinterConfig data = PrinterConfig(
-//           type: "network",
-//           gateway: getway,
-//           value: PrinterValue(ip: ip, data: PrinterData()));
-//       await cmdprinterservice.connect(data);
-//       return true;
-//     } catch (e) {
-//       print({Future.error("Connection Network failed: $e")});
-//       return false;
-//     }
-//   }
-
-//   Future<bool> connectUsb(String deviceId) async {
-//     try {
-//       cmdprinterservice = CommandPrinterService(
-//         connection: UsbPrinter(),
-//         cmd: EscPosCommand(),
-//       );
-//       final data = PrinterConfig(
-//           type: "usb",
-//           gateway: "",
-//           value: PrinterValue(usbName: deviceId, data: PrinterData()));
-//       await cmdprinterservice.connect(data);
-//       return true;
-//     } catch (e) {
-//       print({Future.error("Connection USB failed: $e")});
-//       return false;
-//     }
-//   }
-
-//   Future<void> writeUsbData(Uint8List data) async {
-//     try {
-//       final configPayload = PrinterConfig(
-//         type: "usb",
-//         gateway: "",
-//         value: PrinterValue(
-//           data: PrinterData(
-//             sendText: SendText(dataReceipt: []),
-//           ),
-//         ),
-//       );
-//       await cmdprinterservice.printData(configPayload);
-//     } catch (e) {
-//       print("Write USB data failed: $e");
-//     }
-//   }
-
-//   Future<void> disconnectUsbPrinter() async {
-//     try {
-//       await cmdprinterservice.disconnectPrinter();
-//     } catch (e) {
-//       print("Disconnect USB printer failed: $e");
-//     }
-//   }
-
-//   Future<void> disconnectNetworkPrinter() async {
-//     try {
-//       await cmdprinterservice.disconnectPrinter();
-//     } catch (e) {
-//       print("Disconnect Network printer failed: $e");
-//     }
-//   }
-
-//   PrinterConfig _buildConfig({
-//     app.PrinterConfig? config,
-//     String? fallbackIp,
-//     required PrinterData data,
-//   }) {
-//     // ค่าตั้งต้น (Fallback Defaults)
-//     String gateway = 'posx';
-//     String model = 'generic';
-//     int timeout = 5000;
-//     int maxChar = 32;
-//     bool isThermal = true;
-//     String? ip = fallbackIp;
-//     String? usbName;
-//     int cutPaper = 1;
-//     String printerName = 'SmilePrinter';
-
-//     // ดึงการตั้งค่าระดับลึกจาก Hive Database
-//     if (config != null) {
-//       final extra = config.hardwareTemplate ?? {};
-//       gateway = extra['gateway'] ?? 'posx';
-//       model = extra['model'] ?? 'generic';
-//       timeout = int.tryParse(extra['timeout']?.toString() ?? '5000') ?? 5000;
-
-//       final defaultMaxChar = config.paperSize == "80" ? 48 : 32;
-//       maxChar = int.tryParse(
-//               extra['maxChar']?.toString() ?? defaultMaxChar.toString()) ??
-//           defaultMaxChar;
-
-//       isThermal = extra['isThermal'] ?? true;
-//       final useIp = extra['useIp'] ?? true;
-
-//       ip = useIp ? config.ip : null;
-//       usbName = !useIp ? (extra['usbName'] ?? config.ip) : null;
-//       cutPaper = (config.isAutoCut ?? true) ? 1 : 0;
-//       printerName = config.name.isEmpty ? 'SmilePrinter' : config.name;
-//     }
-
-//     return PrinterConfig(
-//       gateway: gateway,
-//       value: PrinterValue(
-//         ip: ip,
-//         usbName: usbName,
-//         model: model,
-//         printerName: printerName,
-//         timeout: timeout,
-//         cutPaper: cutPaper,
-//         maxChar: maxChar,
-//         printerType: isThermal ? 'thermal' : 'dotMatrix',
-//         data: data,
-//       ),
-//     );
-//   }
-
-//   // ==========================================
-//   // 3. 🖨️ หมวดการพิมพ์ใบเสร็จและฟังก์ชันหลัก
-//   // ==========================================
-//   Future<Uint8List> convertWidgetToImageBytes(GlobalKey repaintKey) async {
-//     // Implementation for converting widget to image bytes
-//     await WidgetsBinding.instance.endOfFrame;
-//     final context = repaintKey.currentContext;
-//     if (context == null) throw Exception("Context is null");
-//     final boundary = context.findRenderObject();
-//     if (boundary == null || boundary is! RenderRepaintBoundary) {
-//       throw Exception("Not a RepaintBoundary");
-//     }
-
-//     if (boundary.debugNeedsPaint) {
-//       await Future.delayed(const Duration(milliseconds: 50));
-//       return convertWidgetToImageBytes(repaintKey);
-//     }
-
-//     // ⚠️ ลดขนาดภาพเพื่อไม่ให้ Buffer เครื่องปริ้นเต็ม (1.5 คมชัดพอดีกระดาษ)
-//     final image = await boundary.toImage(pixelRatio: 1.5);
-//     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-
-//     if (byteData == null) throw Exception("Failed to convert image");
-//     return byteData.buffer.asUint8List();
-//   }
-
-//   Future<bool> printWidgetReciept({
-//     required app.PrinterConfig config,
-//     required GlobalKey repaintKey,
-//   }) async {
-//     try {
-//       final captured = await convertWidgetToImageBytes(repaintKey);
-//       final base64Image = base64Encode(captured);
-//       // Proceed with printing using the base64Image
-//       final configPayload = _buildConfig(
-//         config: config,
-//         data: PrinterData(
-//           sendImage: base64Image,
-//           sendOperation: SendOperation(
-//               buzzer: (config.isBeep ?? false) ? 1 : 0,
-//               cashDrawer: 0), // ตรวจสอบเสียงเตือน
-//         ),
-//       );
-
-//       final useNative = config.hardwareTemplate?['useNative'] ?? true;
-
-//       if (useNative) {
-//         await cmdprinterservice.connect(configPayload);
-//         await cmdprinterservice.printData(configPayload);
-//         await cmdprinterservice.disconnectPrinter();
-//       } else {
-//         await cmdprinterservice.connect(configPayload);
-//         await cmdprinterservice.printData(configPayload);
-//         await cmdprinterservice.disconnectPrinter();
-//       }
-
-//       return true;
-//     } catch (e) {
-//       print("Print widget receipt failed: $e");
-//       return false;
-//     }
-//   }
-
-//   // ==========================================
-//   // 7. 🗂️ หมวดคิวงาน (Print Queue) - สำหรับส่งพิมพ์ออเดอร์พร้อมกัน
-//   // ==========================================
-
-//   Future<bool> addPrintJob(Future<bool> Function() job) async {
-//     final completer = Completer<bool>();
-//     _queue.add(() async {
-//       final result = await job();
-//       completer.complete(result);
-//       return result;
-//     });
-//     _processQueue();
-//     return completer.future;
-//   }
-
-//   Future<void> _processQueue() async{
-//     if (_isProcessing || _queue.isEmpty) return;
-//     _isProcessing = true;
-
-//     while(_queue.isEmpty) {
-//       final job = _queue.removeAt(0);
-//       try {
-//         await job();
-//       } catch (e){
-//         throw("Print job failed: $e");
-//       }
-      
-//     }
-//     _isProcessing = false;
-//   }
-
-//   // ==========================================
-//   // 5. 📡 หมวดแสกนหาปริ้นเตอร์ (Network Scanner)
-//   // ==========================================
-//   static Future<List<app.ScanPrinterDevice>> scanNetworkPrinters({
-//     required List<int> ports,
-//     String subnet = '192.168.1',
-//     int concurrency = 50,
-//     Duration timeout = const Duration(milliseconds: 300),
-//   }) async {
-//     final List<app.ScanPrinterDevice> results = [];
-//     final List<Future<void>> tasks = [];
-//     for 
-    
-// })
-
-
-
-
-// }
-
-

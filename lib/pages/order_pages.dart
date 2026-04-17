@@ -170,6 +170,17 @@ class _OrderPagesState extends State<OrderPages> {
             return;
           }
 
+          // ✅ 1. ตรวจสอบว่าใคร Login อยู่จาก StoreManagementBloc
+          String currentUserId =
+              "customer"; // ถ้าไม่มีการ Login ให้เป็น customer โดยปริยาย
+          final storeState = context.read<StoreManagementBloc>().state;
+          if (storeState is StoreManagementLoaded &&
+              storeState.currentUser != null) {
+            currentUserId = storeState.currentUser!
+                .name; // 👈 เปลี่ยนเป็น .id ได้ถ้าอยากบันทึกรหัสพนักงาน
+          }
+          print("🧑‍💼 [OrderPages] Processed by: $currentUserId");
+
           // ✅ แยก printer
           final kitchenPrinter =
               printers.where((p) => p.category == "kitchen").toList();
@@ -199,6 +210,8 @@ class _OrderPagesState extends State<OrderPages> {
               category: "kitchen",
               isCancellable: true, // ใบแรกยังอนุญาตให้ยกเลิกได้
               orderType: state.orderType ?? "Unknown",
+              userid:
+                  currentUserId, // 👈 ส่งข้อมูลคนรับออเดอร์ หรือ customer เข้าไป
             );
 
             if (kitchenResults == null) return; // กดยกเลิก
@@ -230,6 +243,8 @@ class _OrderPagesState extends State<OrderPages> {
               isCancellable:
                   !hasPrintedKitchen, // 👈 ถ้าพิมพ์ครัวไปแล้ว จะห้ามยกเลิกใบนี้เด็ดขาด
               orderType: state.orderType ?? "Unknown",
+              userid:
+                  currentUserId, // 👈 ส่งข้อมูลคนรับออเดอร์ หรือ customer เข้าไป
             );
 
             if (cashierResults == null) return;

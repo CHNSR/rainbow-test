@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/config/export.dart';
 import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
+import 'package:flutter_application_1/model/app_user.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChangeLangWidget extends StatelessWidget {
   final bool showExitButton;
@@ -56,7 +58,6 @@ class ChangeLangWidget extends StatelessWidget {
             itemBuilder: (context) => [
               _buildItem("english", "English", fontSize),
               _buildItem("setting", "Setting", fontSize),
-              _buildItem("store management", "Store Management", fontSize),
 
               if (showExitButton)
                 _buildItem("exit", "Exit", fontSize), // เงื่อนไขแสดง Exit
@@ -121,6 +122,7 @@ class ChangeLangWidget extends StatelessWidget {
                 bool isMatch = false;
                 String userRole = 'Staff'; // Default role
                 String userName = 'Guest'; // Default name
+                Employee? matchedEmployee;
 
                 final rawUsers = HiveService.getAppUsersRaw();
                 if (rawUsers.isEmpty && enteredPin == "9999") {
@@ -128,6 +130,12 @@ class ChangeLangWidget extends StatelessWidget {
                       true; // Fallback รหัสผ่านชั่วคราว (กรณีแอพยังไม่มีข้อมูล)
                   userRole = 'Owner';
                   userName = 'Owner';
+                  matchedEmployee = Employee(
+                      id: "1",
+                      name: userName,
+                      role: userRole,
+                      pin: enteredPin,
+                      hourlyWage: 0);
                 } else {
                   for (var str in rawUsers) {
                     final map = jsonDecode(str);
@@ -135,12 +143,18 @@ class ChangeLangWidget extends StatelessWidget {
                       isMatch = true;
                       userRole = map['role'] as String? ?? 'Staff';
                       userName = map['name'] as String? ?? 'Staff';
+                      matchedEmployee = Employee.fromJson(map);
                       break;
                     }
                   }
                 }
 
                 if (isMatch) {
+                  // 🧑‍💼 บันทึกข้อมูลพนักงานที่ Login ลงใน State ของแอป
+                  context
+                      .read<StoreManagementBloc>()
+                      .add(SetCurrentUserEvent(matchedEmployee));
+
                   Navigator.pop(context);
                   AppNavigator.goToStoreManagement(context,
                       role: userRole, name: userName);

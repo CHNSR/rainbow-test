@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/model/receipt.dart';
+import 'package:flutter_application_1/model/print_result.dart'; // 👈 นำเข้า PrinterConfig
 import 'package:flutter_application_1/service/hive_ce/hive_ce.dart';
 import 'package:intl/intl.dart';
 
@@ -214,17 +215,40 @@ class _HistoryPrintingState extends State<HistoryPrinting> {
                               ),
                               const SizedBox(height: 8),
                               ...receipt.printer.map((p) {
-                                final category =
-                                    p['category']?.toString() ?? 'Unknown';
-                                final name =
-                                    p['name']?.toString() ?? 'Unknown Printer';
-                                final ip = p['ip']?.toString() ?? '-';
-                                final port = p['port']?.toString() ?? '-';
-                                final printStatus = p['status']?.toString() ??
-                                    'success'; // ดึงสถานะการพิมพ์ของเครื่องนี้
+                                final pConfig = p['printer'] as PrinterConfig?;
+                                final printStatus =
+                                    p['status']?.toString() ?? 'success';
+
+                                // 👈 อ่านค่าจาก Object PrinterConfig โดยมี Fallback รองรับประวัติเก่า
+                                final category = pConfig?.category ??
+                                    p['category']?.toString() ??
+                                    'Unknown';
+                                final name = (pConfig?.name.isNotEmpty == true)
+                                    ? pConfig!.name
+                                    : (p['name']?.toString() ??
+                                        'Unknown Printer');
+                                final ip = (pConfig?.ip.isNotEmpty == true)
+                                    ? pConfig!.ip
+                                    : (p['ip']?.toString() ?? '-');
+                                final port = pConfig?.port.toString() ??
+                                    p['port']?.toString() ??
+                                    '-';
 
                                 final isKitchen =
                                     category.toLowerCase() == 'kitchen';
+                                final gateway = pConfig
+                                        ?.hardwareTemplate?['gateway']
+                                        ?.toString() ??
+                                    p['gateway']?.toString() ??
+                                    'Unknown Gateway';
+                                final model = pConfig
+                                        ?.hardwareTemplate?['model']
+                                        ?.toString() ??
+                                    p['model']?.toString() ??
+                                    'Unknown Model';
+                                final paperSize = pConfig?.paperSize ??
+                                    p['paperSize']?.toString() ??
+                                    'Unknown Paper Size';
 
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 8.0),
@@ -269,7 +293,7 @@ class _HistoryPrintingState extends State<HistoryPrinting> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              "IP: $ip : $port",
+                                              "IP: $ip : $port | Gateway: $gateway | Model: $model | Paper: $paperSize",
                                               style: TextStyle(
                                                   color: Colors.grey.shade600,
                                                   fontSize: 12),

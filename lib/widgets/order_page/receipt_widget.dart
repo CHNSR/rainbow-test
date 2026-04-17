@@ -8,7 +8,8 @@ class ReceiptWidget {
   static Widget customerRecieptWidget(
       {required List<OrderItem> orders,
       required double width,
-      required String orderType}) {
+      required String orderType,
+      required String cashierName}) {
     double total = orders.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
     return Container(
@@ -104,6 +105,8 @@ class ReceiptWidget {
               Text("Time: ${DateFormat.Hm().format(DateTime.now())}")
             ],
           ),
+
+          Text("cashier: $cashierName"),
 
           const SizedBox(height: 4),
           Padding(
@@ -291,7 +294,8 @@ class ReceiptWidget {
   static Widget kitchenRecieptWidget(
       {required List<OrderItem> orders,
       required double width,
-      required String orderType}) {
+      required String orderType,
+      required String cashierName}) {
     double total = orders.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
     return Container(
@@ -392,6 +396,7 @@ class ReceiptWidget {
               Text("Time: ${DateFormat.Hm().format(DateTime.now())}")
             ],
           ),
+          Text("Cashier: $cashierName"),
 
           const SizedBox(height: 4),
           Padding(
