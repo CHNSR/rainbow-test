@@ -12,6 +12,7 @@ class MenuManagement extends StatefulWidget {
 class _MenuManagementState extends State<MenuManagement> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String? _selectedSetId; // null = All Sets
   String? _selectedCategoryId; // null = All Categories
 
   @override
@@ -63,18 +64,32 @@ class _MenuManagementState extends State<MenuManagement> {
             return const Center(child: Text("No Data"));
           }
 
-          // ดึงหมวดหมู่และเมนูทั้งหมดมา
+          // ดึงข้อมูล Sets, Categories และ Menus ทั้งหมดมา
+          final sets = state.sets;
           final categories = state.categories;
           final allMenus = state.menus;
 
-          // คัดกรองเมนูตาม Search และ Category
+          // กรอง Category (Sub Category) ให้เหลือเฉพาะที่มีเมนูอยู่ใน Set ที่เลือก
+          var displayCategories = categories;
+          if (_selectedSetId != null) {
+            final menusInSet =
+                allMenus.where((m) => m.foodSetId == _selectedSetId).toList();
+            final categoryIdsInSet = menusInSet.map((m) => m.foodCatId).toSet();
+            displayCategories = categories
+                .where((c) => categoryIdsInSet.contains(c.foodCatId))
+                .toList();
+          }
+
+          // คัดกรองเมนูตาม Search, Set และ Category
           final filteredMenus = allMenus.where((menu) {
             final matchSearch = menu.foodName!
                 .toLowerCase()
                 .contains(_searchQuery.toLowerCase());
+            final matchSet =
+                _selectedSetId == null || menu.foodSetId == _selectedSetId;
             final matchCategory = _selectedCategoryId == null ||
                 menu.foodCatId == _selectedCategoryId;
-            return matchSearch && matchCategory;
+            return matchSearch && matchSet && matchCategory;
           }).toList();
 
           return Column(
@@ -109,7 +124,34 @@ class _MenuManagementState extends State<MenuManagement> {
                 ),
               ),
 
-              // 2. Category Filter (แนวนอน)
+              // 2. Food Set Filter (หมวดหมู่หลัก)
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      _buildSetChip(
+                        id: null,
+                        name: "All Sets",
+                        isSelected: _selectedSetId == null,
+                      ),
+                      ...sets.map((set) {
+                        return _buildSetChip(
+                          id: set.foodSetId,
+                          name: set.foodSetName ?? "Unknown",
+                          isSelected: _selectedSetId == set.foodSetId,
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 3. Category Filter (หมวดหมู่ย่อย)
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.only(bottom: 12),
@@ -121,10 +163,10 @@ class _MenuManagementState extends State<MenuManagement> {
                     children: [
                       _buildCategoryChip(
                         id: null,
-                        name: "All Items",
+                        name: "All Categories",
                         isSelected: _selectedCategoryId == null,
                       ),
-                      ...categories.map((cat) {
+                      ...displayCategories.map((cat) {
                         return _buildCategoryChip(
                           id: cat.foodCatId,
                           name: cat.foodCatName ?? "Unknown",
@@ -136,7 +178,7 @@ class _MenuManagementState extends State<MenuManagement> {
                 ),
               ),
 
-              // 3. Menu List
+              // 4. Menu List
               Expanded(
                 child: filteredMenus.isEmpty
                     ? const Center(
@@ -149,6 +191,11 @@ class _MenuManagementState extends State<MenuManagement> {
                         itemBuilder: (context, index) {
                           final menu = filteredMenus[index];
                           // หาชื่อหมวดหมู่มาแสดง
+                          final setName = sets
+                                  .where((s) => s.foodSetId == menu.foodSetId)
+                                  .firstOrNull
+                                  ?.foodSetName ??
+                              "Unknown Set";
                           final catName = categories
                                   .where((c) => c.foodCatId == menu.foodCatId)
                                   .firstOrNull
@@ -205,7 +252,7 @@ class _MenuManagementState extends State<MenuManagement> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          catName,
+                                          "$setName • $catName",
                                           style: TextStyle(
                                               color: Colors.grey.shade600,
                                               fontSize: 13),
@@ -260,6 +307,35 @@ class _MenuManagementState extends State<MenuManagement> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSetChip({
+    required String? id,
+    required String name,
+    required bool isSelected,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(name),
+        selected: isSelected,
+        onSelected: (_) {
+          setState(() {
+            _selectedSetId = id;
+            _selectedCategoryId =
+                null; // รีเซ็ต Sub-category ทุกครั้งที่เปลี่ยนหมวดหมู่หลัก
+          });
+        },
+        selectedColor: Colors.orange.shade600, // ใช้สีส้มเพื่อแยกความแตกต่าง
+        labelStyle: TextStyle(
+          color: isSelected ? Colors.white : Colors.black87,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        backgroundColor: Colors.grey.shade100,
+        side: BorderSide.none,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }

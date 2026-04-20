@@ -13,15 +13,16 @@ class ScanUsbScreen extends StatefulWidget {
 
 class _ScanUsbScreenState extends State<ScanUsbScreen> {
   List<USBPrinterDevice> _devices = [];
-  bool _isScanning = true;
+  bool _isScanning = false;
   String _selectedGateway = 'posx';
   List<String> availableModels = [];
+  List<String> gatewayModel = [];
 
   @override
   void initState() {
     super.initState();
     availableModels = gatewayModelMap[PrinterGateway.epson] ?? ['generic'];
-    _scanUsb();
+    gatewayModel = gatewayModelMap[PrinterGateway] ?? ['generic'];
   }
 
   Future<void> _scanUsb() async {
@@ -74,64 +75,81 @@ class _ScanUsbScreenState extends State<ScanUsbScreen> {
             ),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    const Text("Gateway: ",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: SegmentedButton<String>(
-                        segments: const [
-                          ButtonSegment(value: 'posx', label: Text('POSX')),
-                          ButtonSegment(value: 'epson', label: Text('Epson')),
-                          ButtonSegment(value: 'star', label: Text('Star')),
-                        ],
-                        selected: {_selectedGateway},
-                        onSelectionChanged: _isScanning
-                            ? null
-                            : (Set<String> newSelection) {
-                                setState(() {
-                                  _selectedGateway = newSelection.first;
-                                });
-                                _scanUsb(); // เรียกแสกนใหม่ทันทีที่เปลี่ยน Gateway
-                              },
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  items: PrinterGateway.values
+                      .map((gateway) => DropdownMenuItem(
+                            value: gateway.name,
+                            child: Text(gateway.name.toUpperCase()),
+                          ))
+                      .toList(),
+                  value: _selectedGateway,
+                  onChanged: _isScanning
+                      ? null
+                      : (value) {
+                          setState(() {
+                            _selectedGateway = value!;
+                            availableModels = gatewayModelMap[PrinterGateway
+                                    .values
+                                    .firstWhere((g) => g.name == value)] ??
+                                ['generic'];
+                          });
+                        },
+                  decoration: const InputDecoration(
+                    labelText: 'Printer Gateway',
+                    border: OutlineInputBorder(),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
                 ),
-                // const SizedBox(height: 8),
-                // DropdownButtonFormField<String>(
-                //       isExpanded: true,
-                //       value: availableModels.contains(modelController.text)
-                //           ? modelController.text
-                //           : availableModels.first,
-                //       style: TextStyle(fontSize: textSize, color: cs.onSurface),
-                //       items: availableModels
-                //           .map((m) => DropdownMenuItem(
-                //                 value: m,
-                //                 child: Text(
-                //                   m,
-                //                   maxLines: 1,
-                //                   overflow: TextOverflow.ellipsis,
-                //                 ),
-                //               ))
-                //           .toList(),
-                //       decoration: InputDecoration(
-                //           labelText: 'Model',
-                //           labelStyle: TextStyle(fontSize: textSize),
-                //           prefixIcon:
-                //               Icon(Icons.developer_board, size: textSize + 6),
-                //           border: OutlineInputBorder(
-                //               borderRadius: BorderRadius.circular(12)),
-                //           filled: true,
-                //           fillColor: cs.surfaceContainerLow,
-                //           contentPadding: EdgeInsets.symmetric(
-                //               vertical: textSize * 0.9, horizontal: 16)),
-                //       onChanged: (v) =>
-                //           setState(() => modelController.text = v ?? 'generic'),
-                //     ),
-                // const SizedBox(height: 8),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: availableModels.contains('generic')
+                      ? 'generic'
+                      : availableModels.first,
+                  items: availableModels
+                      .map((model) => DropdownMenuItem(
+                            value: model,
+                            child: Text(model.toUpperCase()),
+                          ))
+                      .toList(),
+                  onChanged: _isScanning
+                      ? null
+                      : (value) {
+                          // Handle model selection if needed
+                        },
+                  decoration: const InputDecoration(
+                    labelText: 'Printer Model',
+                    border: OutlineInputBorder(),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: _isScanning ? null : _scanUsb,
+                    icon: _isScanning
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.search),
+                    label: Text(
+                        _isScanning ? 'Scanning...' : 'Scan USB Printers',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
